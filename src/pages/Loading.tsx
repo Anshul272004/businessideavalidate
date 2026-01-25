@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Brain } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 const loadingMessages = [
   "Scanning human behavior patterns...",
@@ -17,37 +19,72 @@ const Loading = () => {
   const [progress, setProgress] = useState(0);
 
   useEffect(() => {
-    const formData = sessionStorage.getItem("validationData");
-    if (!formData) {
+    const formDataStr = sessionStorage.getItem("validationData");
+    if (!formDataStr) {
       navigate("/");
       return;
     }
+
+    const formData = JSON.parse(formDataStr);
 
     // Cycle through messages
     const messageInterval = setInterval(() => {
       setMessageIndex((prev) => (prev + 1) % loadingMessages.length);
     }, 1500);
 
-    // Progress bar
+    // Progress bar (slower now for real AI call)
     const progressInterval = setInterval(() => {
       setProgress((prev) => {
-        if (prev >= 100) return 100;
-        return prev + 2;
+        if (prev >= 90) return 90; // Cap at 90 until complete
+        return prev + 1;
       });
-    }, 100);
+    }, 150);
 
-    // Navigate to results after 5 seconds
-    const timeout = setTimeout(() => {
-      // Generate mock result for now (will be replaced with AI call)
-      const mockResult = generateMockResult(JSON.parse(formData));
-      sessionStorage.setItem("validationResult", JSON.stringify(mockResult));
-      navigate("/result");
-    }, 5000);
+    // Call the AI validation function
+    const validateIdea = async () => {
+      try {
+        const { data, error } = await supabase.functions.invoke("validate-idea", {
+          body: {
+            idea: formData.idea,
+            targetCustomer: formData.targetCustomer,
+            price: formData.price,
+            experience: formData.experience,
+          },
+        });
+
+        if (error) {
+          throw error;
+        }
+
+        setProgress(100);
+        sessionStorage.setItem("validationResult", JSON.stringify(data));
+        
+        // Small delay for visual feedback
+        setTimeout(() => {
+          navigate("/result");
+        }, 500);
+      } catch (error: any) {
+        console.error("Validation error:", error);
+        
+        if (error.message?.includes("429") || error.message?.includes("Rate limit")) {
+          toast.error("Rate limit exceeded. Please try again in a moment.");
+        } else if (error.message?.includes("402") || error.message?.includes("credits")) {
+          toast.error("AI credits exhausted. Please add credits to continue.");
+        } else {
+          toast.error("Failed to analyze your idea. Please try again.");
+        }
+        
+        setTimeout(() => {
+          navigate("/input?paid=true");
+        }, 2000);
+      }
+    };
+
+    validateIdea();
 
     return () => {
       clearInterval(messageInterval);
       clearInterval(progressInterval);
-      clearTimeout(timeout);
     };
   }, [navigate]);
 
@@ -83,41 +120,5 @@ const Loading = () => {
     </div>
   );
 };
-
-// Mock result generator (will be replaced with actual AI call)
-function generateMockResult(formData: any) {
-  const painScore = Math.floor(Math.random() * 4) + 6; // 6-10
-  const verdicts = ["GO", "PIVOT", "KILL"] as const;
-  const verdict = verdicts[Math.floor(Math.random() * 2)]; // Mostly GO or PIVOT for demo
-
-  return {
-    demand_psychology: `The problem you're solving addresses a genuine pain point in the ${formData.targetCustomer} market. There's evidence of emotional investment in finding solutions, particularly around daily frustrations that create strong motivation to pay.`,
-    pain_realism: {
-      score: painScore,
-      urgency: painScore >= 8 ? "high" : painScore >= 5 ? "medium" : "low",
-    },
-    buying_friction: [
-      "Price sensitivity may exist if not properly positioned",
-      "Trust building needed for first-time buyers",
-      "Clear value demonstration required upfront",
-    ],
-    pricing_psychology: {
-      fair: true,
-      suggested: `$${Math.floor(Number(formData.price) * 0.8)}-$${Math.floor(Number(formData.price) * 1.5)}`,
-      reason: `Based on market positioning and perceived value, anchoring at ${Number(formData.price) > 50 ? "premium" : "accessible"} tier would be optimal.`,
-    },
-    neuroscience: {
-      value_triggers: ["Relief from pain point", "Time savings", "Status elevation"],
-      risk: formData.experience === "beginner" ? "medium" : "low",
-      trust_difficulty: "medium",
-    },
-    verdict: verdict,
-    immediate_plan: [
-      "Day 1: Create a simple landing page",
-      "Day 3: Share with 10 potential customers",
-      "Week 1: Collect 5 pre-orders or commitments",
-    ],
-  };
-}
 
 export default Loading;

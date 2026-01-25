@@ -1,0 +1,4 @@
+project_id = "snmdpzhjepttfxpyzpzt"
+
+[functions.validate-idea]
+verify_jwt = false
