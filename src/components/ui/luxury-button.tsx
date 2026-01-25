@@ -8,18 +8,18 @@ const luxuryButtonVariants = cva(
     variants: {
       variant: {
         primary:
-          "bg-primary text-primary-foreground hover:bg-primary/90 active:scale-[0.98]",
+          "bg-primary text-primary-foreground hover:bg-primary/90 active:scale-[0.98] shadow-lg shadow-primary/20",
         secondary:
-          "bg-secondary text-secondary-foreground hover:bg-secondary/80",
+          "bg-card border border-border text-foreground hover:border-primary/50 hover:bg-card/80",
         ghost:
-          "text-foreground hover:text-primary hover:bg-transparent",
+          "text-foreground hover:text-primary",
         outline:
-          "border border-border text-foreground hover:border-primary hover:text-primary",
+          "border border-border text-muted-foreground hover:border-primary hover:text-primary",
       },
       size: {
-        default: "h-12 px-8 text-base rounded-lg",
-        sm: "h-10 px-6 text-sm rounded-md",
-        lg: "h-14 px-10 text-lg rounded-lg",
+        default: "h-12 px-6 text-sm rounded-xl",
+        sm: "h-10 px-5 text-sm rounded-lg",
+        lg: "h-14 px-8 text-base rounded-xl",
       },
     },
     defaultVariants: {
