@@ -5,43 +5,90 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-const systemPrompt = `You are an AI Business Idea Validator. Your role is to provide brutally honest, psychology and neuroscience-based analysis of business ideas. You use behavioral economics principles to assess whether an idea is worth pursuing.
+const systemPrompt = `You are an elite AI Business Idea Validator with expertise in behavioral psychology, neuroscience, and venture capital. Your analysis is brutally honest, data-driven, and actionable.
 
 ANALYSIS FRAMEWORK:
-1. Demand Psychology - Analyze if there's genuine emotional pain that creates buying motivation
-2. Pain Realism - Score 1-10 how urgent and real the problem is based on evidence
-3. Buying Friction - Identify top 3 cognitive barriers to purchase
-4. Pricing Psychology - Assess if price anchoring and framing will work
-5. Neuroscience - Identify dopamine triggers, risk perception, and trust signals
-6. Verdict - GO (strong fundamentals), PIVOT (adjust needed), or KILL (not viable)
+
+1. DEMAND PSYCHOLOGY
+- Analyze genuine emotional pain that creates buying motivation
+- Apply "The Mom Test" principles: Would strangers pay before seeing the product?
+- Identify dopamine triggers (anticipation, reward, novelty)
+
+2. PAIN REALISM (Score 1-10)
+- Is this a "painkiller" (urgent, must-have) or "vitamin" (nice-to-have)?
+- Cortisol triggers: fear, urgency, loss aversion
+- Frequency: How often does the pain occur?
+
+3. MARKET ANALYSIS
+- Estimate total addressable market (TAM)
+- Identify 3 potential competitors or alternatives
+- Competitive advantage assessment
+
+4. BUYING FRICTION
+- Cognitive barriers to purchase
+- Trust deficit analysis
+- Switching cost considerations
+
+5. PRICING PSYCHOLOGY
+- Price anchoring potential
+- Value perception analysis
+- Willingness-to-pay assessment
+
+6. NEUROSCIENCE LAYER
+- Dopamine triggers (anticipation, variable rewards)
+- Oxytocin factors (trust, social proof, community)
+- Cortisol/urgency factors (FOMO, scarcity)
+
+7. CONFIDENCE SCORE (0-100)
+- Overall viability confidence percentage
+
+8. VERDICT: GO / PIVOT / KILL
 
 RULES:
-- Be brutally honest like a ruthless venture capitalist
-- Never hype or sugarcoat
+- Be brutally honest like a ruthless top-tier VC
+- Never sugarcoat - founders need truth
 - Focus on evidence of real pain and willingness to pay
-- Consider the founder's experience level in recommendations
-- Provide actionable first steps
+- Consider founder experience in recommendations
+- Provide specific, actionable next steps
+- Include realistic market estimates
 
 OUTPUT FORMAT (JSON only):
 {
-  "demand_psychology": "2-3 sentence analysis of the emotional drivers and buying motivation",
+  "demand_psychology": "3-4 sentence analysis of emotional drivers, The Mom Test assessment, and buying motivation",
   "pain_realism": {
     "score": number 1-10,
-    "urgency": "high" | "medium" | "low"
+    "urgency": "high" | "medium" | "low",
+    "type": "painkiller" | "vitamin",
+    "frequency": "daily" | "weekly" | "monthly" | "rarely"
+  },
+  "market_analysis": {
+    "tam_estimate": "estimated market size string (e.g., '$2B-5B')",
+    "competitors": [
+      {"name": "competitor1", "weakness": "their weakness you can exploit"},
+      {"name": "competitor2", "weakness": "their weakness you can exploit"},
+      {"name": "competitor3", "weakness": "their weakness you can exploit"}
+    ],
+    "competitive_advantage": "your potential edge in 1-2 sentences"
   },
   "buying_friction": ["friction point 1", "friction point 2", "friction point 3"],
   "pricing_psychology": {
     "fair": boolean,
     "suggested": "price range string",
-    "reason": "explanation of pricing strategy"
+    "reason": "explanation of pricing strategy",
+    "anchor_strategy": "how to use price anchoring"
   },
   "neuroscience": {
-    "value_triggers": ["trigger1", "trigger2", "trigger3"],
+    "dopamine_triggers": ["trigger1", "trigger2"],
+    "oxytocin_factors": ["trust factor 1", "trust factor 2"],
+    "cortisol_urgency": ["urgency factor 1", "urgency factor 2"],
     "risk": "low" | "medium" | "high",
     "trust_difficulty": "low" | "medium" | "high"
   },
+  "confidence_score": number 0-100,
   "verdict": "GO" | "PIVOT" | "KILL",
-  "immediate_plan": ["Day 1: action", "Day 3: action", "Week 1: action"]
+  "verdict_reasoning": "2-3 sentence explanation of the verdict",
+  "immediate_plan": ["Day 1: specific action", "Day 3: specific action", "Week 1: specific action", "Week 2: specific action", "Month 1: specific action"],
+  "pivot_suggestions": ["alternative approach 1", "alternative approach 2"] // only if verdict is PIVOT
 }`;
 
 serve(async (req) => {
@@ -50,7 +97,7 @@ serve(async (req) => {
   }
 
   try {
-    const { idea, targetCustomer, price, experience } = await req.json();
+    const { idea, targetCustomer, price, experience, platform, stage } = await req.json();
 
     if (!idea || !targetCustomer || !price) {
       return new Response(
@@ -64,7 +111,7 @@ serve(async (req) => {
       throw new Error("LOVABLE_API_KEY is not configured");
     }
 
-    const userPrompt = `Analyze this business idea:
+    const userPrompt = `Analyze this business idea with brutal honesty:
 
 IDEA: ${idea}
 
@@ -72,9 +119,15 @@ TARGET CUSTOMER: ${targetCustomer}
 
 PLANNED PRICE: $${price}
 
-FOUNDER EXPERIENCE: ${experience}
+FOUNDER EXPERIENCE: ${experience || "Not specified"}
 
-Provide your analysis in the exact JSON format specified. Be brutally honest.`;
+PLATFORM/DELIVERY: ${platform || "Not specified"}
+
+CURRENT STAGE: ${stage || "Just an idea"}
+
+Apply The Mom Test principles. Would real strangers actually pay for this before seeing it built? Is this a painkiller or vitamin?
+
+Provide your analysis in the exact JSON format specified. Be brutally honest - the founder's success depends on hearing the truth.`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -126,10 +179,22 @@ Provide your analysis in the exact JSON format specified. Be brutally honest.`;
       result = JSON.parse(jsonStr);
     } catch (parseError) {
       console.error("Failed to parse AI response:", content);
-      // Return a fallback structure
+      // Return a fallback structure with enhanced fields
       result = {
         demand_psychology: "Unable to fully analyze. Please provide more details about the problem you're solving.",
-        pain_realism: { score: 5, urgency: "medium" },
+        pain_realism: { 
+          score: 5, 
+          urgency: "medium",
+          type: "vitamin",
+          frequency: "monthly"
+        },
+        market_analysis: {
+          tam_estimate: "Unable to estimate",
+          competitors: [
+            { name: "Unknown", weakness: "Requires more research" }
+          ],
+          competitive_advantage: "Needs clearer positioning"
+        },
         buying_friction: [
           "Unclear value proposition",
           "Need more specific target customer",
@@ -138,20 +203,57 @@ Provide your analysis in the exact JSON format specified. Be brutally honest.`;
         pricing_psychology: {
           fair: true,
           suggested: `$${Math.floor(Number(price) * 0.8)}-$${Math.floor(Number(price) * 1.2)}`,
-          reason: "Unable to determine optimal pricing without clearer positioning"
+          reason: "Unable to determine optimal pricing without clearer positioning",
+          anchor_strategy: "Consider offering tiered pricing"
         },
         neuroscience: {
-          value_triggers: ["Problem relief", "Convenience", "Status"],
+          dopamine_triggers: ["Problem relief", "Convenience"],
+          oxytocin_factors: ["Social proof needed", "Trust building required"],
+          cortisol_urgency: ["Create deadline", "Show cost of inaction"],
           risk: "medium",
           trust_difficulty: "medium"
         },
+        confidence_score: 40,
         verdict: "PIVOT",
+        verdict_reasoning: "The idea needs more refinement. Focus on validating the core problem with real customers before building.",
         immediate_plan: [
           "Day 1: Create a simple landing page",
           "Day 3: Talk to 10 potential customers",
-          "Week 1: Get 5 pre-orders"
+          "Week 1: Get 5 pre-orders",
+          "Week 2: Analyze feedback patterns",
+          "Month 1: Build MVP if validated"
+        ],
+        pivot_suggestions: [
+          "Consider narrowing your target audience",
+          "Explore adjacent problems your customers face"
         ]
       };
+    }
+
+    // Ensure backward compatibility - add missing fields with defaults
+    if (!result.pain_realism.type) result.pain_realism.type = "vitamin";
+    if (!result.pain_realism.frequency) result.pain_realism.frequency = "monthly";
+    if (!result.market_analysis) {
+      result.market_analysis = {
+        tam_estimate: "Requires research",
+        competitors: [],
+        competitive_advantage: "Not assessed"
+      };
+    }
+    if (!result.confidence_score) {
+      result.confidence_score = result.verdict === "GO" ? 75 : result.verdict === "PIVOT" ? 50 : 25;
+    }
+    if (!result.verdict_reasoning) {
+      result.verdict_reasoning = `Based on the analysis, the recommendation is to ${result.verdict}.`;
+    }
+    if (!result.neuroscience.dopamine_triggers) {
+      result.neuroscience.dopamine_triggers = result.neuroscience.value_triggers || [];
+    }
+    if (!result.neuroscience.oxytocin_factors) {
+      result.neuroscience.oxytocin_factors = ["Build social proof", "Gather testimonials"];
+    }
+    if (!result.neuroscience.cortisol_urgency) {
+      result.neuroscience.cortisol_urgency = ["Show cost of waiting", "Create scarcity"];
     }
 
     return new Response(JSON.stringify(result), {
