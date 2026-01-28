@@ -13,6 +13,7 @@ import {
   Sparkles,
   CheckCircle2,
   Lightbulb,
+  Clock,
 } from "lucide-react";
 
 import ConfidenceMeter from "@/components/result/ConfidenceMeter";
@@ -21,6 +22,10 @@ import FollowUpChat from "@/components/result/FollowUpChat";
 import ShareButtons from "@/components/result/ShareButtons";
 import PainTypeIndicator from "@/components/result/PainTypeIndicator";
 import NeurosciencePanel from "@/components/result/NeurosciencePanel";
+import ResearchTrail from "@/components/result/ResearchTrail";
+import ObjectionHandler from "@/components/result/ObjectionHandler";
+import CompetitorChart from "@/components/result/CompetitorChart";
+import MultiAgentBadge from "@/components/result/MultiAgentBadge";
 
 interface ValidationResult {
   demand_psychology: string;
@@ -30,12 +35,19 @@ interface ValidationResult {
     type?: "painkiller" | "vitamin";
     frequency?: "daily" | "weekly" | "monthly" | "rarely";
   };
+  mom_test_pass?: boolean;
   market_analysis?: {
     tam_estimate: string;
-    competitors: { name: string; weakness: string }[];
+    tam_reasoning?: string;
+    competitors: { name: string; weakness: string; market_share?: string; pricing?: string }[];
     competitive_advantage: string;
+    market_timing?: "good" | "moderate" | "risky";
+    timing_reason?: string;
   };
   buying_friction: string[];
+  trust_barriers?: string[];
+  objection_handling?: { objection: string; counter: string }[];
+  regulatory_concerns?: string[] | null;
   pricing_psychology: { 
     fair: boolean; 
     suggested: string; 
@@ -55,6 +67,10 @@ interface ValidationResult {
   verdict_reasoning?: string;
   immediate_plan: string[];
   pivot_suggestions?: string[];
+  key_assumptions?: string[];
+  dealbreakers?: string[];
+  unfair_advantages_needed?: string[];
+  analysis_agents?: string[];
 }
 
 const Result = () => {
@@ -140,6 +156,9 @@ const Result = () => {
 
       <div className="luxury-container pb-24 relative z-10">
         <div className="max-w-4xl mx-auto">
+          {/* Multi-Agent Badge */}
+          <MultiAgentBadge agents={result.analysis_agents} />
+
           {/* Verdict Hero */}
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
@@ -227,6 +246,22 @@ const Result = () => {
               </ResultCard>
             </motion.div>
 
+            {/* Research Trail (Mom Test, Assumptions, Dealbreakers) */}
+            {(result.key_assumptions?.length || result.dealbreakers?.length || result.mom_test_pass !== undefined) && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.22 }}
+              >
+                <ResearchTrail
+                  keyAssumptions={result.key_assumptions || []}
+                  dealbreakers={result.dealbreakers || []}
+                  unfairAdvantages={result.unfair_advantages_needed || []}
+                  momTestPass={result.mom_test_pass ?? false}
+                />
+              </motion.div>
+            )}
+
             {/* Market Analysis */}
             {result.market_analysis && (
               <motion.div
@@ -239,6 +274,46 @@ const Result = () => {
                   competitors={result.market_analysis.competitors}
                   competitive_advantage={result.market_analysis.competitive_advantage}
                 />
+              </motion.div>
+            )}
+
+            {/* Competitor Chart */}
+            {result.market_analysis?.competitors && result.market_analysis.competitors.length > 0 && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.27 }}
+              >
+                <CompetitorChart
+                  competitors={result.market_analysis.competitors}
+                  yourEdge={result.market_analysis.competitive_advantage}
+                />
+              </motion.div>
+            )}
+
+            {/* Market Timing */}
+            {result.market_analysis?.market_timing && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.28 }}
+              >
+                <ResultCard icon={<Clock className="w-5 h-5" />} title="Market Timing">
+                  <div className="flex items-center gap-4">
+                    <div className={`px-4 py-2 rounded-xl text-sm font-medium capitalize ${
+                      result.market_analysis.market_timing === "good" 
+                        ? "bg-success/20 text-success" 
+                        : result.market_analysis.market_timing === "moderate"
+                        ? "bg-primary/20 text-primary"
+                        : "bg-destructive/20 text-destructive"
+                    }`}>
+                      {result.market_analysis.market_timing} timing
+                    </div>
+                    {result.market_analysis.timing_reason && (
+                      <p className="text-sm text-muted-foreground">{result.market_analysis.timing_reason}</p>
+                    )}
+                  </div>
+                </ResultCard>
               </motion.div>
             )}
 
@@ -261,6 +336,17 @@ const Result = () => {
                 </ul>
               </ResultCard>
             </motion.div>
+
+            {/* Objection Handling */}
+            {result.objection_handling && result.objection_handling.length > 0 && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.32 }}
+              >
+                <ObjectionHandler objections={result.objection_handling} />
+              </motion.div>
+            )}
 
             {/* Pricing */}
             <motion.div

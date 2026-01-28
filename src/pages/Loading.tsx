@@ -4,52 +4,48 @@ import { motion, AnimatePresence } from "framer-motion";
 import { 
   Brain, 
   Sparkles, 
-  Search, 
-  Target, 
   DollarSign, 
-  Zap, 
+  Shield, 
   CheckCircle2,
-  Lock
+  Lock,
+  Zap
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
-const analysisStages = [
+// Multi-Agent Analysis Stages
+const analysisAgents = [
   {
-    icon: <Search className="w-6 h-6" />,
-    title: "Scanning Patterns",
-    description: "Analyzing market signals and behavioral data",
-    duration: 2000,
-  },
-  {
+    name: "Dopamine Detective",
     icon: <Brain className="w-6 h-6" />,
-    title: "Psychology Deep-Dive",
-    description: "Evaluating cognitive triggers and pain points",
-    duration: 2500,
+    description: "Analyzing demand psychology & buying motivation",
+    color: "from-purple-500 to-pink-500",
+    bgColor: "bg-purple-500/20",
+    textColor: "text-purple-400",
   },
   {
-    icon: <Target className="w-6 h-6" />,
-    title: "Demand Analysis",
-    description: "Measuring problem urgency and market need",
-    duration: 2000,
-  },
-  {
+    name: "Money Trail",
     icon: <DollarSign className="w-6 h-6" />,
-    title: "Pricing Psychology",
-    description: "Calculating optimal price perception",
-    duration: 2000,
+    description: "Mapping market size & competitor weaknesses",
+    color: "from-emerald-500 to-teal-500",
+    bgColor: "bg-emerald-500/20",
+    textColor: "text-emerald-400",
   },
   {
+    name: "Amygdala Audit",
+    icon: <Shield className="w-6 h-6" />,
+    description: "Evaluating risk factors & trust barriers",
+    color: "from-orange-500 to-red-500",
+    bgColor: "bg-orange-500/20",
+    textColor: "text-orange-400",
+  },
+  {
+    name: "Verdict Synthesizer",
     icon: <Zap className="w-6 h-6" />,
-    title: "Neuroscience Layer",
-    description: "Identifying value triggers and trust factors",
-    duration: 2000,
-  },
-  {
-    icon: <CheckCircle2 className="w-6 h-6" />,
-    title: "Generating Verdict",
     description: "Compiling brutally honest assessment",
-    duration: 1500,
+    color: "from-primary to-amber-500",
+    bgColor: "bg-primary/20",
+    textColor: "text-primary",
   },
 ];
 
@@ -60,14 +56,16 @@ const insights = [
   "Trust takes 7+ positive interactions to build",
   "Loss aversion is 2x stronger than gain motivation",
   "Social proof increases purchase intent by 63%",
+  "The Mom Test: Would strangers pay before seeing it?",
+  "Painkiller products outsell vitamins 10:1",
 ];
 
 const Loading = () => {
   const navigate = useNavigate();
-  const [currentStage, setCurrentStage] = useState(0);
+  const [currentAgent, setCurrentAgent] = useState(0);
   const [progress, setProgress] = useState(0);
   const [insightIndex, setInsightIndex] = useState(0);
-  const [completedStages, setCompletedStages] = useState<number[]>([]);
+  const [completedAgents, setCompletedAgents] = useState<number[]>([]);
 
   useEffect(() => {
     const formDataStr = sessionStorage.getItem("validationData");
@@ -78,32 +76,35 @@ const Loading = () => {
 
     const formData = JSON.parse(formDataStr);
 
-    // Stage progression
-    let stageTimeout: NodeJS.Timeout;
-    let cumulativeTime = 0;
+    // Agent progression (3 parallel + 1 synthesis = ~15 seconds total)
+    const agentTimings = [0, 4000, 8000, 12000]; // When each agent "completes"
     
-    analysisStages.forEach((stage, index) => {
+    agentTimings.forEach((time, index) => {
       setTimeout(() => {
-        setCurrentStage(index);
+        setCurrentAgent(index);
         if (index > 0) {
-          setCompletedStages(prev => [...prev, index - 1]);
+          setCompletedAgents(prev => [...prev, index - 1]);
         }
-      }, cumulativeTime);
-      cumulativeTime += stage.duration;
+      }, time);
     });
+
+    // Mark all complete near the end
+    setTimeout(() => {
+      setCompletedAgents([0, 1, 2, 3]);
+    }, 14000);
 
     // Progress bar
     const progressInterval = setInterval(() => {
       setProgress((prev) => {
         if (prev >= 90) return 90;
-        return prev + 0.8;
+        return prev + 0.6;
       });
     }, 100);
 
     // Insight rotation
     const insightInterval = setInterval(() => {
       setInsightIndex((prev) => (prev + 1) % insights.length);
-    }, 4000);
+    }, 3500);
 
     // API call
     const validateIdea = async () => {
@@ -122,7 +123,7 @@ const Loading = () => {
         if (error) throw error;
 
         setProgress(100);
-        setCompletedStages([0, 1, 2, 3, 4, 5]);
+        setCompletedAgents([0, 1, 2, 3]);
         sessionStorage.setItem("validationResult", JSON.stringify(data));
         
         setTimeout(() => navigate("/result"), 800);
@@ -146,7 +147,6 @@ const Loading = () => {
     return () => {
       clearInterval(progressInterval);
       clearInterval(insightInterval);
-      clearTimeout(stageTimeout);
     };
   }, [navigate]);
 
@@ -164,14 +164,14 @@ const Loading = () => {
         />
       </div>
 
-      <div className="luxury-container text-center relative z-10 max-w-2xl mx-auto">
+      <div className="luxury-container text-center relative z-10 max-w-3xl mx-auto px-4">
         {/* Main Brain Animation */}
         <motion.div 
           initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
-          className="relative mb-12"
+          className="relative mb-10"
         >
-          <div className="w-32 h-32 mx-auto relative">
+          <div className="w-28 h-28 mx-auto relative">
             {/* Pulsing rings */}
             <motion.div 
               animate={{ scale: [1, 1.5], opacity: [0.3, 0] }}
@@ -190,51 +190,82 @@ const Loading = () => {
               transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
               className="absolute inset-2 rounded-full bg-gradient-to-br from-primary/30 to-transparent"
             />
-            <div className="relative w-32 h-32 rounded-full bg-card border border-primary/50 flex items-center justify-center">
+            <div className="relative w-28 h-28 rounded-full bg-card border border-primary/50 flex items-center justify-center">
               <motion.div
                 animate={{ scale: [1, 1.1, 1] }}
                 transition={{ duration: 2, repeat: Infinity }}
               >
-                <Brain className="w-14 h-14 text-primary" />
+                <Brain className="w-12 h-12 text-primary" />
               </motion.div>
             </div>
           </div>
         </motion.div>
 
-        {/* Current Stage Display */}
+        {/* Multi-Agent Status */}
+        <div className="mb-10">
+          <p className="text-sm text-muted-foreground mb-4">Multi-Agent Analysis in Progress</p>
+          
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+            {analysisAgents.map((agent, index) => {
+              const isActive = currentAgent === index;
+              const isComplete = completedAgents.includes(index);
+              
+              return (
+                <motion.div
+                  key={agent.name}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                  className={`relative p-4 rounded-xl border transition-all duration-300 ${
+                    isComplete 
+                      ? "bg-success/10 border-success/30" 
+                      : isActive 
+                      ? `${agent.bgColor} border-primary/30` 
+                      : "bg-card border-border"
+                  }`}
+                >
+                  {/* Active indicator */}
+                  {isActive && !isComplete && (
+                    <motion.div
+                      animate={{ opacity: [0.5, 1, 0.5] }}
+                      transition={{ duration: 1.5, repeat: Infinity }}
+                      className={`absolute inset-0 rounded-xl bg-gradient-to-r ${agent.color} opacity-10`}
+                    />
+                  )}
+                  
+                  <div className="relative">
+                    <div className={`w-10 h-10 mx-auto mb-2 rounded-lg flex items-center justify-center ${
+                      isComplete ? "bg-success/20 text-success" : `${agent.bgColor} ${agent.textColor}`
+                    }`}>
+                      {isComplete ? <CheckCircle2 className="w-5 h-5" /> : agent.icon}
+                    </div>
+                    <p className={`text-xs font-medium ${isComplete ? "text-success" : isActive ? agent.textColor : "text-muted-foreground"}`}>
+                      {agent.name}
+                    </p>
+                  </div>
+                </motion.div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Current Agent Display */}
         <AnimatePresence mode="wait">
           <motion.div
-            key={currentStage}
-            initial={{ opacity: 0, y: 20 }}
+            key={currentAgent}
+            initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            className="mb-12"
+            exit={{ opacity: 0, y: -10 }}
+            className="mb-8"
           >
-            <div className="inline-flex items-center gap-3 px-6 py-3 bg-card border border-border rounded-full mb-4">
-              <span className="text-primary">{analysisStages[currentStage]?.icon}</span>
-              <span className="font-semibold">{analysisStages[currentStage]?.title}</span>
+            <div className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-full border ${analysisAgents[currentAgent]?.bgColor} border-primary/20`}>
+              <span className={analysisAgents[currentAgent]?.textColor}>
+                {analysisAgents[currentAgent]?.icon}
+              </span>
+              <span className="font-medium text-sm">{analysisAgents[currentAgent]?.description}</span>
             </div>
-            <p className="text-muted-foreground">
-              {analysisStages[currentStage]?.description}
-            </p>
           </motion.div>
         </AnimatePresence>
-
-        {/* Stage Progress Indicators */}
-        <div className="flex justify-center gap-2 mb-12">
-          {analysisStages.map((_, index) => (
-            <motion.div
-              key={index}
-              className={`h-2 rounded-full transition-all duration-300 ${
-                completedStages.includes(index)
-                  ? "w-8 bg-success"
-                  : currentStage === index
-                  ? "w-8 bg-primary"
-                  : "w-2 bg-muted"
-              }`}
-            />
-          ))}
-        </div>
 
         {/* Main Progress Bar */}
         <div className="max-w-md mx-auto mb-8">
@@ -262,7 +293,7 @@ const Loading = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="max-w-md mx-auto p-6 bg-card/50 border border-border/50 rounded-xl"
+            className="max-w-md mx-auto p-5 bg-card/50 border border-border/50 rounded-xl"
           >
             <p className="text-sm text-muted-foreground">
               💡 <span className="text-foreground">{insights[insightIndex]}</span>
@@ -275,7 +306,7 @@ const Loading = () => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 1 }}
-          className="mt-12 flex items-center justify-center gap-2 text-xs text-muted-foreground"
+          className="mt-10 flex items-center justify-center gap-2 text-xs text-muted-foreground"
         >
           <Lock className="w-3 h-3" />
           Your idea is 100% confidential
