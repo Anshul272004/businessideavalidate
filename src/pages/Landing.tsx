@@ -8,6 +8,9 @@ import FAQ from "@/components/landing/FAQ";
 import Stats from "@/components/landing/Stats";
 import Benefits from "@/components/landing/Benefits";
 import ComparisonTable from "@/components/landing/ComparisonTable";
+import FeatureShowcase from "@/components/landing/FeatureShowcase";
+import SocialProof from "@/components/landing/SocialProof";
+import ProblemAgitation from "@/components/landing/ProblemAgitation";
 
 const Landing = () => {
   const navigate = useNavigate();
@@ -58,7 +61,7 @@ const Landing = () => {
           >
             <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium mb-8">
               <Sparkles className="w-4 h-4" />
-              AI-Powered Business Validation
+              Multi-Agent AI Validation
             </span>
           </motion.div>
 
@@ -80,7 +83,7 @@ const Landing = () => {
             className="text-xl md:text-2xl text-muted-foreground max-w-2xl leading-relaxed mb-12"
           >
             Get a brutally honest, psychology-based verdict on your business idea 
-            before you invest months of work.
+            using 4 specialized AI agents that analyze in parallel.
           </motion.p>
 
           <motion.div 
@@ -121,7 +124,7 @@ const Landing = () => {
           >
             {[
               { icon: <Shield className="w-4 h-4" />, text: "100% Confidential" },
-              { icon: <Zap className="w-4 h-4" />, text: "5-Minute Analysis" },
+              { icon: <Zap className="w-4 h-4" />, text: "4 AI Agents in Parallel" },
               { icon: <TrendingUp className="w-4 h-4" />, text: "Actionable Insights" },
             ].map((badge, i) => (
               <div key={i} className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -153,14 +156,20 @@ const Landing = () => {
               <div className="h-2 bg-muted rounded-full overflow-hidden">
                 <div className="h-full w-[85%] bg-success rounded-full" />
               </div>
-              <p className="text-xs text-muted-foreground mt-2">Pain Score: 8.5/10</p>
+              <p className="text-xs text-muted-foreground mt-2">Confidence: 85%</p>
             </div>
           </motion.div>
         </div>
       </section>
 
+      {/* Social Proof */}
+      <SocialProof />
+
       {/* Stats Section */}
       <Stats />
+
+      {/* Problem Agitation */}
+      <ProblemAgitation />
 
       {/* Quote Section */}
       <section className="luxury-container py-24 border-t border-border/50">
@@ -195,21 +204,24 @@ const Landing = () => {
         <div className="grid md:grid-cols-3 gap-8">
           <FeatureCard
             icon={<Brain className="w-6 h-6" />}
-            title="Psychology Analysis"
-            description="Understand the emotional drivers behind your customer's willingness to pay."
+            title="Multi-Agent Analysis"
+            description="4 specialized AI agents analyze demand, pricing, competitors, and risk in parallel."
           />
           <FeatureCard
             icon={<Target className="w-6 h-6" />}
-            title="Pain Reality Score"
-            description="Get a 1-10 score on how urgent and real the problem actually is."
+            title="The Mom Test Applied"
+            description="Would strangers actually pay before seeing it built? We apply the real test."
           />
           <FeatureCard
             icon={<Sparkles className="w-6 h-6" />}
             title="Clear Verdict"
-            description="Receive a GO, PIVOT, or KILL recommendation with reasoning."
+            description="Receive a GO, PIVOT, or KILL recommendation with brutally honest reasoning."
           />
         </div>
       </section>
+
+      {/* Feature Showcase (12 features) */}
+      <FeatureShowcase />
 
       {/* Benefits Section */}
       <Benefits />
@@ -282,7 +294,7 @@ const Landing = () => {
             </div>
             <span>Validator</span>
           </div>
-          <p>Psychology-powered decisions</p>
+          <p>Multi-Agent Neuro-Validation Protocol</p>
           <p>© 2024 All rights reserved</p>
         </div>
       </footer>

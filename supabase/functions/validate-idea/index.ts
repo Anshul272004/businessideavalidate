@@ -5,91 +5,134 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-const systemPrompt = `You are an elite AI Business Idea Validator with expertise in behavioral psychology, neuroscience, and venture capital. Your analysis is brutally honest, data-driven, and actionable.
+// Multi-Agent Neuro-Validation Protocol
+const agentPrompts = {
+  dopamineDetective: `You are the "Dopamine Detective" - an expert in demand psychology and buying motivation. Analyze:
+1. Emotional drivers that create buying urgency
+2. Dopamine triggers (anticipation, novelty, reward patterns)
+3. Apply "The Mom Test" - would strangers pay before seeing it built?
+4. Identify if this solves a "bleeding neck" problem or a "nice-to-have"
 
-ANALYSIS FRAMEWORK:
-
-1. DEMAND PSYCHOLOGY
-- Analyze genuine emotional pain that creates buying motivation
-- Apply "The Mom Test" principles: Would strangers pay before seeing the product?
-- Identify dopamine triggers (anticipation, reward, novelty)
-
-2. PAIN REALISM (Score 1-10)
-- Is this a "painkiller" (urgent, must-have) or "vitamin" (nice-to-have)?
-- Cortisol triggers: fear, urgency, loss aversion
-- Frequency: How often does the pain occur?
-
-3. MARKET ANALYSIS
-- Estimate total addressable market (TAM)
-- Identify 3 potential competitors or alternatives
-- Competitive advantage assessment
-
-4. BUYING FRICTION
-- Cognitive barriers to purchase
-- Trust deficit analysis
-- Switching cost considerations
-
-5. PRICING PSYCHOLOGY
-- Price anchoring potential
-- Value perception analysis
-- Willingness-to-pay assessment
-
-6. NEUROSCIENCE LAYER
-- Dopamine triggers (anticipation, variable rewards)
-- Oxytocin factors (trust, social proof, community)
-- Cortisol/urgency factors (FOMO, scarcity)
-
-7. CONFIDENCE SCORE (0-100)
-- Overall viability confidence percentage
-
-8. VERDICT: GO / PIVOT / KILL
-
-RULES:
-- Be brutally honest like a ruthless top-tier VC
-- Never sugarcoat - founders need truth
-- Focus on evidence of real pain and willingness to pay
-- Consider founder experience in recommendations
-- Provide specific, actionable next steps
-- Include realistic market estimates
-
-OUTPUT FORMAT (JSON only):
+Return ONLY a JSON object with these fields:
 {
-  "demand_psychology": "3-4 sentence analysis of emotional drivers, The Mom Test assessment, and buying motivation",
-  "pain_realism": {
-    "score": number 1-10,
-    "urgency": "high" | "medium" | "low",
-    "type": "painkiller" | "vitamin",
-    "frequency": "daily" | "weekly" | "monthly" | "rarely"
-  },
-  "market_analysis": {
-    "tam_estimate": "estimated market size string (e.g., '$2B-5B')",
-    "competitors": [
-      {"name": "competitor1", "weakness": "their weakness you can exploit"},
-      {"name": "competitor2", "weakness": "their weakness you can exploit"},
-      {"name": "competitor3", "weakness": "their weakness you can exploit"}
-    ],
-    "competitive_advantage": "your potential edge in 1-2 sentences"
-  },
+  "demand_analysis": "3-4 sentence analysis of emotional drivers",
+  "mom_test_pass": boolean,
+  "dopamine_triggers": ["trigger1", "trigger2", "trigger3"],
+  "pain_type": "painkiller" | "vitamin",
+  "pain_frequency": "daily" | "weekly" | "monthly" | "rarely",
+  "pain_score": number 1-10,
+  "urgency": "high" | "medium" | "low"
+}`,
+
+  moneyTrail: `You are "Money Trail" - an expert in market dynamics, competitor analysis, and pricing psychology. Analyze:
+1. Total Addressable Market (TAM) with realistic estimates
+2. Top 3-5 competitors and their specific exploitable weaknesses
+3. Pricing psychology and willingness-to-pay
+4. Price anchoring strategies
+5. Market timing and trends
+
+Return ONLY a JSON object:
+{
+  "tam_estimate": "$X-Y billion/million",
+  "tam_reasoning": "Brief justification",
+  "competitors": [
+    {"name": "competitor", "weakness": "exploitable weakness", "market_share": "estimate", "pricing": "their pricing"}
+  ],
+  "your_edge": "2-3 sentence competitive advantage",
+  "suggested_price": "$X-Y range",
+  "price_reasoning": "Why this price works",
+  "anchor_strategy": "How to use price anchoring",
+  "market_timing": "good" | "moderate" | "risky",
+  "timing_reason": "Brief explanation"
+}`,
+
+  amygdalaAudit: `You are "Amygdala Audit" - an expert in risk assessment, fear/trust triggers, and buying friction. Analyze:
+1. Cognitive barriers to purchase (objections, fears, doubts)
+2. Trust deficit - what needs to be proven
+3. Switching cost considerations
+4. Cortisol triggers (urgency, FOMO, loss aversion)
+5. Oxytocin factors (social proof, community, testimonials needed)
+6. Regulatory/legal risks
+
+Return ONLY a JSON object:
+{
   "buying_friction": ["friction point 1", "friction point 2", "friction point 3"],
-  "pricing_psychology": {
-    "fair": boolean,
-    "suggested": "price range string",
-    "reason": "explanation of pricing strategy",
-    "anchor_strategy": "how to use price anchoring"
-  },
-  "neuroscience": {
-    "dopamine_triggers": ["trigger1", "trigger2"],
-    "oxytocin_factors": ["trust factor 1", "trust factor 2"],
-    "cortisol_urgency": ["urgency factor 1", "urgency factor 2"],
-    "risk": "low" | "medium" | "high",
-    "trust_difficulty": "low" | "medium" | "high"
-  },
+  "trust_barriers": ["barrier1", "barrier2"],
+  "trust_difficulty": "low" | "medium" | "high",
+  "risk_level": "low" | "medium" | "high",
+  "risk_factors": ["risk1", "risk2"],
+  "cortisol_urgency": ["urgency factor 1", "urgency factor 2"],
+  "oxytocin_factors": ["trust factor 1", "trust factor 2"],
+  "regulatory_concerns": ["concern1"] | null,
+  "objection_handling": [{"objection": "common objection", "counter": "how to handle"}]
+}`,
+
+  verdictSynthesizer: `You are the "Verdict Synthesizer" - the final arbiter who synthesizes all agent analyses into a verdict. Given the analyses from our specialist agents:
+
+DOPAMINE DETECTIVE FINDINGS: {dopamineAnalysis}
+MONEY TRAIL FINDINGS: {moneyAnalysis}
+AMYGDALA AUDIT FINDINGS: {amygdalaAnalysis}
+
+Synthesize a final verdict. Be BRUTALLY HONEST like a top-tier VC. Consider:
+- Does the pain justify the price?
+- Is the market timing right?
+- Can the founder realistically execute?
+- What's the probability of success?
+
+Return ONLY a JSON object:
+{
   "confidence_score": number 0-100,
   "verdict": "GO" | "PIVOT" | "KILL",
-  "verdict_reasoning": "2-3 sentence explanation of the verdict",
-  "immediate_plan": ["Day 1: specific action", "Day 3: specific action", "Week 1: specific action", "Week 2: specific action", "Month 1: specific action"],
-  "pivot_suggestions": ["alternative approach 1", "alternative approach 2"] // only if verdict is PIVOT
-}`;
+  "verdict_reasoning": "2-3 sentence brutal honest summary",
+  "immediate_plan": ["Day 1: action", "Day 3: action", "Week 1: action", "Week 2: action", "Month 1: action"],
+  "pivot_suggestions": ["suggestion 1", "suggestion 2"] | null,
+  "key_assumptions": ["assumption to validate 1", "assumption 2"],
+  "dealbreakers": ["what could kill this"],
+  "unfair_advantages_needed": ["what would make this unstoppable"]
+}`,
+};
+
+async function callAgent(
+  agentName: string,
+  prompt: string,
+  userContext: string,
+  apiKey: string
+): Promise<any> {
+  const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${apiKey}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      model: "google/gemini-3-flash-preview",
+      messages: [
+        { role: "system", content: prompt },
+        { role: "user", content: userContext },
+      ],
+      temperature: 0.7,
+    }),
+  });
+
+  if (!response.ok) {
+    const status = response.status;
+    if (status === 429) throw new Error("429");
+    if (status === 402) throw new Error("402");
+    throw new Error(`Agent ${agentName} failed: ${status}`);
+  }
+
+  const data = await response.json();
+  const content = data.choices?.[0]?.message?.content || "";
+  
+  try {
+    const jsonMatch = content.match(/```(?:json)?\s*([\s\S]*?)```/);
+    const jsonStr = jsonMatch ? jsonMatch[1].trim() : content.trim();
+    return JSON.parse(jsonStr);
+  } catch {
+    console.error(`Failed to parse ${agentName} response:`, content);
+    return null;
+  }
+}
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -111,9 +154,8 @@ serve(async (req) => {
       throw new Error("LOVABLE_API_KEY is not configured");
     }
 
-    const userPrompt = `Analyze this business idea with brutal honesty:
-
-IDEA: ${idea}
+    const userContext = `
+BUSINESS IDEA: ${idea}
 
 TARGET CUSTOMER: ${targetCustomer}
 
@@ -125,142 +167,113 @@ PLATFORM/DELIVERY: ${platform || "Not specified"}
 
 CURRENT STAGE: ${stage || "Just an idea"}
 
-Apply The Mom Test principles. Would real strangers actually pay for this before seeing it built? Is this a painkiller or vitamin?
+Analyze with brutal honesty. The founder's success depends on hearing the truth.`;
 
-Provide your analysis in the exact JSON format specified. Be brutally honest - the founder's success depends on hearing the truth.`;
+    // Run all three specialist agents in PARALLEL
+    console.log("🧠 Starting multi-agent analysis...");
+    
+    const [dopamineResult, moneyResult, amygdalaResult] = await Promise.all([
+      callAgent("DopamineDetective", agentPrompts.dopamineDetective, userContext, LOVABLE_API_KEY),
+      callAgent("MoneyTrail", agentPrompts.moneyTrail, userContext, LOVABLE_API_KEY),
+      callAgent("AmygdalaAudit", agentPrompts.amygdalaAudit, userContext, LOVABLE_API_KEY),
+    ]);
 
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
-        "Content-Type": "application/json",
+    console.log("✅ All agents completed, synthesizing verdict...");
+
+    // Now synthesize the verdict with all agent findings
+    const synthesisPrompt = agentPrompts.verdictSynthesizer
+      .replace("{dopamineAnalysis}", JSON.stringify(dopamineResult || {}))
+      .replace("{moneyAnalysis}", JSON.stringify(moneyResult || {}))
+      .replace("{amygdalaAnalysis}", JSON.stringify(amygdalaResult || {}));
+
+    const verdictResult = await callAgent("VerdictSynthesizer", synthesisPrompt, userContext, LOVABLE_API_KEY);
+
+    // Combine all results into the final response
+    const finalResult = {
+      // Demand Psychology (from Dopamine Detective)
+      demand_psychology: dopamineResult?.demand_analysis || "Analysis pending",
+      pain_realism: {
+        score: dopamineResult?.pain_score || 5,
+        urgency: dopamineResult?.urgency || "medium",
+        type: dopamineResult?.pain_type || "vitamin",
+        frequency: dopamineResult?.pain_frequency || "monthly",
       },
-      body: JSON.stringify({
-        model: "google/gemini-3-flash-preview",
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: userPrompt },
-        ],
-        temperature: 0.7,
-      }),
-    });
+      mom_test_pass: dopamineResult?.mom_test_pass ?? false,
 
-    if (!response.ok) {
-      if (response.status === 429) {
+      // Market Analysis (from Money Trail)
+      market_analysis: {
+        tam_estimate: moneyResult?.tam_estimate || "Requires research",
+        tam_reasoning: moneyResult?.tam_reasoning || "",
+        competitors: moneyResult?.competitors || [],
+        competitive_advantage: moneyResult?.your_edge || "Not assessed",
+        market_timing: moneyResult?.market_timing || "moderate",
+        timing_reason: moneyResult?.timing_reason || "",
+      },
+
+      // Pricing (from Money Trail)
+      pricing_psychology: {
+        fair: true,
+        suggested: moneyResult?.suggested_price || `$${price}`,
+        reason: moneyResult?.price_reasoning || "Based on market analysis",
+        anchor_strategy: moneyResult?.anchor_strategy || "Consider tiered pricing",
+      },
+
+      // Friction & Risk (from Amygdala Audit)
+      buying_friction: amygdalaResult?.buying_friction || ["Needs validation"],
+      trust_barriers: amygdalaResult?.trust_barriers || [],
+      objection_handling: amygdalaResult?.objection_handling || [],
+      regulatory_concerns: amygdalaResult?.regulatory_concerns || null,
+
+      // Neuroscience Layer
+      neuroscience: {
+        dopamine_triggers: dopamineResult?.dopamine_triggers || [],
+        oxytocin_factors: amygdalaResult?.oxytocin_factors || [],
+        cortisol_urgency: amygdalaResult?.cortisol_urgency || [],
+        risk: amygdalaResult?.risk_level || "medium",
+        trust_difficulty: amygdalaResult?.trust_difficulty || "medium",
+      },
+
+      // Verdict (from Synthesizer)
+      confidence_score: verdictResult?.confidence_score || 50,
+      verdict: verdictResult?.verdict || "PIVOT",
+      verdict_reasoning: verdictResult?.verdict_reasoning || "Further validation needed",
+      immediate_plan: verdictResult?.immediate_plan || [
+        "Day 1: Talk to 5 potential customers",
+        "Day 3: Create landing page",
+        "Week 1: Get 10 email signups",
+        "Week 2: Conduct pre-sales",
+        "Month 1: Build MVP if validated",
+      ],
+      pivot_suggestions: verdictResult?.pivot_suggestions || null,
+      key_assumptions: verdictResult?.key_assumptions || [],
+      dealbreakers: verdictResult?.dealbreakers || [],
+      unfair_advantages_needed: verdictResult?.unfair_advantages_needed || [],
+
+      // Meta info
+      analysis_agents: ["Dopamine Detective", "Money Trail", "Amygdala Audit", "Verdict Synthesizer"],
+    };
+
+    return new Response(JSON.stringify(finalResult), {
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  } catch (error) {
+    console.error("Validation error:", error);
+    
+    if (error instanceof Error) {
+      if (error.message === "429") {
         return new Response(
           JSON.stringify({ error: "Rate limit exceeded. Please try again later." }),
           { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
-      if (response.status === 402) {
+      if (error.message === "402") {
         return new Response(
           JSON.stringify({ error: "AI credits exhausted. Please add credits to continue." }),
           { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
-      const errorText = await response.text();
-      console.error("AI gateway error:", response.status, errorText);
-      throw new Error("AI gateway error");
     }
-
-    const aiResponse = await response.json();
-    const content = aiResponse.choices?.[0]?.message?.content;
-
-    if (!content) {
-      throw new Error("No content in AI response");
-    }
-
-    // Parse the JSON from the AI response
-    let result;
-    try {
-      // Extract JSON from markdown code blocks if present
-      const jsonMatch = content.match(/```(?:json)?\s*([\s\S]*?)```/);
-      const jsonStr = jsonMatch ? jsonMatch[1].trim() : content.trim();
-      result = JSON.parse(jsonStr);
-    } catch (parseError) {
-      console.error("Failed to parse AI response:", content);
-      // Return a fallback structure with enhanced fields
-      result = {
-        demand_psychology: "Unable to fully analyze. Please provide more details about the problem you're solving.",
-        pain_realism: { 
-          score: 5, 
-          urgency: "medium",
-          type: "vitamin",
-          frequency: "monthly"
-        },
-        market_analysis: {
-          tam_estimate: "Unable to estimate",
-          competitors: [
-            { name: "Unknown", weakness: "Requires more research" }
-          ],
-          competitive_advantage: "Needs clearer positioning"
-        },
-        buying_friction: [
-          "Unclear value proposition",
-          "Need more specific target customer",
-          "Pricing needs validation"
-        ],
-        pricing_psychology: {
-          fair: true,
-          suggested: `$${Math.floor(Number(price) * 0.8)}-$${Math.floor(Number(price) * 1.2)}`,
-          reason: "Unable to determine optimal pricing without clearer positioning",
-          anchor_strategy: "Consider offering tiered pricing"
-        },
-        neuroscience: {
-          dopamine_triggers: ["Problem relief", "Convenience"],
-          oxytocin_factors: ["Social proof needed", "Trust building required"],
-          cortisol_urgency: ["Create deadline", "Show cost of inaction"],
-          risk: "medium",
-          trust_difficulty: "medium"
-        },
-        confidence_score: 40,
-        verdict: "PIVOT",
-        verdict_reasoning: "The idea needs more refinement. Focus on validating the core problem with real customers before building.",
-        immediate_plan: [
-          "Day 1: Create a simple landing page",
-          "Day 3: Talk to 10 potential customers",
-          "Week 1: Get 5 pre-orders",
-          "Week 2: Analyze feedback patterns",
-          "Month 1: Build MVP if validated"
-        ],
-        pivot_suggestions: [
-          "Consider narrowing your target audience",
-          "Explore adjacent problems your customers face"
-        ]
-      };
-    }
-
-    // Ensure backward compatibility - add missing fields with defaults
-    if (!result.pain_realism.type) result.pain_realism.type = "vitamin";
-    if (!result.pain_realism.frequency) result.pain_realism.frequency = "monthly";
-    if (!result.market_analysis) {
-      result.market_analysis = {
-        tam_estimate: "Requires research",
-        competitors: [],
-        competitive_advantage: "Not assessed"
-      };
-    }
-    if (!result.confidence_score) {
-      result.confidence_score = result.verdict === "GO" ? 75 : result.verdict === "PIVOT" ? 50 : 25;
-    }
-    if (!result.verdict_reasoning) {
-      result.verdict_reasoning = `Based on the analysis, the recommendation is to ${result.verdict}.`;
-    }
-    if (!result.neuroscience.dopamine_triggers) {
-      result.neuroscience.dopamine_triggers = result.neuroscience.value_triggers || [];
-    }
-    if (!result.neuroscience.oxytocin_factors) {
-      result.neuroscience.oxytocin_factors = ["Build social proof", "Gather testimonials"];
-    }
-    if (!result.neuroscience.cortisol_urgency) {
-      result.neuroscience.cortisol_urgency = ["Show cost of waiting", "Create scarcity"];
-    }
-
-    return new Response(JSON.stringify(result), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
-  } catch (error) {
-    console.error("Validation error:", error);
+    
     return new Response(
       JSON.stringify({ error: error instanceof Error ? error.message : "Unknown error" }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
