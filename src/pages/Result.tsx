@@ -26,6 +26,10 @@ import ResearchTrail from "@/components/result/ResearchTrail";
 import ObjectionHandler from "@/components/result/ObjectionHandler";
 import CompetitorChart from "@/components/result/CompetitorChart";
 import MultiAgentBadge from "@/components/result/MultiAgentBadge";
+import ExecutionRisks from "@/components/result/ExecutionRisks";
+import UnitEconomics from "@/components/result/UnitEconomics";
+import TimelineRoadmap from "@/components/result/TimelineRoadmap";
+import FounderFitQuestions from "@/components/result/FounderFitQuestions";
 
 interface ValidationResult {
   demand_psychology: string;
@@ -36,6 +40,8 @@ interface ValidationResult {
     frequency?: "daily" | "weekly" | "monthly" | "rarely";
   };
   mom_test_pass?: boolean;
+  existing_alternatives?: string[];
+  why_alternatives_fail?: string;
   market_analysis?: {
     tam_estimate: string;
     tam_reasoning?: string;
@@ -44,10 +50,30 @@ interface ValidationResult {
     market_timing?: "good" | "moderate" | "risky";
     timing_reason?: string;
   };
+  unit_economics?: {
+    estimated_cac?: string;
+    estimated_ltv?: string;
+    ltv_cac_ratio?: string;
+    estimated_margin?: string;
+    payback_period?: string;
+    sustainability?: "good" | "moderate" | "concerning";
+  } | null;
+  revenue_model?: string;
   buying_friction: string[];
   trust_barriers?: string[];
   objection_handling?: { objection: string; counter: string }[];
   regulatory_concerns?: string[] | null;
+  legal_considerations?: string[] | null;
+  industry_barriers?: string[] | null;
+  execution_risks?: {
+    team_requirements?: string[];
+    capital_needed?: string;
+    tech_complexity?: "low" | "medium" | "high";
+    tech_challenges?: string[];
+    time_to_mvp?: string;
+    critical_hires?: string[];
+    moat_difficulty?: "easy" | "medium" | "hard";
+  } | null;
   pricing_psychology: { 
     fair: boolean; 
     suggested: string; 
@@ -65,6 +91,15 @@ interface ValidationResult {
   confidence_score?: number;
   verdict: "GO" | "PIVOT" | "KILL";
   verdict_reasoning?: string;
+  eli8_summary?: string;
+  success_probability?: string;
+  timeline_to_revenue?: {
+    mvp_weeks?: number;
+    first_customer_weeks?: number;
+    ten_customers_weeks?: number;
+    profitability_months?: number;
+  } | null;
+  founder_fit_questions?: string[];
   immediate_plan: string[];
   pivot_suggestions?: string[];
   key_assumptions?: string[];
@@ -106,7 +141,7 @@ const Result = () => {
 
   const verdictConfig = {
     GO: {
-      containerClass: "verdict-go",
+      containerClass: "verdict-go glow-box",
       icon: <CheckCircle2 className="w-10 h-10" />,
       title: "GO",
       description: "Strong fundamentals. Build it.",
@@ -137,18 +172,18 @@ const Result = () => {
     <div className="min-h-screen bg-background print:py-8">
       {/* Ambient Background */}
       <div className="fixed inset-0 pointer-events-none print:hidden">
-        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-primary/5 rounded-full blur-[100px]" />
-        <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-success/5 rounded-full blur-[100px]" />
+        <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-primary/8 rounded-full blur-[120px]" />
+        <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-success/5 rounded-full blur-[100px]" />
       </div>
 
       {/* Navigation */}
       <nav className="luxury-container py-8 relative z-10 print:hidden">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
-              <Sparkles className="w-4 h-4 text-primary-foreground" />
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shadow-lg shadow-primary/20">
+              <Sparkles className="w-5 h-5 text-primary-foreground" />
             </div>
-            <span className="font-semibold">Validator</span>
+            <span className="font-bold text-lg">IdeaValidator</span>
           </div>
           <ShareButtons verdict={result.verdict} confidenceScore={confidenceScore} />
         </div>
@@ -196,6 +231,20 @@ const Result = () => {
 
           {/* Result Cards */}
           <div className="space-y-6">
+            {/* ELI8 Summary & Founder Fit */}
+            {(result.eli8_summary || result.founder_fit_questions?.length) && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.12 }}
+              >
+                <FounderFitQuestions
+                  questions={result.founder_fit_questions || []}
+                  eli8_summary={result.eli8_summary}
+                />
+              </motion.div>
+            )}
+
             {/* Demand Psychology */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -291,12 +340,55 @@ const Result = () => {
               </motion.div>
             )}
 
+            {/* Unit Economics */}
+            {result.unit_economics && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.28 }}
+              >
+                <UnitEconomics
+                  unit_economics={result.unit_economics}
+                  revenue_model={result.revenue_model}
+                />
+              </motion.div>
+            )}
+
+            {/* Timeline Roadmap */}
+            {result.timeline_to_revenue && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.29 }}
+              >
+                <TimelineRoadmap
+                  timeline_to_revenue={result.timeline_to_revenue}
+                  success_probability={result.success_probability}
+                />
+              </motion.div>
+            )}
+
+            {/* Execution Risks */}
+            {result.execution_risks && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.30 }}
+              >
+                <ExecutionRisks
+                  execution_risks={result.execution_risks}
+                  regulatory_concerns={result.regulatory_concerns}
+                  legal_considerations={result.legal_considerations}
+                />
+              </motion.div>
+            )}
+
             {/* Market Timing */}
             {result.market_analysis?.market_timing && (
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.28 }}
+                transition={{ delay: 0.31 }}
               >
                 <ResultCard icon={<Clock className="w-5 h-5" />} title="Market Timing">
                   <div className="flex items-center gap-4">
@@ -321,7 +413,7 @@ const Result = () => {
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
+              transition={{ delay: 0.32 }}
             >
               <ResultCard icon={<AlertTriangle className="w-5 h-5" />} title="Buying Friction">
                 <ul className="space-y-3">
@@ -342,7 +434,7 @@ const Result = () => {
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.32 }}
+                transition={{ delay: 0.35 }}
               >
                 <ObjectionHandler objections={result.objection_handling} />
               </motion.div>
@@ -352,7 +444,7 @@ const Result = () => {
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.35 }}
+              transition={{ delay: 0.38 }}
             >
               <ResultCard icon={<DollarSign className="w-5 h-5" />} title="Pricing Psychology">
                 <div className="flex items-baseline gap-4 mb-4">
@@ -416,7 +508,7 @@ const Result = () => {
                 <ol className="space-y-4">
                   {result.immediate_plan.map((step, i) => (
                     <li key={i} className="flex items-start gap-4">
-                      <div className="w-10 h-10 rounded-xl bg-primary text-primary-foreground flex items-center justify-center flex-shrink-0 font-bold">
+                      <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-primary/80 text-primary-foreground flex items-center justify-center flex-shrink-0 font-bold shadow-lg shadow-primary/20">
                         {i + 1}
                       </div>
                       <span className="text-muted-foreground pt-2">{step}</span>
@@ -447,7 +539,7 @@ const Result = () => {
           {/* Disclaimer */}
           <div className="mt-16 pt-8 border-t border-border">
             <p className="text-sm text-muted-foreground/60 italic text-center">
-              This is decision support, not financial, legal, or medical advice. Always validate with real customers.
+              This is decision support powered by AI, not financial, legal, or professional advice. Always validate with real customers and consult experts.
             </p>
           </div>
         </div>
@@ -460,7 +552,7 @@ const Result = () => {
 };
 
 const ResultCard = ({ icon, title, children }: { icon: React.ReactNode; title: string; children: React.ReactNode }) => (
-  <div className="bg-card border border-border rounded-2xl p-8">
+  <div className="glass-card rounded-2xl p-8">
     <div className="flex items-center gap-3 mb-6">
       <div className="text-primary">{icon}</div>
       <h3 className="text-lg font-semibold">{title}</h3>
