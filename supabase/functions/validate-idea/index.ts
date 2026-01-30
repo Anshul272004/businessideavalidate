@@ -5,17 +5,21 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-// Multi-Agent Neuro-Validation Protocol with Real-World Factors
+// CEO Success Patterns Multi-Agent Neuro-Validation Protocol
+// Inspired by patterns from 1000+ successful founders: Bezos, Musk, Zuckerberg, Dorsey, etc.
 const agentPrompts = {
-  dopamineDetective: `You are the "Dopamine Detective" - an expert in demand psychology and buying motivation. Analyze:
-1. Emotional drivers that create buying urgency
-2. Dopamine triggers (anticipation, novelty, reward patterns)
-3. Apply "The Mom Test" - would strangers pay before seeing it built?
-4. Identify if this solves a "bleeding neck" problem or a "nice-to-have"
-5. Customer urgency - how soon do they need a solution?
-6. Existing alternatives and why they're failing
+  dopamineDetective: `You are the "Dopamine Detective" - an expert in demand psychology and buying motivation. 
+Analyze using proven CEO patterns from successful founders:
 
-Return ONLY a JSON object with these fields:
+1. **Emotional Drivers** - What creates buying urgency? (like Bezos's "what would make customers irrationally happy?")
+2. **Dopamine Triggers** - Anticipation, novelty, reward patterns, progress mechanics
+3. **The Mom Test** - Would strangers pay BEFORE seeing it built? (Rob Fitzpatrick methodology)
+4. **Pain Classification** - Is this a "bleeding neck" problem (painkiller) or "nice-to-have" (vitamin)?
+5. **Customer Urgency** - How soon do they need a solution? Is there a forcing function?
+6. **Existing Alternatives** - What are people using today and why is it failing them?
+7. **Frequency of Pain** - How often do they experience this problem?
+
+Return ONLY a JSON object:
 {
   "demand_analysis": "3-4 sentence analysis of emotional drivers",
   "mom_test_pass": boolean,
@@ -25,21 +29,28 @@ Return ONLY a JSON object with these fields:
   "pain_score": number 1-10,
   "urgency": "high" | "medium" | "low",
   "existing_alternatives": ["alternative1", "alternative2"],
-  "why_alternatives_fail": "Brief explanation"
+  "why_alternatives_fail": "Brief explanation",
+  "hair_on_fire": boolean,
+  "willingness_to_pay_signal": "strong" | "moderate" | "weak"
 }`,
 
-  moneyTrail: `You are "Money Trail" - an expert in market dynamics, competitor analysis, pricing psychology, and unit economics. Analyze:
-1. Total Addressable Market (TAM) with realistic estimates
-2. Top 3-5 competitors and their specific exploitable weaknesses
-3. Pricing psychology and willingness-to-pay
-4. Price anchoring strategies
-5. Market timing and trends
-6. Unit Economics: CAC (Customer Acquisition Cost), LTV (Lifetime Value), margins
-7. Revenue model sustainability
+  moneyTrail: `You are "Money Trail" - an expert in market dynamics, competitor analysis, and unit economics.
+Apply CEO patterns from successful founders (Musk's first principles, Bezos's flywheel thinking):
+
+1. **TAM/SAM/SOM Analysis** - Total, Serviceable, Obtainable market with realistic estimates
+2. **Competitor Mapping** - Top 3-5 competitors with EXPLOITABLE weaknesses
+3. **Market Timing** - Is now the right time? (like Airbnb during recession, Uber with smartphone adoption)
+4. **Network Effects Potential** - Does the product get better with more users?
+5. **Pricing Psychology** - Anchoring, decoy effect, value-based pricing
+6. **Unit Economics Deep Dive** - CAC, LTV, margins, payback period, contribution margin
+7. **Revenue Model Fit** - Which model fits best? Subscription, transactional, freemium?
+8. **Winner-Take-All Dynamics** - Is this market prone to monopoly?
 
 Return ONLY a JSON object:
 {
   "tam_estimate": "$X-Y billion/million",
+  "sam_estimate": "$X-Y million",
+  "som_estimate": "$X-Y million (year 1 realistic)",
   "tam_reasoning": "Brief justification",
   "competitors": [
     {"name": "competitor", "weakness": "exploitable weakness", "market_share": "estimate", "pricing": "their pricing"}
@@ -48,28 +59,38 @@ Return ONLY a JSON object:
   "suggested_price": "$X-Y range",
   "price_reasoning": "Why this price works",
   "anchor_strategy": "How to use price anchoring",
-  "market_timing": "good" | "moderate" | "risky",
-  "timing_reason": "Brief explanation",
+  "market_timing": "perfect" | "good" | "moderate" | "early" | "late",
+  "timing_reason": "Brief explanation with specific market signals",
+  "network_effects": {
+    "has_network_effects": boolean,
+    "type": "direct" | "indirect" | "data" | "platform" | "none",
+    "strength": "strong" | "moderate" | "weak"
+  },
   "unit_economics": {
     "estimated_cac": "$X estimate",
     "estimated_ltv": "$X estimate",
     "ltv_cac_ratio": "X:1 (healthy is >3:1)",
     "estimated_margin": "X% gross margin",
     "payback_period": "X months",
-    "sustainability": "good" | "moderate" | "concerning"
+    "contribution_margin": "X%",
+    "sustainability": "excellent" | "good" | "moderate" | "concerning"
   },
-  "revenue_model": "subscription" | "one-time" | "freemium" | "marketplace" | "other"
+  "revenue_model": "subscription" | "one-time" | "freemium" | "marketplace" | "usage-based" | "hybrid",
+  "winner_take_all": boolean,
+  "market_maturity": "nascent" | "growing" | "mature" | "declining"
 }`,
 
-  amygdalaAudit: `You are "Amygdala Audit" - an expert in risk assessment, fear/trust triggers, buying friction, and real-world execution challenges. Analyze:
-1. Cognitive barriers to purchase (objections, fears, doubts)
-2. Trust deficit - what needs to be proven
-3. Switching cost considerations
-4. Cortisol triggers (urgency, FOMO, loss aversion)
-5. Oxytocin factors (social proof, community, testimonials needed)
-6. Regulatory/legal risks specific to the industry
-7. Execution risks - team, technology, capital requirements
-8. Time-to-market pressures
+  amygdalaAudit: `You are "Amygdala Audit" - an expert in risk assessment, trust psychology, and execution reality.
+Apply learnings from 1000+ startup post-mortems and CEO failure patterns:
+
+1. **Buying Friction Analysis** - Every barrier between awareness and purchase
+2. **Trust Deficit Mapping** - What proof points are needed?
+3. **Fear/Risk Triggers** - Cortisol responses, loss aversion
+4. **Switching Cost Reality** - How hard is it to leave current solution?
+5. **Regulatory/Legal Landmines** - Industry-specific compliance issues
+6. **Execution Risk Matrix** - Team, tech, capital, time constraints
+7. **Founder-Market Fit Signals** - Does this founder have unique advantages?
+8. **Distribution Viability** - How will customers actually discover this?
 
 Return ONLY a JSON object:
 {
@@ -80,57 +101,144 @@ Return ONLY a JSON object:
   "risk_factors": ["risk1", "risk2"],
   "cortisol_urgency": ["urgency factor 1", "urgency factor 2"],
   "oxytocin_factors": ["trust factor 1", "trust factor 2"],
+  "switching_costs": {
+    "level": "low" | "medium" | "high",
+    "barriers": ["barrier1", "barrier2"],
+    "migration_complexity": "simple" | "moderate" | "complex"
+  },
   "regulatory_concerns": ["concern1"] | null,
   "objection_handling": [{"objection": "common objection", "counter": "how to handle"}],
   "execution_risks": {
     "team_requirements": ["skill/role needed 1", "skill/role needed 2"],
     "capital_needed": "$X estimate to reach MVP/traction",
+    "burn_rate_estimate": "$X/month",
+    "runway_needed": "X months",
     "tech_complexity": "low" | "medium" | "high",
     "tech_challenges": ["challenge1", "challenge2"],
     "time_to_mvp": "X weeks/months",
     "critical_hires": ["role1", "role2"],
-    "moat_difficulty": "easy" | "medium" | "hard"
+    "moat_difficulty": "easy" | "medium" | "hard",
+    "moat_type": "network" | "scale" | "brand" | "tech" | "data" | "none"
   },
+  "founder_market_fit": {
+    "score": number 1-10,
+    "advantages": ["advantage1", "advantage2"],
+    "gaps": ["gap1", "gap2"]
+  },
+  "distribution_channels": [
+    {"channel": "channel name", "viability": "high" | "medium" | "low", "cac_estimate": "$X"}
+  ],
   "legal_considerations": ["legal item 1"] | null,
   "industry_barriers": ["barrier1"] | null
 }`,
 
-  verdictSynthesizer: `You are the "Verdict Synthesizer" - the final arbiter who synthesizes all agent analyses into a verdict. Given the analyses from our specialist agents:
+  ceoPatternMatcher: `You are the "CEO Pattern Matcher" - an expert who has studied 1000+ successful and failed startups.
+Apply learnings from legendary founders:
 
-DOPAMINE DETECTIVE FINDINGS: {dopamineAnalysis}
-MONEY TRAIL FINDINGS: {moneyAnalysis}
-AMYGDALA AUDIT FINDINGS: {amygdalaAnalysis}
+1. **Bezos Regret Minimization** - Will the founder regret NOT trying this at 80?
+2. **Musk First Principles** - What are the fundamental truths, not assumptions?
+3. **Zuckerberg Speed** - Can this be built and tested in 2 weeks?
+4. **Thiel Zero-to-One** - Is this 10x better or just 10% better?
+5. **Buffett Circle of Competence** - Does founder understand this deeply?
+6. **Hormozi Value Equation** - Dream outcome × Perceived likelihood / Time delay × Effort
+7. **YC Startup Patterns** - Does this match patterns of successful YC companies?
+8. **Anti-Patterns** - Warning signs from failed startups
 
-Synthesize a final verdict. Be BRUTALLY HONEST like a top-tier VC who has seen 10,000 pitches. Consider:
-- Does the pain justify the price?
-- Is the market timing right?
-- Can the founder realistically execute given the challenges?
-- What's the probability of success?
-- Is the unit economics viable?
-- Are execution requirements realistic?
+Return ONLY a JSON object:
+{
+  "pattern_matches": {
+    "regret_minimization": {"score": number 1-10, "reasoning": "brief explanation"},
+    "first_principles": {"passes": boolean, "fundamental_truths": ["truth1", "truth2"]},
+    "speed_to_test": {"weeks_to_mvp": number, "validation_speed": "fast" | "medium" | "slow"},
+    "zero_to_one": {"is_10x": boolean, "improvement_type": "10x better" | "new category" | "incremental"},
+    "circle_of_competence": {"in_circle": boolean, "gaps": ["gap1"] | null},
+    "value_equation": {
+      "dream_outcome_score": number 1-10,
+      "likelihood_score": number 1-10,
+      "time_delay_score": number 1-10,
+      "effort_score": number 1-10,
+      "total_value_score": number 1-100
+    }
+  },
+  "yc_pattern_match": {
+    "matches_successful_patterns": boolean,
+    "similar_successful_companies": ["company1", "company2"],
+    "pattern_type": "marketplace" | "saas" | "consumer" | "b2b" | "dev-tools" | "fintech" | "health"
+  },
+  "anti_patterns_detected": [
+    {"pattern": "anti-pattern name", "severity": "critical" | "warning" | "minor", "explanation": "why this matters"}
+  ],
+  "founder_archetype": "visionary" | "operator" | "technical" | "domain-expert" | "hustler",
+  "scalability_score": number 1-10,
+  "scalability_bottlenecks": ["bottleneck1", "bottleneck2"],
+  "exit_potential": {
+    "acquisition_likely": boolean,
+    "potential_acquirers": ["company1", "company2"],
+    "ipo_viable": boolean,
+    "exit_timeline": "X-Y years"
+  },
+  "pivot_risk": {
+    "likelihood": "low" | "medium" | "high",
+    "likely_pivot_directions": ["direction1", "direction2"]
+  }
+}`,
 
-Provide an 8-year-old summary - explain the verdict so simply that a child would understand.
+  verdictSynthesizer: `You are the "Verdict Synthesizer" - the final arbiter synthesizing all agent analyses.
+Given findings from our 4 specialist agents:
+
+DOPAMINE DETECTIVE: {dopamineAnalysis}
+MONEY TRAIL: {moneyAnalysis}
+AMYGDALA AUDIT: {amygdalaAnalysis}
+CEO PATTERN MATCHER: {ceoPatterns}
+
+Synthesize a final verdict. Be BRUTALLY HONEST like a top-tier VC who has seen 10,000 pitches.
+Apply the "friend who works at Goldman" test - tell the hard truth even if it hurts.
+
+Weight factors:
+- Pain Score × Market Size × Timing = Core opportunity (40%)
+- Execution Feasibility × Founder-Market Fit = Delivery capability (30%)
+- Unit Economics × Moat Potential = Long-term viability (30%)
+
+Provide:
+1. Clear GO/PIVOT/KILL verdict with probability
+2. ELI8 Summary - explain so simply an 8-year-old would understand
+3. Immediate action plan for next 30 days
+4. What would change the verdict
 
 Return ONLY a JSON object:
 {
   "confidence_score": number 0-100,
   "verdict": "GO" | "PIVOT" | "KILL",
+  "verdict_probability": {"go": X, "pivot": Y, "kill": Z},
   "verdict_reasoning": "2-3 sentence brutal honest summary",
-  "eli8_summary": "Explain to an 8-year-old why this will/won't work in 2 sentences",
-  "immediate_plan": ["Day 1: action", "Day 3: action", "Week 1: action", "Week 2: action", "Month 1: action"],
+  "eli8_summary": "Explain to an 8-year-old why this will/won't work in 2-3 sentences",
+  "one_liner": "One sentence that captures the core insight",
+  "immediate_plan": [
+    {"day": "Day 1", "action": "specific action", "goal": "what success looks like"},
+    {"day": "Day 3", "action": "specific action", "goal": "what success looks like"},
+    {"day": "Week 1", "action": "specific action", "goal": "what success looks like"},
+    {"day": "Week 2", "action": "specific action", "goal": "what success looks like"},
+    {"day": "Month 1", "action": "specific action", "goal": "what success looks like"}
+  ],
   "pivot_suggestions": ["suggestion 1", "suggestion 2"] | null,
+  "what_would_change_verdict": ["factor that would upgrade/downgrade the verdict"],
   "key_assumptions": ["assumption to validate 1", "assumption 2", "assumption 3"],
   "dealbreakers": ["what could kill this"],
   "unfair_advantages_needed": ["what would make this unstoppable"],
   "success_probability": "X% chance of reaching $10k MRR",
+  "failure_modes": ["likely failure mode 1", "likely failure mode 2"],
   "timeline_to_revenue": {
     "mvp_weeks": number,
     "first_customer_weeks": number,
     "ten_customers_weeks": number,
-    "profitability_months": number
+    "hundred_customers_months": number,
+    "profitability_months": number,
+    "million_arr_months": number | null
   },
-  "founder_fit_questions": ["Question to ask yourself 1", "Question 2"]
-}`,
+  "founder_fit_questions": ["Deep question 1", "Deep question 2", "Deep question 3"],
+  "recommended_reading": ["Book or resource 1", "Book or resource 2"],
+  "similar_successful_founders": ["Founder who did something similar", "Another example"]
+}`
 };
 
 async function callAgent(
@@ -139,6 +247,8 @@ async function callAgent(
   userContext: string,
   apiKey: string
 ): Promise<any> {
+  console.log(`🤖 Starting ${agentName}...`);
+  
   const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
     method: "POST",
     headers: {
@@ -168,6 +278,7 @@ async function callAgent(
   try {
     const jsonMatch = content.match(/```(?:json)?\s*([\s\S]*?)```/);
     const jsonStr = jsonMatch ? jsonMatch[1].trim() : content.trim();
+    console.log(`✅ ${agentName} completed`);
     return JSON.parse(jsonStr);
   } catch {
     console.error(`Failed to parse ${agentName} response:`, content);
@@ -208,24 +319,29 @@ PLATFORM/DELIVERY: ${platform || "Not specified"}
 
 CURRENT STAGE: ${stage || "Just an idea"}
 
-Analyze with brutal honesty. The founder's success depends on hearing the truth. Consider all real-world factors: execution difficulty, capital requirements, regulatory hurdles, and realistic timelines.`;
+Analyze with brutal honesty using patterns from 1000+ successful and failed startups.
+Apply the "friend who works at Goldman" test - tell the hard truth, not what they want to hear.
+Consider all real-world factors: market timing, network effects, founder-market fit, distribution channels, 
+execution difficulty, capital requirements, regulatory hurdles, and realistic timelines.`;
 
-    // Run all three specialist agents in PARALLEL
-    console.log("🧠 Starting multi-agent analysis with real-world factors...");
+    // Run all FOUR specialist agents in PARALLEL
+    console.log("🧠 Starting CEO Pattern Multi-Agent Analysis...");
     
-    const [dopamineResult, moneyResult, amygdalaResult] = await Promise.all([
+    const [dopamineResult, moneyResult, amygdalaResult, ceoResult] = await Promise.all([
       callAgent("DopamineDetective", agentPrompts.dopamineDetective, userContext, LOVABLE_API_KEY),
       callAgent("MoneyTrail", agentPrompts.moneyTrail, userContext, LOVABLE_API_KEY),
       callAgent("AmygdalaAudit", agentPrompts.amygdalaAudit, userContext, LOVABLE_API_KEY),
+      callAgent("CEOPatternMatcher", agentPrompts.ceoPatternMatcher, userContext, LOVABLE_API_KEY),
     ]);
 
-    console.log("✅ All agents completed, synthesizing verdict...");
+    console.log("✅ All 4 agents completed, synthesizing verdict...");
 
     // Now synthesize the verdict with all agent findings
     const synthesisPrompt = agentPrompts.verdictSynthesizer
       .replace("{dopamineAnalysis}", JSON.stringify(dopamineResult || {}))
       .replace("{moneyAnalysis}", JSON.stringify(moneyResult || {}))
-      .replace("{amygdalaAnalysis}", JSON.stringify(amygdalaResult || {}));
+      .replace("{amygdalaAnalysis}", JSON.stringify(amygdalaResult || {}))
+      .replace("{ceoPatterns}", JSON.stringify(ceoResult || {}));
 
     const verdictResult = await callAgent("VerdictSynthesizer", synthesisPrompt, userContext, LOVABLE_API_KEY);
 
@@ -240,18 +356,27 @@ Analyze with brutal honesty. The founder's success depends on hearing the truth.
         frequency: dopamineResult?.pain_frequency || "monthly",
       },
       mom_test_pass: dopamineResult?.mom_test_pass ?? false,
+      hair_on_fire: dopamineResult?.hair_on_fire ?? false,
+      willingness_to_pay: dopamineResult?.willingness_to_pay_signal || "moderate",
       existing_alternatives: dopamineResult?.existing_alternatives || [],
       why_alternatives_fail: dopamineResult?.why_alternatives_fail || "",
 
       // Market Analysis (from Money Trail)
       market_analysis: {
         tam_estimate: moneyResult?.tam_estimate || "Requires research",
+        sam_estimate: moneyResult?.sam_estimate || "",
+        som_estimate: moneyResult?.som_estimate || "",
         tam_reasoning: moneyResult?.tam_reasoning || "",
         competitors: moneyResult?.competitors || [],
         competitive_advantage: moneyResult?.your_edge || "Not assessed",
         market_timing: moneyResult?.market_timing || "moderate",
         timing_reason: moneyResult?.timing_reason || "",
+        market_maturity: moneyResult?.market_maturity || "growing",
+        winner_take_all: moneyResult?.winner_take_all ?? false,
       },
+
+      // Network Effects (from Money Trail)
+      network_effects: moneyResult?.network_effects || null,
 
       // Unit Economics (from Money Trail)
       unit_economics: moneyResult?.unit_economics || null,
@@ -269,12 +394,19 @@ Analyze with brutal honesty. The founder's success depends on hearing the truth.
       buying_friction: amygdalaResult?.buying_friction || ["Needs validation"],
       trust_barriers: amygdalaResult?.trust_barriers || [],
       objection_handling: amygdalaResult?.objection_handling || [],
+      switching_costs: amygdalaResult?.switching_costs || null,
       regulatory_concerns: amygdalaResult?.regulatory_concerns || null,
       legal_considerations: amygdalaResult?.legal_considerations || null,
       industry_barriers: amygdalaResult?.industry_barriers || null,
 
       // Execution Risks (from Amygdala Audit)
       execution_risks: amygdalaResult?.execution_risks || null,
+      
+      // Founder-Market Fit (from Amygdala Audit)
+      founder_market_fit: amygdalaResult?.founder_market_fit || null,
+      
+      // Distribution (from Amygdala Audit)
+      distribution_channels: amygdalaResult?.distribution_channels || null,
 
       // Neuroscience Layer
       neuroscience: {
@@ -285,20 +417,40 @@ Analyze with brutal honesty. The founder's success depends on hearing the truth.
         trust_difficulty: amygdalaResult?.trust_difficulty || "medium",
       },
 
+      // CEO Pattern Analysis (from CEO Pattern Matcher)
+      ceo_patterns: {
+        pattern_matches: ceoResult?.pattern_matches || null,
+        yc_pattern_match: ceoResult?.yc_pattern_match || null,
+        anti_patterns: ceoResult?.anti_patterns_detected || [],
+        founder_archetype: ceoResult?.founder_archetype || "operator",
+        scalability: {
+          score: ceoResult?.scalability_score || 5,
+          bottlenecks: ceoResult?.scalability_bottlenecks || [],
+        },
+        exit_potential: ceoResult?.exit_potential || null,
+        pivot_risk: ceoResult?.pivot_risk || null,
+      },
+
       // Verdict (from Synthesizer)
       confidence_score: verdictResult?.confidence_score || 50,
       verdict: verdictResult?.verdict || "PIVOT",
+      verdict_probability: verdictResult?.verdict_probability || null,
       verdict_reasoning: verdictResult?.verdict_reasoning || "Further validation needed",
+      one_liner: verdictResult?.one_liner || "",
       eli8_summary: verdictResult?.eli8_summary || "",
       success_probability: verdictResult?.success_probability || "Unknown",
+      failure_modes: verdictResult?.failure_modes || [],
       timeline_to_revenue: verdictResult?.timeline_to_revenue || null,
       founder_fit_questions: verdictResult?.founder_fit_questions || [],
+      what_would_change_verdict: verdictResult?.what_would_change_verdict || [],
+      recommended_reading: verdictResult?.recommended_reading || [],
+      similar_founders: verdictResult?.similar_successful_founders || [],
       immediate_plan: verdictResult?.immediate_plan || [
-        "Day 1: Talk to 5 potential customers",
-        "Day 3: Create landing page",
-        "Week 1: Get 10 email signups",
-        "Week 2: Conduct pre-sales",
-        "Month 1: Build MVP if validated",
+        { day: "Day 1", action: "Talk to 5 potential customers", goal: "Validate core pain point" },
+        { day: "Day 3", action: "Create landing page", goal: "Test messaging and collect emails" },
+        { day: "Week 1", action: "Get 10 email signups", goal: "Prove initial interest" },
+        { day: "Week 2", action: "Conduct pre-sales", goal: "Get 3 paying customers" },
+        { day: "Month 1", action: "Build MVP if validated", goal: "Launch to first cohort" },
       ],
       pivot_suggestions: verdictResult?.pivot_suggestions || null,
       key_assumptions: verdictResult?.key_assumptions || [],
@@ -306,7 +458,8 @@ Analyze with brutal honesty. The founder's success depends on hearing the truth.
       unfair_advantages_needed: verdictResult?.unfair_advantages_needed || [],
 
       // Meta info
-      analysis_agents: ["Dopamine Detective", "Money Trail", "Amygdala Audit", "Verdict Synthesizer"],
+      analysis_agents: ["Dopamine Detective", "Money Trail", "Amygdala Audit", "CEO Pattern Matcher", "Verdict Synthesizer"],
+      analysis_version: "2.0-ceo-patterns",
     };
 
     return new Response(JSON.stringify(finalResult), {

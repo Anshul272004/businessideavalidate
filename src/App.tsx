@@ -7,6 +7,8 @@ import Landing from "./pages/Landing";
 import Input from "./pages/Input";
 import Loading from "./pages/Loading";
 import Result from "./pages/Result";
+import Pricing from "./pages/Pricing";
+import CaseStudies from "./pages/CaseStudies";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -22,6 +24,8 @@ const App = () => (
           <Route path="/input" element={<Input />} />
           <Route path="/loading" element={<Loading />} />
           <Route path="/result" element={<Result />} />
+          <Route path="/pricing" element={<Pricing />} />
+          <Route path="/case-studies" element={<CaseStudies />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

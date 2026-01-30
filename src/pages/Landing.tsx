@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { LuxuryButton } from "@/components/ui/luxury-button";
-import { ArrowRight, Sparkles, Target, Brain, TrendingUp, Shield, Zap, Star } from "lucide-react";
+import { ArrowRight, Sparkles, Target, Brain, TrendingUp, Shield, Zap, Star, Menu } from "lucide-react";
 import HowItWorks from "@/components/landing/HowItWorks";
 import Testimonials from "@/components/landing/Testimonials";
 import FAQ from "@/components/landing/FAQ";
@@ -15,6 +15,7 @@ import MoneyBackGuarantee from "@/components/landing/MoneyBackGuarantee";
 import FounderShowcase from "@/components/landing/FounderShowcase";
 import TrustBadges from "@/components/landing/TrustBadges";
 import FinalCTA from "@/components/landing/FinalCTA";
+import CEOPatternSection from "@/components/landing/CEOPatternSection";
 
 const Landing = () => {
   const navigate = useNavigate();
@@ -48,8 +49,22 @@ const Landing = () => {
           <motion.div
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
-            className="flex items-center gap-4"
+            className="flex items-center gap-6"
           >
+            <div className="hidden md:flex items-center gap-6">
+              <button 
+                onClick={() => navigate("/pricing")}
+                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+              >
+                Pricing
+              </button>
+              <button 
+                onClick={() => navigate("/case-studies")}
+                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+              >
+                Case Studies
+              </button>
+            </div>
             <span className="hidden sm:flex items-center gap-1 text-sm text-muted-foreground">
               <Star className="w-4 h-4 fill-primary text-primary" />
               4.9/5 rating
@@ -267,6 +282,9 @@ const Landing = () => {
 
       {/* Comparison Table */}
       <ComparisonTable />
+
+      {/* CEO Pattern Section */}
+      <CEOPatternSection />
 
       {/* Founder Success Stories */}
       <FounderShowcase />

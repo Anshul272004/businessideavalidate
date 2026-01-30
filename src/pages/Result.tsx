@@ -30,6 +30,11 @@ import ExecutionRisks from "@/components/result/ExecutionRisks";
 import UnitEconomics from "@/components/result/UnitEconomics";
 import TimelineRoadmap from "@/components/result/TimelineRoadmap";
 import FounderFitQuestions from "@/components/result/FounderFitQuestions";
+import CEOPatterns from "@/components/result/CEOPatterns";
+import NetworkEffects from "@/components/result/NetworkEffects";
+import DistributionChannels from "@/components/result/DistributionChannels";
+import FounderMarketFit from "@/components/result/FounderMarketFit";
+import ActionPlan from "@/components/result/ActionPlan";
 
 interface ValidationResult {
   demand_psychology: string;
@@ -40,40 +45,70 @@ interface ValidationResult {
     frequency?: "daily" | "weekly" | "monthly" | "rarely";
   };
   mom_test_pass?: boolean;
+  hair_on_fire?: boolean;
+  willingness_to_pay?: string;
   existing_alternatives?: string[];
   why_alternatives_fail?: string;
   market_analysis?: {
     tam_estimate: string;
+    sam_estimate?: string;
+    som_estimate?: string;
     tam_reasoning?: string;
     competitors: { name: string; weakness: string; market_share?: string; pricing?: string }[];
     competitive_advantage: string;
-    market_timing?: "good" | "moderate" | "risky";
+    market_timing?: "perfect" | "good" | "moderate" | "early" | "late" | "risky";
     timing_reason?: string;
+    market_maturity?: string;
+    winner_take_all?: boolean;
   };
+  network_effects?: {
+    has_network_effects: boolean;
+    type: "direct" | "indirect" | "data" | "platform" | "none";
+    strength: "strong" | "moderate" | "weak";
+  } | null;
   unit_economics?: {
     estimated_cac?: string;
     estimated_ltv?: string;
     ltv_cac_ratio?: string;
     estimated_margin?: string;
     payback_period?: string;
-    sustainability?: "good" | "moderate" | "concerning";
+    contribution_margin?: string;
+    sustainability?: "excellent" | "good" | "moderate" | "concerning";
   } | null;
   revenue_model?: string;
   buying_friction: string[];
   trust_barriers?: string[];
   objection_handling?: { objection: string; counter: string }[];
+  switching_costs?: {
+    level: string;
+    barriers: string[];
+    migration_complexity: string;
+  } | null;
   regulatory_concerns?: string[] | null;
   legal_considerations?: string[] | null;
   industry_barriers?: string[] | null;
   execution_risks?: {
     team_requirements?: string[];
     capital_needed?: string;
+    burn_rate_estimate?: string;
+    runway_needed?: string;
     tech_complexity?: "low" | "medium" | "high";
     tech_challenges?: string[];
     time_to_mvp?: string;
     critical_hires?: string[];
     moat_difficulty?: "easy" | "medium" | "hard";
+    moat_type?: string;
   } | null;
+  founder_market_fit?: {
+    score: number;
+    advantages: string[];
+    gaps: string[];
+  } | null;
+  distribution_channels?: Array<{
+    channel: string;
+    viability: "high" | "medium" | "low";
+    cac_estimate: string;
+  }> | null;
   pricing_psychology: { 
     fair: boolean; 
     suggested: string; 
@@ -88,24 +123,42 @@ interface ValidationResult {
     risk: string; 
     trust_difficulty: string;
   };
+  ceo_patterns?: {
+    pattern_matches?: any;
+    yc_pattern_match?: any;
+    anti_patterns?: any[];
+    founder_archetype?: string;
+    scalability?: { score: number; bottlenecks: string[] };
+    exit_potential?: any;
+    pivot_risk?: any;
+  } | null;
   confidence_score?: number;
   verdict: "GO" | "PIVOT" | "KILL";
+  verdict_probability?: { go: number; pivot: number; kill: number } | null;
   verdict_reasoning?: string;
+  one_liner?: string;
   eli8_summary?: string;
   success_probability?: string;
+  failure_modes?: string[];
   timeline_to_revenue?: {
     mvp_weeks?: number;
     first_customer_weeks?: number;
     ten_customers_weeks?: number;
+    hundred_customers_months?: number;
     profitability_months?: number;
+    million_arr_months?: number | null;
   } | null;
   founder_fit_questions?: string[];
-  immediate_plan: string[];
+  what_would_change_verdict?: string[];
+  recommended_reading?: string[];
+  similar_founders?: string[];
+  immediate_plan: Array<{ day: string; action: string; goal: string }> | string[];
   pivot_suggestions?: string[];
   key_assumptions?: string[];
   dealbreakers?: string[];
   unfair_advantages_needed?: string[];
   analysis_agents?: string[];
+  analysis_version?: string;
 }
 
 const Result = () => {
@@ -383,6 +436,58 @@ const Result = () => {
               </motion.div>
             )}
 
+            {/* CEO Patterns */}
+            {result.ceo_patterns && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.305 }}
+              >
+                <CEOPatterns ceo_patterns={result.ceo_patterns} />
+              </motion.div>
+            )}
+
+            {/* Network Effects */}
+            {result.network_effects && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.31 }}
+              >
+                <NetworkEffects
+                  network_effects={result.network_effects}
+                  winner_take_all={result.market_analysis?.winner_take_all}
+                  market_maturity={result.market_analysis?.market_maturity}
+                />
+              </motion.div>
+            )}
+
+            {/* Founder Market Fit */}
+            {result.founder_market_fit && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.315 }}
+              >
+                <FounderMarketFit
+                  founder_market_fit={result.founder_market_fit}
+                  founder_archetype={result.ceo_patterns?.founder_archetype}
+                  similar_founders={result.similar_founders}
+                />
+              </motion.div>
+            )}
+
+            {/* Distribution Channels */}
+            {result.distribution_channels && result.distribution_channels.length > 0 && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.32 }}
+              >
+                <DistributionChannels channels={result.distribution_channels} />
+              </motion.div>
+            )}
+
             {/* Market Timing */}
             {result.market_analysis?.market_timing && (
               <motion.div
@@ -498,24 +603,17 @@ const Result = () => {
               </motion.div>
             )}
 
-            {/* Immediate Plan */}
+            {/* Enhanced Action Plan */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.5 }}
             >
-              <ResultCard icon={<ArrowRight className="w-5 h-5" />} title="Your Action Plan">
-                <ol className="space-y-4">
-                  {result.immediate_plan.map((step, i) => (
-                    <li key={i} className="flex items-start gap-4">
-                      <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-primary/80 text-primary-foreground flex items-center justify-center flex-shrink-0 font-bold shadow-lg shadow-primary/20">
-                        {i + 1}
-                      </div>
-                      <span className="text-muted-foreground pt-2">{step}</span>
-                    </li>
-                  ))}
-                </ol>
-              </ResultCard>
+              <ActionPlan
+                immediate_plan={result.immediate_plan}
+                what_would_change_verdict={result.what_would_change_verdict}
+                recommended_reading={result.recommended_reading}
+              />
             </motion.div>
           </div>
 
