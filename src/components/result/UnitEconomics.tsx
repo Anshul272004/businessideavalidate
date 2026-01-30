@@ -8,7 +8,8 @@ interface UnitEconomicsProps {
     ltv_cac_ratio?: string;
     estimated_margin?: string;
     payback_period?: string;
-    sustainability?: "good" | "moderate" | "concerning";
+    contribution_margin?: string;
+    sustainability?: "excellent" | "good" | "moderate" | "concerning";
   } | null;
   revenue_model?: string;
 }
@@ -17,6 +18,13 @@ const UnitEconomics = ({ unit_economics, revenue_model }: UnitEconomicsProps) =>
   if (!unit_economics) return null;
 
   const sustainabilityConfig = {
+    excellent: {
+      color: "text-success",
+      bgColor: "bg-success/10",
+      borderColor: "border-success/20",
+      icon: <CheckCircle className="w-5 h-5" />,
+      label: "Excellent Economics",
+    },
     good: {
       color: "text-success",
       bgColor: "bg-success/10",
