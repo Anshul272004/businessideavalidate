@@ -14,6 +14,7 @@ import {
   CheckCircle2,
   Lightbulb,
   Clock,
+  Crown,
 } from "lucide-react";
 
 import ConfidenceMeter from "@/components/result/ConfidenceMeter";
@@ -35,6 +36,8 @@ import NetworkEffects from "@/components/result/NetworkEffects";
 import DistributionChannels from "@/components/result/DistributionChannels";
 import FounderMarketFit from "@/components/result/FounderMarketFit";
 import ActionPlan from "@/components/result/ActionPlan";
+import USPAnalysis from "@/components/result/USPAnalysis";
+import PersonalizedBlueprint from "@/components/result/PersonalizedBlueprint";
 
 interface ValidationResult {
   demand_psychology: string;
