@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { LuxuryButton } from "@/components/ui/luxury-button";
@@ -7,37 +7,65 @@ import {
   ArrowLeft, 
   Target,
   User,
-  Briefcase,
   DollarSign,
   Clock,
   Rocket,
-  Brain,
-  AlertTriangle
+  Globe,
+  Users,
+  Network,
+  Shield,
+  CheckCircle2,
+  MapPin
 } from "lucide-react";
+import { 
+  countries, 
+  cityTiers, 
+  marketMaturityOptions,
+  customerLocationOptions,
+  paymentMaturityOptions,
+  trustCultureOptions,
+  investorAccessOptions,
+  customerAccessOptions,
+  regulatoryEnvironmentOptions,
+  infrastructureOptions
+} from "@/data/countries";
 
 interface FormData {
-  // Idea
+  // Step 1: The Idea
   idea: string;
   targetCustomer: string;
   price: string;
   platform: "digital" | "physical" | "hybrid";
   stage: "concept" | "validated" | "mvp" | "revenue";
   uniqueInsight: string;
-  // Founder Reality
+  // Step 2: Location Reality
+  country: string;
+  state: string;
+  cityTier: "metro" | "tier-1" | "tier-2" | "tier-3" | "rural";
+  marketMaturity: "nascent" | "emerging" | "developed" | "saturated";
+  // Step 3: Market Culture
+  customerLocation: "local" | "national" | "global";
+  paymentMaturity: "cash-heavy" | "digital-emerging" | "digital-first";
+  trustCulture: "relationship" | "transaction" | "hybrid";
+  regulatoryEnvironment: "light" | "moderate" | "heavy" | "uncertain";
+  infrastructure: "excellent" | "good" | "developing" | "challenging";
+  // Step 4: Founder Reality
   age: "under-25" | "25-35" | "35-45" | "45-plus";
   coreSkill: "technical" | "sales" | "operations" | "content" | "generalist";
   industryYears: "0-2" | "2-5" | "5-10" | "10-plus";
   energyLevel: "side-project" | "part-time" | "full-time" | "obsessed";
-  // Capital Reality
+  previousBusiness: "none" | "failed" | "small-exit" | "big-exit";
+  // Step 5: Capital Reality
   budget: "zero" | "under-50k" | "50k-200k" | "200k-plus";
   monthlyBurn: "under-5k" | "5k-15k" | "15k-50k" | "50k-plus";
   riskTolerance: "low" | "medium" | "high";
-  // Time Reality
+  // Step 6: Network & Time
   hoursPerDay: "1-2" | "4-6" | "8-plus" | "all-waking";
   deadline: "fast-money" | "12-months" | "long-term";
-  // Outcome Intent
+  investorAccess: "none" | "angels" | "vcs" | "institutional";
+  customerAccess: "cold" | "warm" | "hot" | "existing";
+  // Step 7: Outcome Intent
   goal: "lifestyle" | "agency" | "saas" | "venture" | "acquisition";
-  previousBusiness: "none" | "failed" | "small-exit" | "big-exit";
   competitiveAdvantage: string;
 }
 
@@ -54,19 +82,35 @@ const Input = () => {
     platform: "digital",
     stage: "concept",
     uniqueInsight: "",
+    country: "",
+    state: "",
+    cityTier: "metro",
+    marketMaturity: "emerging",
+    customerLocation: "national",
+    paymentMaturity: "digital-emerging",
+    trustCulture: "hybrid",
+    regulatoryEnvironment: "moderate",
+    infrastructure: "good",
     age: "25-35",
     coreSkill: "technical",
     industryYears: "2-5",
     energyLevel: "full-time",
+    previousBusiness: "none",
     budget: "under-50k",
     monthlyBurn: "5k-15k",
     riskTolerance: "medium",
     hoursPerDay: "8-plus",
     deadline: "12-months",
+    investorAccess: "none",
+    customerAccess: "cold",
     goal: "saas",
-    previousBusiness: "none",
     competitiveAdvantage: "",
   });
+
+  const selectedCountry = useMemo(() => 
+    countries.find(c => c.code === formData.country), 
+    [formData.country]
+  );
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -76,15 +120,26 @@ const Input = () => {
 
   const isStepComplete = (step: number) => {
     if (step === 1) return formData.idea.length > 20 && formData.targetCustomer.length > 10;
-    if (step === 2) return true;
+    if (step === 2) return formData.country !== "";
     if (step === 3) return true;
     if (step === 4) return true;
     if (step === 5) return true;
+    if (step === 6) return true;
+    if (step === 7) return true;
     return false;
   };
 
-  const stepTitles = ["The Idea", "Founder Reality", "Capital Reality", "Time Reality", "Outcome Intent"];
-  const totalSteps = 5;
+  const stepConfig = [
+    { title: "The Idea", icon: <Target className="w-4 h-4" />, desc: "Describe what you want to build" },
+    { title: "Location Reality", icon: <Globe className="w-4 h-4" />, desc: "Where will you operate?" },
+    { title: "Market Culture", icon: <Users className="w-4 h-4" />, desc: "How customers behave locally" },
+    { title: "Founder Reality", icon: <User className="w-4 h-4" />, desc: "Your skills and experience" },
+    { title: "Capital Reality", icon: <DollarSign className="w-4 h-4" />, desc: "Budget and risk tolerance" },
+    { title: "Network & Time", icon: <Network className="w-4 h-4" />, desc: "Connections and commitment" },
+    { title: "Outcome Intent", icon: <Rocket className="w-4 h-4" />, desc: "Your ultimate goal" },
+  ];
+  const totalSteps = 7;
+  const progressPercent = Math.round((currentStep / totalSteps) * 100);
 
   if (!isPaid) {
     return (
@@ -110,8 +165,14 @@ const Input = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      {/* Ambient Background */}
+      <div className="fixed inset-0 pointer-events-none">
+        <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-primary/5 rounded-full blur-[150px]" />
+        <div className="absolute bottom-1/3 right-1/4 w-[400px] h-[400px] bg-ice/3 rounded-full blur-[120px]" />
+      </div>
+
       {/* Navigation */}
-      <nav className="luxury-container py-8">
+      <nav className="luxury-container py-6 relative z-10">
         <div className="flex items-center justify-between">
           <button
             onClick={() => navigate("/")}
@@ -121,25 +182,68 @@ const Input = () => {
             Back
           </button>
           
-          {/* Progress */}
-          <div className="flex items-center gap-2">
-            {[1, 2, 3, 4, 5].map((step) => (
-              <div
-                key={step}
-                className={`w-8 h-1 rounded-full transition-colors ${
-                  step <= currentStep ? "bg-primary" : "bg-border"
-                }`}
-              />
-            ))}
+          {/* Progress Circle */}
+          <div className="flex items-center gap-4">
+            <div className="relative w-12 h-12">
+              <svg className="w-12 h-12 -rotate-90">
+                <circle
+                  cx="24"
+                  cy="24"
+                  r="20"
+                  stroke="currentColor"
+                  strokeWidth="3"
+                  fill="none"
+                  className="text-border"
+                />
+                <circle
+                  cx="24"
+                  cy="24"
+                  r="20"
+                  stroke="currentColor"
+                  strokeWidth="3"
+                  fill="none"
+                  strokeDasharray={`${progressPercent * 1.26} 126`}
+                  className="text-primary transition-all duration-300"
+                />
+              </svg>
+              <span className="absolute inset-0 flex items-center justify-center text-xs font-semibold">
+                {progressPercent}%
+              </span>
+            </div>
+            <span className="text-sm text-muted-foreground hidden sm:block">
+              Step {currentStep} of {totalSteps}
+            </span>
           </div>
-          
-          <span className="text-sm text-muted-foreground">
-            {currentStep} of {totalSteps}
-          </span>
         </div>
       </nav>
 
-      <div className="luxury-container pb-24">
+      {/* Step Indicators */}
+      <div className="luxury-container relative z-10 mb-8">
+        <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+          {stepConfig.map((step, i) => (
+            <button
+              key={i}
+              onClick={() => i + 1 <= currentStep && setCurrentStep(i + 1)}
+              className={`flex items-center gap-2 px-4 py-2 rounded-full text-xs whitespace-nowrap transition-all ${
+                i + 1 === currentStep
+                  ? "bg-primary/10 text-primary border border-primary/30"
+                  : i + 1 < currentStep
+                  ? "bg-success/10 text-success border border-success/20"
+                  : "bg-muted/30 text-muted-foreground border border-transparent"
+              }`}
+            >
+              {i + 1 < currentStep ? (
+                <CheckCircle2 className="w-3.5 h-3.5" />
+              ) : (
+                step.icon
+              )}
+              <span className="hidden sm:inline">{step.title}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="luxury-container pb-24 relative z-10">
         <div className="max-w-2xl mx-auto">
           {/* Header */}
           <motion.div 
@@ -148,18 +252,21 @@ const Input = () => {
             animate={{ opacity: 1, y: 0 }}
             className="mb-10"
           >
-            <p className="text-sm text-muted-foreground mb-2 uppercase tracking-wide">
-              Step {currentStep}
-            </p>
-            <h1 className="text-3xl md:text-4xl font-semibold mb-2">
-              {stepTitles[currentStep - 1]}
-            </h1>
-            <p className="text-muted-foreground">
-              {currentStep === 1 && "Describe what you want to build and who it's for."}
-              {currentStep === 2 && "Your skills and capacity determine what's viable for you."}
-              {currentStep === 3 && "Capital constraints shape the path forward."}
-              {currentStep === 4 && "Time availability affects execution speed."}
-              {currentStep === 5 && "Your goal determines the strategy."}
+            <div className="flex items-center gap-3 mb-3">
+              <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary">
+                {stepConfig[currentStep - 1].icon}
+              </div>
+              <div>
+                <p className="text-xs text-muted-foreground uppercase tracking-widest">
+                  Step {currentStep}
+                </p>
+                <h1 className="text-2xl md:text-3xl font-semibold">
+                  {stepConfig[currentStep - 1].title}
+                </h1>
+              </div>
+            </div>
+            <p className="text-muted-foreground ml-[52px]">
+              {stepConfig[currentStep - 1].desc}
             </p>
           </motion.div>
 
@@ -175,7 +282,7 @@ const Input = () => {
                   className="space-y-6"
                 >
                   <div>
-                    <label className="luxury-label mb-2 block">What is your business idea?</label>
+                    <label className="luxury-label mb-3 block">What is your business idea?</label>
                     <textarea
                       className="luxury-textarea min-h-[140px]"
                       placeholder="Describe the problem you solve and your solution. Be specific about the value you create."
@@ -186,7 +293,7 @@ const Input = () => {
                   </div>
 
                   <div>
-                    <label className="luxury-label mb-2 block">Who is your target customer?</label>
+                    <label className="luxury-label mb-3 block">Who is your target customer?</label>
                     <textarea
                       className="luxury-textarea min-h-[100px]"
                       placeholder="Describe your ideal customer with specifics: role, company size, pain point, current solution."
@@ -198,21 +305,20 @@ const Input = () => {
 
                   <div className="grid sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="luxury-label mb-2 block">Price Point (Monthly)</label>
+                      <label className="luxury-label mb-3 block">Price Point (Monthly)</label>
                       <div className="relative">
                         <span className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground">$</span>
                         <input
-                          type="number"
+                          type="text"
                           className="luxury-input pl-8"
                           placeholder="99"
                           value={formData.price}
                           onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-                          required
                         />
                       </div>
                     </div>
                     <div>
-                      <label className="luxury-label mb-2 block">Current Stage</label>
+                      <label className="luxury-label mb-3 block">Current Stage</label>
                       <select
                         className="luxury-input"
                         value={formData.stage}
@@ -227,7 +333,7 @@ const Input = () => {
                   </div>
 
                   <div>
-                    <label className="luxury-label mb-2 block">What is your unique insight?</label>
+                    <label className="luxury-label mb-3 block">What is your unique insight?</label>
                     <textarea
                       className="luxury-textarea"
                       placeholder="What do you believe about this market that most people think is wrong?"
@@ -238,7 +344,7 @@ const Input = () => {
                 </motion.div>
               )}
 
-              {/* Step 2: Founder Reality */}
+              {/* Step 2: Location Reality */}
               {currentStep === 2 && (
                 <motion.div
                   key="step2"
@@ -247,9 +353,135 @@ const Input = () => {
                   exit={{ opacity: 0, x: -20 }}
                   className="space-y-6"
                 >
-                  <div className="grid sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="luxury-label mb-3 block">
+                      <MapPin className="w-3.5 h-3.5 inline mr-1" />
+                      Country
+                    </label>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                      {countries.map((country) => (
+                        <button
+                          key={country.code}
+                          type="button"
+                          onClick={() => setFormData({ ...formData, country: country.code, state: "" })}
+                          className={`option-card ${formData.country === country.code ? "selected" : ""}`}
+                        >
+                          <span className="text-xl mb-1 block">{country.flag}</span>
+                          <span className="text-sm font-medium">{country.name}</span>
+                          {country.startupHub && (
+                            <span className="text-[10px] text-primary mt-1 block">Startup Hub</span>
+                          )}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {selectedCountry?.states && selectedCountry.states.length > 0 && (
                     <div>
-                      <label className="luxury-label mb-2 block">Age Range</label>
+                      <label className="luxury-label mb-3 block">State / Region</label>
+                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                        {selectedCountry.states.map((state) => (
+                          <button
+                            key={state.code}
+                            type="button"
+                            onClick={() => setFormData({ ...formData, state: state.code })}
+                            className={`option-card ${formData.state === state.code ? "selected" : ""}`}
+                          >
+                            <span className="text-sm font-medium">{state.name}</span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  <div>
+                    <label className="luxury-label mb-3 block">City Tier</label>
+                    <OptionGrid
+                      options={cityTiers}
+                      value={formData.cityTier}
+                      onChange={(v) => setFormData({ ...formData, cityTier: v as FormData["cityTier"] })}
+                    />
+                  </div>
+
+                  <div>
+                    <label className="luxury-label mb-3 block">Market Maturity</label>
+                    <OptionGrid
+                      options={marketMaturityOptions}
+                      value={formData.marketMaturity}
+                      onChange={(v) => setFormData({ ...formData, marketMaturity: v as FormData["marketMaturity"] })}
+                    />
+                  </div>
+                </motion.div>
+              )}
+
+              {/* Step 3: Market Culture */}
+              {currentStep === 3 && (
+                <motion.div
+                  key="step3"
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -20 }}
+                  className="space-y-6"
+                >
+                  <div>
+                    <label className="luxury-label mb-3 block">Where are your customers located?</label>
+                    <OptionGrid
+                      options={customerLocationOptions}
+                      value={formData.customerLocation}
+                      onChange={(v) => setFormData({ ...formData, customerLocation: v as FormData["customerLocation"] })}
+                    />
+                  </div>
+
+                  <div>
+                    <label className="luxury-label mb-3 block">Payment Infrastructure</label>
+                    <OptionGrid
+                      options={paymentMaturityOptions}
+                      value={formData.paymentMaturity}
+                      onChange={(v) => setFormData({ ...formData, paymentMaturity: v as FormData["paymentMaturity"] })}
+                    />
+                  </div>
+
+                  <div>
+                    <label className="luxury-label mb-3 block">Trust Culture</label>
+                    <OptionGrid
+                      options={trustCultureOptions}
+                      value={formData.trustCulture}
+                      onChange={(v) => setFormData({ ...formData, trustCulture: v as FormData["trustCulture"] })}
+                    />
+                  </div>
+
+                  <div>
+                    <label className="luxury-label mb-3 block">Regulatory Environment</label>
+                    <OptionGrid
+                      options={regulatoryEnvironmentOptions}
+                      value={formData.regulatoryEnvironment}
+                      onChange={(v) => setFormData({ ...formData, regulatoryEnvironment: v as FormData["regulatoryEnvironment"] })}
+                    />
+                  </div>
+
+                  <div>
+                    <label className="luxury-label mb-3 block">Infrastructure Quality</label>
+                    <OptionGrid
+                      options={infrastructureOptions}
+                      value={formData.infrastructure}
+                      onChange={(v) => setFormData({ ...formData, infrastructure: v as FormData["infrastructure"] })}
+                    />
+                  </div>
+                </motion.div>
+              )}
+
+              {/* Step 4: Founder Reality */}
+              {currentStep === 4 && (
+                <motion.div
+                  key="step4"
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -20 }}
+                  className="space-y-6"
+                >
+                  <div className="grid sm:grid-cols-2 gap-6">
+                    <div>
+                      <label className="luxury-label mb-3 block">Age Range</label>
                       <OptionGrid
                         options={[
                           { value: "under-25", label: "Under 25" },
@@ -262,7 +494,7 @@ const Input = () => {
                       />
                     </div>
                     <div>
-                      <label className="luxury-label mb-2 block">Core Skill</label>
+                      <label className="luxury-label mb-3 block">Core Skill</label>
                       <OptionGrid
                         options={[
                           { value: "technical", label: "Technical" },
@@ -278,13 +510,13 @@ const Input = () => {
                   </div>
 
                   <div>
-                    <label className="luxury-label mb-2 block">Years of Industry Experience</label>
+                    <label className="luxury-label mb-3 block">Years of Industry Experience</label>
                     <OptionGrid
                       options={[
-                        { value: "0-2", label: "0-2 years" },
-                        { value: "2-5", label: "2-5 years" },
-                        { value: "5-10", label: "5-10 years" },
-                        { value: "10-plus", label: "10+ years" },
+                        { value: "0-2", label: "0-2 years", desc: "New to industry" },
+                        { value: "2-5", label: "2-5 years", desc: "Building expertise" },
+                        { value: "5-10", label: "5-10 years", desc: "Deep experience" },
+                        { value: "10-plus", label: "10+ years", desc: "Industry veteran" },
                       ]}
                       value={formData.industryYears}
                       onChange={(v) => setFormData({ ...formData, industryYears: v as FormData["industryYears"] })}
@@ -292,7 +524,7 @@ const Input = () => {
                   </div>
 
                   <div>
-                    <label className="luxury-label mb-2 block">Energy Level / Commitment</label>
+                    <label className="luxury-label mb-3 block">Energy Level / Commitment</label>
                     <OptionGrid
                       options={[
                         { value: "side-project", label: "Side Project", desc: "5-10 hrs/week" },
@@ -306,13 +538,13 @@ const Input = () => {
                   </div>
 
                   <div>
-                    <label className="luxury-label mb-2 block">Previous Business Experience</label>
+                    <label className="luxury-label mb-3 block">Previous Business Experience</label>
                     <OptionGrid
                       options={[
-                        { value: "none", label: "First Time" },
-                        { value: "failed", label: "Failed Startup" },
-                        { value: "small-exit", label: "Small Exit" },
-                        { value: "big-exit", label: "Major Exit" },
+                        { value: "none", label: "First Time", desc: "No prior businesses" },
+                        { value: "failed", label: "Failed Startup", desc: "Learned from failure" },
+                        { value: "small-exit", label: "Small Exit", desc: "Sold for <$1M" },
+                        { value: "big-exit", label: "Major Exit", desc: "Sold for >$1M" },
                       ]}
                       value={formData.previousBusiness}
                       onChange={(v) => setFormData({ ...formData, previousBusiness: v as FormData["previousBusiness"] })}
@@ -321,17 +553,17 @@ const Input = () => {
                 </motion.div>
               )}
 
-              {/* Step 3: Capital Reality */}
-              {currentStep === 3 && (
+              {/* Step 5: Capital Reality */}
+              {currentStep === 5 && (
                 <motion.div
-                  key="step3"
+                  key="step5"
                   initial={{ opacity: 0, x: 20 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -20 }}
                   className="space-y-6"
                 >
                   <div>
-                    <label className="luxury-label mb-2 block">Available Budget</label>
+                    <label className="luxury-label mb-3 block">Available Budget</label>
                     <OptionGrid
                       options={[
                         { value: "zero", label: "$0", desc: "Sweat equity only" },
@@ -345,13 +577,13 @@ const Input = () => {
                   </div>
 
                   <div>
-                    <label className="luxury-label mb-2 block">Monthly Burn Tolerance</label>
+                    <label className="luxury-label mb-3 block">Monthly Burn Tolerance</label>
                     <OptionGrid
                       options={[
-                        { value: "under-5k", label: "Under $5K" },
-                        { value: "5k-15k", label: "$5K-$15K" },
-                        { value: "15k-50k", label: "$15K-$50K" },
-                        { value: "50k-plus", label: "$50K+" },
+                        { value: "under-5k", label: "Under $5K", desc: "Lean operation" },
+                        { value: "5k-15k", label: "$5K-$15K", desc: "Small team" },
+                        { value: "15k-50k", label: "$15K-$50K", desc: "Growth mode" },
+                        { value: "50k-plus", label: "$50K+", desc: "Scale ready" },
                       ]}
                       value={formData.monthlyBurn}
                       onChange={(v) => setFormData({ ...formData, monthlyBurn: v as FormData["monthlyBurn"] })}
@@ -359,7 +591,7 @@ const Input = () => {
                   </div>
 
                   <div>
-                    <label className="luxury-label mb-2 block">Personal Risk Tolerance</label>
+                    <label className="luxury-label mb-3 block">Personal Risk Tolerance</label>
                     <OptionGrid
                       options={[
                         { value: "low", label: "Conservative", desc: "Preserve capital" },
@@ -373,23 +605,23 @@ const Input = () => {
                 </motion.div>
               )}
 
-              {/* Step 4: Time Reality */}
-              {currentStep === 4 && (
+              {/* Step 6: Network & Time */}
+              {currentStep === 6 && (
                 <motion.div
-                  key="step4"
+                  key="step6"
                   initial={{ opacity: 0, x: 20 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -20 }}
                   className="space-y-6"
                 >
                   <div>
-                    <label className="luxury-label mb-2 block">Hours Per Day Available</label>
+                    <label className="luxury-label mb-3 block">Hours Per Day Available</label>
                     <OptionGrid
                       options={[
-                        { value: "1-2", label: "1-2 hours" },
-                        { value: "4-6", label: "4-6 hours" },
-                        { value: "8-plus", label: "8+ hours" },
-                        { value: "all-waking", label: "All waking hours" },
+                        { value: "1-2", label: "1-2 hours", desc: "Very limited" },
+                        { value: "4-6", label: "4-6 hours", desc: "Part-time focus" },
+                        { value: "8-plus", label: "8+ hours", desc: "Full-time focus" },
+                        { value: "all-waking", label: "All waking hours", desc: "Complete dedication" },
                       ]}
                       value={formData.hoursPerDay}
                       onChange={(v) => setFormData({ ...formData, hoursPerDay: v as FormData["hoursPerDay"] })}
@@ -397,10 +629,10 @@ const Input = () => {
                   </div>
 
                   <div>
-                    <label className="luxury-label mb-2 block">Timeline Expectation</label>
+                    <label className="luxury-label mb-3 block">Timeline Expectation</label>
                     <OptionGrid
                       options={[
-                        { value: "fast-money", label: "Fast Money", desc: "Need revenue in 3 months" },
+                        { value: "fast-money", label: "Fast Money", desc: "Revenue in 3 months" },
                         { value: "12-months", label: "12 Months", desc: "Standard runway" },
                         { value: "long-term", label: "Long-Term", desc: "Building for years" },
                       ]}
@@ -408,20 +640,38 @@ const Input = () => {
                       onChange={(v) => setFormData({ ...formData, deadline: v as FormData["deadline"] })}
                     />
                   </div>
+
+                  <div>
+                    <label className="luxury-label mb-3 block">Investor Access</label>
+                    <OptionGrid
+                      options={investorAccessOptions}
+                      value={formData.investorAccess}
+                      onChange={(v) => setFormData({ ...formData, investorAccess: v as FormData["investorAccess"] })}
+                    />
+                  </div>
+
+                  <div>
+                    <label className="luxury-label mb-3 block">Customer Access</label>
+                    <OptionGrid
+                      options={customerAccessOptions}
+                      value={formData.customerAccess}
+                      onChange={(v) => setFormData({ ...formData, customerAccess: v as FormData["customerAccess"] })}
+                    />
+                  </div>
                 </motion.div>
               )}
 
-              {/* Step 5: Outcome Intent */}
-              {currentStep === 5 && (
+              {/* Step 7: Outcome Intent */}
+              {currentStep === 7 && (
                 <motion.div
-                  key="step5"
+                  key="step7"
                   initial={{ opacity: 0, x: 20 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -20 }}
                   className="space-y-6"
                 >
                   <div>
-                    <label className="luxury-label mb-2 block">Ultimate Goal</label>
+                    <label className="luxury-label mb-3 block">Ultimate Goal</label>
                     <OptionGrid
                       options={[
                         { value: "lifestyle", label: "Lifestyle", desc: "Freedom & flexibility" },
@@ -436,7 +686,7 @@ const Input = () => {
                   </div>
 
                   <div>
-                    <label className="luxury-label mb-2 block">What is your competitive advantage?</label>
+                    <label className="luxury-label mb-3 block">What is your competitive advantage?</label>
                     <textarea
                       className="luxury-textarea"
                       placeholder="What makes you uniquely qualified to win? (expertise, access, technology, relationships)"
@@ -445,12 +695,18 @@ const Input = () => {
                     />
                   </div>
 
-                  <div className="p-4 rounded-xl bg-primary/5 border border-primary/20">
-                    <div className="flex items-start gap-3">
-                      <AlertTriangle className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
-                      <div className="text-sm text-muted-foreground">
-                        <p className="font-medium text-foreground mb-1">What happens next</p>
-                        <p>Five analysis agents will evaluate your situation against 100,000+ founder patterns. You will receive a GO, PIVOT, or KILL verdict with supporting evidence.</p>
+                  <div className="p-5 rounded-2xl bg-primary/5 border border-primary/20">
+                    <div className="flex items-start gap-4">
+                      <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
+                        <Shield className="w-5 h-5 text-primary" />
+                      </div>
+                      <div>
+                        <p className="font-medium mb-1">What happens next</p>
+                        <p className="text-sm text-muted-foreground">
+                          Six analysis agents will evaluate your situation against 100,000+ founder patterns, 
+                          including regional market dynamics. You will receive a GO, PIVOT, or KILL verdict 
+                          with supporting evidence tailored to your location and market culture.
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -487,6 +743,7 @@ const Input = () => {
                 <LuxuryButton
                   type="submit"
                   className="group"
+                  size="lg"
                 >
                   Begin Analysis
                   <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
@@ -509,20 +766,16 @@ const OptionGrid = ({
   value: string;
   onChange: (value: string) => void;
 }) => (
-  <div className={`grid gap-2 ${options.length <= 3 ? `grid-cols-${options.length}` : "grid-cols-2 sm:grid-cols-4"}`}>
+  <div className={`grid gap-3 ${options.length <= 3 ? `grid-cols-${options.length}` : "grid-cols-2 sm:grid-cols-4"}`}>
     {options.map((option) => (
       <button
         key={option.value}
         type="button"
         onClick={() => onChange(option.value)}
-        className={`p-3 rounded-lg border text-left transition-colors ${
-          value === option.value
-            ? "bg-primary/10 border-primary/30 text-foreground"
-            : "bg-card border-border text-muted-foreground hover:border-primary/20"
-        }`}
+        className={`option-card ${value === option.value ? "selected" : ""}`}
       >
         <span className="text-sm font-medium block">{option.label}</span>
-        {option.desc && <span className="text-xs opacity-70">{option.desc}</span>}
+        {option.desc && <span className="text-xs opacity-60 mt-0.5 block">{option.desc}</span>}
       </button>
     ))}
   </div>
