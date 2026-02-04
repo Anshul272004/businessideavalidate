@@ -382,12 +382,15 @@ serve(async (req) => {
       uniqueInsight
     } = await req.json();
 
-    if (!idea || !targetCustomer || !price) {
+    if (!idea || !targetCustomer) {
       return new Response(
         JSON.stringify({ error: "Missing required fields" }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
+    
+    // Default price if not provided
+    const finalPrice = price || "Not specified";
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) {
@@ -414,7 +417,7 @@ BUSINESS IDEA: ${idea}
 
 TARGET CUSTOMER: ${targetCustomer}
 
-PLANNED PRICE: $${price}
+PLANNED PRICE: ${finalPrice}
 
 ${founderContext}
 
