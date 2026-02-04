@@ -11,49 +11,87 @@ const testimonials = [
     rating: 5,
     verdict: "PIVOT",
     outcome: "Now at $420K ARR",
+    country: "US",
+    flag: "🇺🇸",
+    industry: "Design Tools",
+  },
+  {
+    name: "Rahul Sharma",
+    role: "Serial Entrepreneur",
+    company: "3x Founder",
+    avatar: "RS",
+    quote: "The regional analysis was game-changing. It showed me why my India-first pricing needed to be completely different from US competitors.",
+    rating: 5,
+    verdict: "GO",
+    outcome: "₹2Cr ARR in 8 months",
+    country: "IN",
+    flag: "🇮🇳",
+    industry: "EdTech",
   },
   {
     name: "Marcus Thompson",
-    role: "Serial Entrepreneur",
-    company: "3x Founder",
+    role: "First-Time Founder",
+    company: "Bootstrapped",
     avatar: "MT",
     quote: "The same rigor as a Sequoia partner meeting, but faster and more honest. The CEO pattern matching caught things my advisors missed.",
     rating: 5,
     verdict: "GO",
     outcome: "$2.4M raised post-validation",
+    country: "US",
+    flag: "🇺🇸",
+    industry: "FinTech",
   },
   {
-    name: "Dr. Priya Sharma",
+    name: "Dr. Priya Patel",
     role: "Former Product Lead",
     company: "Ex-Stripe",
-    avatar: "PS",
+    avatar: "PP",
     quote: "After eight years in product, I thought I knew how to evaluate ideas. The founder-market fit analysis completely changed my approach.",
     rating: 5,
     verdict: "GO",
     outcome: "0 to $100K MRR in 6 months",
+    country: "GB",
+    flag: "🇬🇧",
+    industry: "B2B SaaS",
   },
   {
-    name: "James Park",
-    role: "First-Time Founder",
-    company: "Bootstrapped",
-    avatar: "JP",
+    name: "Hans Mueller",
+    role: "Tech Lead",
+    company: "Now CEO",
+    avatar: "HM",
     quote: "Almost quit my job for an idea that got KILL. Brutal, but the reasoning was undeniable. Two months later, validated a different idea that got GO.",
     rating: 5,
     verdict: "KILL → GO",
-    outcome: "$18K MRR bootstrapped",
+    outcome: "€180K MRR bootstrapped",
+    country: "DE",
+    flag: "🇩🇪",
+    industry: "DevTools",
+  },
+  {
+    name: "Amit Verma",
+    role: "Ex-Consultant",
+    company: "McKinsey Alumni",
+    avatar: "AV",
+    quote: "The cultural fit analysis nailed the trust dynamics in Tier-2 cities. Saved me from a costly GTM mistake. Worth every rupee.",
+    rating: 5,
+    verdict: "PIVOT",
+    outcome: "Pivoted to B2B, now profitable",
+    country: "IN",
+    flag: "🇮🇳",
+    industry: "HealthTech",
   },
 ];
 
 const Testimonials = () => {
   return (
-    <section className="luxury-container py-20 border-t border-border/50">
-      <div className="text-center mb-12">
-        <p className="text-sm text-muted-foreground mb-4 uppercase tracking-wide">Outcomes</p>
-        <h2 className="text-3xl md:text-5xl font-semibold mb-4">
+    <section className="luxury-container py-24 border-t border-border/50">
+      <div className="text-center mb-16">
+        <p className="text-xs text-muted-foreground mb-4 uppercase tracking-widest">Global Outcomes</p>
+        <h2 className="text-heading font-semibold mb-4">
           Founders who <span className="font-serif italic font-normal gradient-text">validated first</span>
         </h2>
         <p className="text-muted-foreground max-w-xl mx-auto">
-          Real decisions. Real outcomes.
+          Real decisions. Real outcomes. From founders around the world.
         </p>
       </div>
 
@@ -61,7 +99,7 @@ const Testimonials = () => {
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
         viewport={{ once: true }}
-        className="grid md:grid-cols-2 gap-6"
+        className="grid md:grid-cols-2 lg:grid-cols-3 gap-6"
       >
         {testimonials.map((testimonial, index) => (
           <motion.div
@@ -69,10 +107,15 @@ const Testimonials = () => {
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ delay: index * 0.1 }}
-            className="p-8 bg-card border border-border rounded-xl hover:border-primary/30 transition-colors"
+            transition={{ delay: index * 0.08 }}
+            className="p-6 bg-card border border-border rounded-2xl hover:border-primary/30 hover-lift transition-all group"
           >
-            <div className="flex items-center gap-2 mb-6">
+            {/* Header Row */}
+            <div className="flex items-center justify-between mb-5">
+              <div className="flex items-center gap-2">
+                <span className="text-xl">{testimonial.flag}</span>
+                <span className="text-xs text-muted-foreground">{testimonial.industry}</span>
+              </div>
               <div className={`px-3 py-1 rounded-full text-xs font-medium ${
                 testimonial.verdict.includes("GO") ? "bg-success/10 text-success border border-success/20" :
                 testimonial.verdict.includes("PIVOT") ? "bg-primary/10 text-primary border border-primary/20" :
@@ -80,23 +123,29 @@ const Testimonials = () => {
               }`}>
                 {testimonial.verdict}
               </div>
-              <span className="text-xs text-muted-foreground">→</span>
+            </div>
+
+            {/* Outcome Badge */}
+            <div className="mb-4 px-3 py-1.5 rounded-lg bg-success/5 border border-success/10 inline-block">
               <span className="text-xs text-success font-medium">{testimonial.outcome}</span>
             </div>
 
-            <Quote className="w-4 h-4 text-primary/30 mb-3" />
-            <p className="text-muted-foreground leading-relaxed mb-6">
+            {/* Quote */}
+            <Quote className="w-4 h-4 text-primary/30 mb-2" />
+            <p className="text-muted-foreground leading-relaxed text-sm mb-5">
               "{testimonial.quote}"
             </p>
 
-            <div className="flex gap-1 mb-4">
+            {/* Rating */}
+            <div className="flex gap-0.5 mb-4">
               {[...Array(testimonial.rating)].map((_, i) => (
-                <Star key={i} className="w-4 h-4 fill-primary text-primary" />
+                <Star key={i} className="w-3.5 h-3.5 fill-primary text-primary" />
               ))}
             </div>
 
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary text-sm font-medium">
+            {/* Author */}
+            <div className="flex items-center gap-3 pt-4 border-t border-border/50">
+              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center text-primary text-sm font-semibold">
                 {testimonial.avatar}
               </div>
               <div>

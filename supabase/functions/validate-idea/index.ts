@@ -241,31 +241,28 @@ Return ONLY a JSON object:
 }`,
 
   verdictSynthesizer: `You are the "Verdict Synthesizer" - the final arbiter synthesizing all agent analyses.
-Given findings from our 5 specialist agents:
+Given findings from our 6 specialist agents:
 
 DOPAMINE DETECTIVE: {dopamineAnalysis}
 MONEY TRAIL: {moneyAnalysis}
 AMYGDALA AUDIT: {amygdalaAnalysis}
 CEO PATTERN MATCHER: {ceoPatterns}
 USP GENERATOR: {uspAnalysis}
+REGIONAL MARKET ANALYST: {regionalAnalysis}
 
 FOUNDER CONTEXT: {founderContext}
 
 Synthesize a final verdict. Be BRUTALLY HONEST like a top-tier VC who has seen 10,000 pitches.
 Apply the "friend who works at Goldman" test - tell the hard truth even if it hurts.
 
-Weight factors based on founder's goals:
+WEIGHT FACTORS BASED ON FOUNDER'S CONTEXT:
+- If in emerging market (India Tier-2, SEA, Africa): Weight regional factors 30%, adapt pricing expectations
 - If LIFESTYLE business: Weight pain/demand (50%), execution feasibility (30%), unit economics (20%)
 - If GROWTH business: Weight market size (40%), unit economics (30%), execution (30%)
 - If UNICORN potential: Weight market size (30%), network effects (25%), timing (25%), team (20%)
 - If EXIT focused: Weight acquisition fit (40%), defensibility (30%), growth trajectory (30%)
 
-Provide:
-1. Clear GO/PIVOT/KILL verdict with probability
-2. ELI8 Summary - explain so simply an 8-year-old would understand
-3. Personalized 30-day action plan based on founder's budget and time commitment
-4. What would change the verdict
-5. Personalized blueprint tailored to their specific situation
+Generate executive-style summary bullets that could be presented in a boardroom.
 
 Return ONLY a JSON object:
 {
@@ -273,6 +270,24 @@ Return ONLY a JSON object:
   "verdict": "GO" | "PIVOT" | "KILL",
   "verdict_probability": {"go": X, "pivot": Y, "kill": Z},
   "verdict_reasoning": "2-3 sentence brutal honest summary",
+  "executive_bullets": [
+    "Key finding 1 - cold, factual, no fluff",
+    "Key finding 2 - specific metrics where possible",
+    "Key finding 3 - risk or opportunity highlight",
+    "Key finding 4 - execution reality check",
+    "Key finding 5 - bottom line recommendation"
+  ],
+  "key_metrics": [
+    {"label": "Market Size", "value": "$X", "trend": "up" | "down" | "neutral"},
+    {"label": "Success Odds", "value": "X%", "trend": "neutral"},
+    {"label": "Time to Revenue", "value": "X months", "trend": "neutral"},
+    {"label": "Capital Needed", "value": "$X", "trend": "neutral"}
+  ],
+  "risk_opportunity_balance": {
+    "opportunities": ["opportunity 1", "opportunity 2"],
+    "risks": ["risk 1", "risk 2"]
+  },
+  "bottom_line": "One paragraph boardroom-ready summary",
   "eli8_summary": "Explain to an 8-year-old why this will/won't work in 2-3 sentences",
   "one_liner": "One sentence that captures the core insight",
   "personalized_blueprint": {
@@ -369,7 +384,7 @@ serve(async (req) => {
       experience, 
       platform, 
       stage,
-      // New founder profile fields
+      // Founder profile fields
       background,
       education,
       industryExperience,
@@ -379,7 +394,27 @@ serve(async (req) => {
       goal,
       brandVision,
       competitiveAdvantage,
-      uniqueInsight
+      uniqueInsight,
+      // Geographic & Cultural fields (NEW)
+      country,
+      state,
+      cityTier,
+      marketMaturity,
+      customerLocation,
+      paymentMaturity,
+      trustCulture,
+      regulatoryEnvironment,
+      infrastructure,
+      investorAccess,
+      customerAccess,
+      age,
+      coreSkill,
+      industryYears,
+      energyLevel,
+      monthlyBurn,
+      riskTolerance,
+      hoursPerDay,
+      deadline
     } = await req.json();
 
     if (!idea || !targetCustomer) {
@@ -397,19 +432,43 @@ serve(async (req) => {
       throw new Error("LOVABLE_API_KEY is not configured");
     }
 
-    // Build comprehensive founder context
+    // Build comprehensive founder context with geographic data
     const founderContext = `
 FOUNDER PROFILE:
-- Background: ${background || "Not specified"}
-- Education: ${education || "Not specified"}
-- Industry Experience: ${industryExperience || "Not specified"}
+- Age Range: ${age || "Not specified"}
+- Core Skill: ${coreSkill || "Not specified"}
+- Industry Experience: ${industryYears || industryExperience || "Not specified"}
 - Previous Business: ${previousBusiness || "None"}
+- Energy Level: ${energyLevel || "Full-time"}
+- Hours Per Day: ${hoursPerDay || "Not specified"}
+
+CAPITAL & RISK:
 - Available Budget: ${budget || "Not specified"}
-- Time Commitment: ${timeCommitment || "Full-time"}
+- Monthly Burn Tolerance: ${monthlyBurn || "Not specified"}
+- Risk Tolerance: ${riskTolerance || "Medium"}
+- Timeline Expectation: ${deadline || "12 months"}
+
+NETWORK:
+- Investor Access: ${investorAccess || "None"}
+- Customer Access: ${customerAccess || "Cold"}
+
+GOAL & VISION:
 - Ultimate Goal: ${goal || "Growth business"}
-- Brand Vision: ${brandVision || "Not specified"}
 - Competitive Advantage: ${competitiveAdvantage || "Not specified"}
 - Unique Insight: ${uniqueInsight || "Not specified"}
+`;
+
+    const geographicContext = `
+GEOGRAPHIC & CULTURAL CONTEXT:
+- Country: ${country || "Not specified"}
+- State/Region: ${state || "Not specified"}
+- City Tier: ${cityTier || "Not specified"}
+- Market Maturity: ${marketMaturity || "Emerging"}
+- Customer Location: ${customerLocation || "National"}
+- Payment Infrastructure: ${paymentMaturity || "Digital-emerging"}
+- Trust Culture: ${trustCulture || "Hybrid"}
+- Regulatory Environment: ${regulatoryEnvironment || "Moderate"}
+- Infrastructure Quality: ${infrastructure || "Good"}
 `;
 
     const userContext = `
@@ -421,6 +480,8 @@ PLANNED PRICE: ${finalPrice}
 
 ${founderContext}
 
+${geographicContext}
+
 PLATFORM/DELIVERY: ${platform || "Not specified"}
 
 CURRENT STAGE: ${stage || "Just an idea"}
@@ -429,31 +490,33 @@ FOUNDER EXPERIENCE LEVEL: ${experience || "Not specified"}
 
 Analyze with brutal honesty using patterns from 100,000+ successful and failed startups.
 Apply the "friend who works at Goldman" test - tell the hard truth, not what they want to hear.
-Consider all real-world factors: market timing, network effects, founder-market fit, distribution channels, 
-execution difficulty, capital requirements, regulatory hurdles, and realistic timelines.
-Tailor your analysis and recommendations to this specific founder's background, budget, and goals.`;
+Consider all real-world factors including REGIONAL MARKET DYNAMICS, cultural trust patterns, 
+local competition, payment behaviors, and infrastructure limitations.
+Tailor your analysis and recommendations to this specific founder's background, budget, location, and goals.`;
 
-    // Run all FIVE specialist agents in PARALLEL
-    console.log("🧠 Starting 100K CEO Pattern Multi-Agent Analysis...");
+    // Run all SIX specialist agents in PARALLEL
+    console.log("🧠 Starting 100K CEO Pattern Multi-Agent Analysis with Regional Intelligence...");
     
-    const [dopamineResult, moneyResult, amygdalaResult, ceoResult, uspResult] = await Promise.all([
+    const [dopamineResult, moneyResult, amygdalaResult, ceoResult, uspResult, regionalResult] = await Promise.all([
       callAgent("DopamineDetective", agentPrompts.dopamineDetective, userContext, LOVABLE_API_KEY),
       callAgent("MoneyTrail", agentPrompts.moneyTrail, userContext, LOVABLE_API_KEY),
       callAgent("AmygdalaAudit", agentPrompts.amygdalaAudit, userContext, LOVABLE_API_KEY),
       callAgent("CEOPatternMatcher", agentPrompts.ceoPatternMatcher, userContext, LOVABLE_API_KEY),
       callAgent("USPGenerator", agentPrompts.uspGenerator, userContext, LOVABLE_API_KEY),
+      callAgent("RegionalMarketAnalyst", agentPrompts.regionalMarketAnalyst, userContext, LOVABLE_API_KEY),
     ]);
 
-    console.log("✅ All 5 agents completed, synthesizing verdict...");
+    console.log("✅ All 6 agents completed, synthesizing verdict...");
 
-    // Now synthesize the verdict with all agent findings
+    // Now synthesize the verdict with all agent findings including regional
     const synthesisPrompt = agentPrompts.verdictSynthesizer
       .replace("{dopamineAnalysis}", JSON.stringify(dopamineResult || {}))
       .replace("{moneyAnalysis}", JSON.stringify(moneyResult || {}))
       .replace("{amygdalaAnalysis}", JSON.stringify(amygdalaResult || {}))
       .replace("{ceoPatterns}", JSON.stringify(ceoResult || {}))
       .replace("{uspAnalysis}", JSON.stringify(uspResult || {}))
-      .replace("{founderContext}", founderContext);
+      .replace("{regionalAnalysis}", JSON.stringify(regionalResult || {}))
+      .replace("{founderContext}", founderContext + geographicContext);
 
     const verdictResult = await callAgent("VerdictSynthesizer", synthesisPrompt, userContext, LOVABLE_API_KEY);
 
@@ -559,11 +622,43 @@ Tailor your analysis and recommendations to this specific founder's background, 
         differentiation_matrix: uspResult?.differentiation_matrix || [],
       },
 
+      // Regional Analysis (from Regional Market Analyst - NEW)
+      regional_analysis: {
+        regional_viability_score: regionalResult?.regional_viability_score || 5,
+        cultural_fit_analysis: regionalResult?.cultural_fit_analysis || null,
+        local_market_psychology: regionalResult?.local_market_psychology || null,
+        localization_requirements: regionalResult?.localization_requirements || [],
+        pricing_recommendations: regionalResult?.pricing_recommendations || null,
+        distribution_strategy: regionalResult?.distribution_strategy || null,
+        regulatory_checklist: regionalResult?.regulatory_checklist || [],
+        infrastructure_dependencies: regionalResult?.infrastructure_dependencies || [],
+        local_competitor_map: regionalResult?.local_competitor_map || [],
+        cultural_insights: regionalResult?.cultural_insights || [],
+        trust_signals_needed: regionalResult?.trust_signals_needed || [],
+        buying_behavior: regionalResult?.buying_behavior || null,
+        local_market_timing: regionalResult?.local_market_timing || "moderate",
+        expansion_path: regionalResult?.expansion_path || null,
+        localization_cost_estimate: regionalResult?.localization_cost_estimate || "medium",
+        local_success_factors: regionalResult?.local_success_factors || [],
+      },
+      
+      // Founder's geographic context
+      geographic_context: {
+        country: country || null,
+        state: state || null,
+        cityTier: cityTier || null,
+        marketMaturity: marketMaturity || null,
+      },
+
       // Verdict (from Synthesizer)
       confidence_score: verdictResult?.confidence_score || 50,
       verdict: verdictResult?.verdict || "PIVOT",
       verdict_probability: verdictResult?.verdict_probability || null,
       verdict_reasoning: verdictResult?.verdict_reasoning || "Further validation needed",
+      executive_bullets: verdictResult?.executive_bullets || [],
+      key_metrics: verdictResult?.key_metrics || [],
+      risk_opportunity_balance: verdictResult?.risk_opportunity_balance || null,
+      bottom_line: verdictResult?.bottom_line || null,
       one_liner: verdictResult?.one_liner || "",
       eli8_summary: verdictResult?.eli8_summary || "",
       success_probability: verdictResult?.success_probability || "Unknown",
@@ -589,8 +684,8 @@ Tailor your analysis and recommendations to this specific founder's background, 
       unfair_advantages_needed: verdictResult?.unfair_advantages_needed || [],
 
       // Meta info
-      analysis_agents: ["Dopamine Detective", "Money Trail", "Amygdala Audit", "CEO Pattern Matcher", "USP Generator", "Verdict Synthesizer"],
-      analysis_version: "3.0-100k-ceo-patterns",
+      analysis_agents: ["Dopamine Detective", "Money Trail", "Amygdala Audit", "CEO Pattern Matcher", "USP Generator", "Regional Market Analyst", "Verdict Synthesizer"],
+      analysis_version: "4.0-regional-intelligence",
     };
 
     return new Response(JSON.stringify(finalResult), {
