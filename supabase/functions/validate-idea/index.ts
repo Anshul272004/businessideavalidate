@@ -240,8 +240,142 @@ Return ONLY a JSON object:
   ]
 }`,
 
+  regionalMarketAnalyst: `You are the "Regional Market Analyst" - expert in geographic and cultural market dynamics.
+Analyze based on the founder's specific location and target market:
+
+1. **Local Market Psychology** - How do people in this region make buying decisions?
+2. **Cultural Trust Factors** - What proof points work in this culture? (testimonials vs credentials vs referrals)
+3. **Payment Behavior** - How do customers prefer to pay? (UPI, cards, cash, EMI, COD)
+4. **Competition Dynamics** - Local vs global competitor positioning
+5. **Regulatory Environment** - Country/state specific rules and compliance
+6. **Infrastructure Reality** - Internet, logistics, banking, talent availability
+7. **Pricing Localization** - What price points work in this market? Purchasing power parity
+8. **Distribution Channels** - What channels work in this geography? (WhatsApp, Instagram, local marketplaces)
+9. **Cultural Adoption Patterns** - How do new products spread? (word of mouth, influencers, traditional media)
+10. **Regional Risk Factors** - Political stability, currency risk, market access barriers
+
+Return ONLY a JSON object:
+{
+  "regional_viability_score": number 1-100,
+  "market_psychology": {
+    "decision_style": "relationship-based" | "transaction-based" | "hybrid",
+    "trust_signals_needed": ["what builds trust in this market"],
+    "buying_triggers": ["what makes people buy here"],
+    "price_sensitivity": "high" | "medium" | "low",
+    "brand_vs_price": "brand-loyal" | "price-driven" | "value-seeking"
+  },
+  "cultural_fit_analysis": {
+    "score": number 1-10,
+    "alignment_factors": ["factor1", "factor2"],
+    "friction_factors": ["friction1", "friction2"],
+    "adaptation_needed": ["what to change for this market"]
+  },
+  "payment_landscape": {
+    "preferred_methods": ["method1", "method2"],
+    "fintech_maturity": "nascent" | "emerging" | "developed",
+    "subscription_readiness": "high" | "medium" | "low",
+    "recommended_pricing_model": "recommendation based on local behavior"
+  },
+  "localization_requirements": ["requirement1", "requirement2", "requirement3"],
+  "pricing_recommendations": {
+    "local_price_range": "$X-Y in local context",
+    "purchasing_power_adjustment": "X% vs US pricing",
+    "premium_viability": boolean,
+    "discount_culture": "heavy" | "moderate" | "minimal"
+  },
+  "distribution_strategy": {
+    "primary_channels": ["channel1", "channel2"],
+    "acquisition_tactics": ["tactic1", "tactic2"],
+    "viral_potential": "high" | "medium" | "low",
+    "offline_required": boolean
+  },
+  "regulatory_checklist": ["compliance item 1", "compliance item 2"],
+  "infrastructure_dependencies": {
+    "internet_reliability": "excellent" | "good" | "moderate" | "poor",
+    "logistics_quality": "excellent" | "good" | "moderate" | "poor",
+    "talent_availability": "abundant" | "moderate" | "scarce",
+    "key_infrastructure_risks": ["risk1", "risk2"]
+  },
+  "local_competitor_map": [
+    {"name": "competitor", "strength": "what they do well", "weakness": "opportunity"}
+  ],
+  "regional_success_probability": "X% adjusted for regional factors",
+  "go_to_market_timeline_adjustment": "faster" | "same" | "slower" | "much slower",
+  "regional_pivot_suggestions": ["suggestion based on local market reality"]
+}`,
+
+  cognitivebiasAnalyst: `You are the "Cognitive Bias Analyst" - expert in human psychology and decision-making biases.
+Analyze how cognitive biases affect both the FOUNDER's decision-making and the TARGET CUSTOMER's buying behavior:
+
+FOUNDER BIAS ANALYSIS:
+1. **Confirmation Bias** - Is founder only seeing evidence that supports their idea?
+2. **Sunk Cost Fallacy** - Are they too invested to see reality?
+3. **Dunning-Kruger Effect** - Do they overestimate their competence in key areas?
+4. **Survivorship Bias** - Are they only looking at successful examples?
+5. **Optimism Bias** - Are projections unrealistic?
+6. **IKEA Effect** - Are they overvaluing their creation?
+7. **Anchoring Bias** - Are they stuck on initial assumptions?
+8. **Bandwagon Effect** - Are they chasing trends without validation?
+
+CUSTOMER PSYCHOLOGY:
+1. **Loss Aversion** - Can this product prevent loss? (2x more powerful than gains)
+2. **Social Proof Dependency** - How much do customers need others' validation?
+3. **Authority Bias** - Will expert endorsements drive adoption?
+4. **Scarcity Effect** - Can urgency/exclusivity drive purchases?
+5. **Status Quo Bias** - How hard is it to change behavior?
+6. **Paradox of Choice** - Is simplicity an advantage?
+7. **Reciprocity Principle** - Can free value drive conversion?
+8. **Commitment Escalation** - Can small yeses lead to big purchases?
+
+PERSUASION PSYCHOLOGY:
+1. **Cialdini's Principles** - Which apply? (reciprocity, scarcity, authority, consistency, liking, consensus)
+2. **Hormozi Value Equation** - Dream outcome × Likelihood / Time × Effort
+3. **Jobs-to-be-Done** - What functional, emotional, social jobs does this do?
+4. **Peak-End Rule** - What memories will customers have?
+
+Return ONLY a JSON object:
+{
+  "founder_bias_warnings": [
+    {"bias": "bias name", "severity": "critical" | "warning" | "minor", "evidence": "why this might apply", "mitigation": "how to counteract"}
+  ],
+  "founder_reality_score": number 1-10,
+  "blind_spot_analysis": "Summary of what founder might be missing",
+  "customer_psychology": {
+    "primary_motivator": "fear" | "desire" | "status" | "convenience" | "belonging",
+    "decision_speed": "impulse" | "considered" | "committee" | "lengthy",
+    "emotional_triggers": ["trigger1", "trigger2"],
+    "rational_justifications": ["justification1", "justification2"],
+    "objection_patterns": ["objection1", "objection2"]
+  },
+  "persuasion_leverage": {
+    "strongest_principles": ["cialdini principle 1", "principle 2"],
+    "recommended_tactics": ["tactic1", "tactic2"],
+    "trust_building_sequence": ["step1", "step2", "step3"],
+    "conversion_psychology": "How to move from interest to purchase"
+  },
+  "loss_aversion_angle": "What loss can this product prevent?",
+  "social_proof_strategy": {
+    "proof_types_needed": ["testimonial", "case study", "numbers"],
+    "early_adopter_profile": "Who will buy first and why",
+    "viral_coefficient_potential": number 0-3
+  },
+  "jobs_to_be_done": {
+    "functional": "What practical job does this do?",
+    "emotional": "How does this make them feel?",
+    "social": "How does this make them look to others?"
+  },
+  "behavioral_barriers": ["barrier1", "barrier2"],
+  "behavioral_enablers": ["enabler1", "enabler2"],
+  "neuromarketing_insights": {
+    "dopamine_triggers": ["anticipation", "novelty", "reward patterns"],
+    "oxytocin_builders": ["trust signals", "community", "shared values"],
+    "cortisol_reducers": ["risk reversal", "guarantees", "social proof"]
+  },
+  "bias_adjusted_success_probability": "X% after accounting for founder biases"
+}`,
+
   verdictSynthesizer: `You are the "Verdict Synthesizer" - the final arbiter synthesizing all agent analyses.
-Given findings from our 6 specialist agents:
+Given findings from our 7 specialist agents:
 
 DOPAMINE DETECTIVE: {dopamineAnalysis}
 MONEY TRAIL: {moneyAnalysis}
@@ -249,6 +383,7 @@ AMYGDALA AUDIT: {amygdalaAnalysis}
 CEO PATTERN MATCHER: {ceoPatterns}
 USP GENERATOR: {uspAnalysis}
 REGIONAL MARKET ANALYST: {regionalAnalysis}
+COGNITIVE BIAS ANALYST: {biasAnalysis}
 
 FOUNDER CONTEXT: {founderContext}
 
@@ -261,6 +396,11 @@ WEIGHT FACTORS BASED ON FOUNDER'S CONTEXT:
 - If GROWTH business: Weight market size (40%), unit economics (30%), execution (30%)
 - If UNICORN potential: Weight market size (30%), network effects (25%), timing (25%), team (20%)
 - If EXIT focused: Weight acquisition fit (40%), defensibility (30%), growth trajectory (30%)
+
+BIAS ADJUSTMENT:
+- Factor in founder bias warnings to adjust confidence scores
+- Highlight if founder optimism may be inflating projections
+- Provide reality-adjusted success probability
 
 Generate executive-style summary bullets that could be presented in a boardroom.
 
@@ -277,6 +417,12 @@ Return ONLY a JSON object:
     "Key finding 4 - execution reality check",
     "Key finding 5 - bottom line recommendation"
   ],
+  "bias_adjusted_verdict": {
+    "raw_score": number,
+    "bias_penalty": number,
+    "adjusted_score": number,
+    "explanation": "How founder biases affected the score"
+  },
   "key_metrics": [
     {"label": "Market Size", "value": "$X", "trend": "up" | "down" | "neutral"},
     {"label": "Success Odds", "value": "X%", "trend": "neutral"},
@@ -322,7 +468,12 @@ Return ONLY a JSON object:
   "founder_fit_questions": ["Deep question 1", "Deep question 2", "Deep question 3"],
   "recommended_reading": ["Book or resource 1", "Book or resource 2"],
   "similar_successful_founders": ["Founder who did something similar", "Another example"],
-  "risk_mitigation_plan": ["How to reduce biggest risk 1", "How to reduce biggest risk 2"]
+  "risk_mitigation_plan": ["How to reduce biggest risk 1", "How to reduce biggest risk 2"],
+  "psychology_insights": {
+    "customer_primary_driver": "What really motivates purchase",
+    "objection_handling": ["objection and counter"],
+    "trust_building_sequence": ["step1", "step2"]
+  }
 }`
 };
 
@@ -494,21 +645,22 @@ Consider all real-world factors including REGIONAL MARKET DYNAMICS, cultural tru
 local competition, payment behaviors, and infrastructure limitations.
 Tailor your analysis and recommendations to this specific founder's background, budget, location, and goals.`;
 
-    // Run all SIX specialist agents in PARALLEL
-    console.log("🧠 Starting 100K CEO Pattern Multi-Agent Analysis with Regional Intelligence...");
+    // Run all SEVEN specialist agents in PARALLEL
+    console.log("🧠 Starting 100K CEO Pattern Multi-Agent Analysis with Regional + Cognitive Bias Intelligence...");
     
-    const [dopamineResult, moneyResult, amygdalaResult, ceoResult, uspResult, regionalResult] = await Promise.all([
+    const [dopamineResult, moneyResult, amygdalaResult, ceoResult, uspResult, regionalResult, biasResult] = await Promise.all([
       callAgent("DopamineDetective", agentPrompts.dopamineDetective, userContext, LOVABLE_API_KEY),
       callAgent("MoneyTrail", agentPrompts.moneyTrail, userContext, LOVABLE_API_KEY),
       callAgent("AmygdalaAudit", agentPrompts.amygdalaAudit, userContext, LOVABLE_API_KEY),
       callAgent("CEOPatternMatcher", agentPrompts.ceoPatternMatcher, userContext, LOVABLE_API_KEY),
       callAgent("USPGenerator", agentPrompts.uspGenerator, userContext, LOVABLE_API_KEY),
       callAgent("RegionalMarketAnalyst", agentPrompts.regionalMarketAnalyst, userContext, LOVABLE_API_KEY),
+      callAgent("CognitiveBiasAnalyst", agentPrompts.cognitivebiasAnalyst, userContext, LOVABLE_API_KEY),
     ]);
 
-    console.log("✅ All 6 agents completed, synthesizing verdict...");
+    console.log("✅ All 7 agents completed, synthesizing verdict...");
 
-    // Now synthesize the verdict with all agent findings including regional
+    // Now synthesize the verdict with all agent findings including regional and bias
     const synthesisPrompt = agentPrompts.verdictSynthesizer
       .replace("{dopamineAnalysis}", JSON.stringify(dopamineResult || {}))
       .replace("{moneyAnalysis}", JSON.stringify(moneyResult || {}))
@@ -516,6 +668,7 @@ Tailor your analysis and recommendations to this specific founder's background, 
       .replace("{ceoPatterns}", JSON.stringify(ceoResult || {}))
       .replace("{uspAnalysis}", JSON.stringify(uspResult || {}))
       .replace("{regionalAnalysis}", JSON.stringify(regionalResult || {}))
+      .replace("{biasAnalysis}", JSON.stringify(biasResult || {}))
       .replace("{founderContext}", founderContext + geographicContext);
 
     const verdictResult = await callAgent("VerdictSynthesizer", synthesisPrompt, userContext, LOVABLE_API_KEY);
