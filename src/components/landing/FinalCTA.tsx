@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { LuxuryButton } from "@/components/ui/luxury-button";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Shield } from "lucide-react";
 
 const FinalCTA = () => {
   const navigate = useNavigate();
@@ -15,11 +15,13 @@ const FinalCTA = () => {
         className="max-w-2xl mx-auto text-center"
       >
         <p className="text-sm text-muted-foreground mb-4 uppercase tracking-wide">Begin</p>
-        <h2 className="text-3xl md:text-5xl font-semibold mb-6">
-          Make the <span className="font-serif italic font-normal gradient-text">informed</span> decision
+        <h2 className="text-heading font-semibold mb-6">
+          Reduce irreversible <span className="font-serif italic font-normal gradient-text">mistakes</span>
         </h2>
-        <p className="text-muted-foreground mb-10 leading-relaxed">
+        <p className="text-muted-foreground mb-4 leading-relaxed">
           The cost of a wrong direction is measured in years, not dollars. 
+        </p>
+        <p className="text-foreground font-medium mb-10">
           Know before you commit.
         </p>
         <LuxuryButton 
@@ -27,12 +29,17 @@ const FinalCTA = () => {
           size="lg" 
           className="group"
         >
-          Evaluate Your Decision
+          Validate My Business Idea
           <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
         </LuxuryButton>
-        <p className="text-xs text-muted-foreground mt-6">
-          24-hour money-back guarantee. No questions.
-        </p>
+        <div className="flex items-center justify-center gap-6 mt-8 text-sm text-muted-foreground">
+          <div className="flex items-center gap-2">
+            <Shield className="w-4 h-4 text-primary" />
+            <span>24-hour money-back guarantee</span>
+          </div>
+          <span className="w-px h-4 bg-border" />
+          <span>No questions asked</span>
+        </div>
       </motion.div>
     </section>
   );
