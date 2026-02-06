@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { LuxuryButton } from "@/components/ui/luxury-button";
@@ -15,6 +15,9 @@ import {
   Lightbulb,
   Clock,
   Crown,
+  ChevronUp,
+  Globe,
+  Fingerprint,
 } from "lucide-react";
 
 import ConfidenceMeter from "@/components/result/ConfidenceMeter";
@@ -38,6 +41,9 @@ import FounderMarketFit from "@/components/result/FounderMarketFit";
 import ActionPlan from "@/components/result/ActionPlan";
 import USPAnalysis from "@/components/result/USPAnalysis";
 import PersonalizedBlueprint from "@/components/result/PersonalizedBlueprint";
+import BoardroomSummary from "@/components/result/BoardroomSummary";
+import RegionalAnalysis from "@/components/result/RegionalAnalysis";
+import CulturalFit from "@/components/result/CulturalFit";
 
 interface ValidationResult {
   demand_psychology: string;
@@ -131,6 +137,7 @@ interface ValidationResult {
     yc_pattern_match?: any;
     anti_patterns?: any[];
     founder_archetype?: string;
+    founder_profile_analysis?: any;
     scalability?: { score: number; bottlenecks: string[] };
     exit_potential?: any;
     pivot_risk?: any;
@@ -162,12 +169,44 @@ interface ValidationResult {
   unfair_advantages_needed?: string[];
   analysis_agents?: string[];
   analysis_version?: string;
+  // Boardroom Summary fields
+  executive_bullets?: string[];
+  key_metrics?: { label: string; value: string; trend?: "up" | "down" | "neutral" }[];
+  risk_opportunity_balance?: { opportunities: string[]; risks: string[] };
+  bottom_line?: string;
+  // Regional
+  regional_analysis?: any;
+  geographic_context?: { country?: string; state?: string; cityTier?: string; marketMaturity?: string };
+  // USP
+  usp_analysis?: any;
+  // Blueprint
+  personalized_blueprint?: any;
+  founder_specific_advice?: string;
+  risk_mitigation_plan?: string[];
+  // Bias
+  bias_adjusted_verdict?: any;
+  // Cognitive bias agent data
+  cognitive_bias_analysis?: any;
 }
+
+// Section definitions for floating nav
+const sections = [
+  { id: "verdict", label: "Verdict", icon: <Sparkles className="w-3.5 h-3.5" /> },
+  { id: "executive", label: "Executive Summary", icon: <Crown className="w-3.5 h-3.5" /> },
+  { id: "psychology", label: "Psychology", icon: <Brain className="w-3.5 h-3.5" /> },
+  { id: "regional", label: "Regional", icon: <Globe className="w-3.5 h-3.5" /> },
+  { id: "market", label: "Market", icon: <Target className="w-3.5 h-3.5" /> },
+  { id: "economics", label: "Economics", icon: <DollarSign className="w-3.5 h-3.5" /> },
+  { id: "execution", label: "Execution", icon: <AlertTriangle className="w-3.5 h-3.5" /> },
+  { id: "action", label: "Action Plan", icon: <Lightbulb className="w-3.5 h-3.5" /> },
+];
 
 const Result = () => {
   const navigate = useNavigate();
   const [result, setResult] = useState<ValidationResult | null>(null);
   const [originalIdea, setOriginalIdea] = useState("");
+  const [showBackToTop, setShowBackToTop] = useState(false);
+  const [activeSection, setActiveSection] = useState("verdict");
 
   useEffect(() => {
     const storedResult = sessionStorage.getItem("validationResult");
@@ -185,12 +224,37 @@ const Result = () => {
     }
   }, [navigate]);
 
+  // Scroll tracking
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowBackToTop(window.scrollY > 600);
+      
+      // Track active section
+      const sectionElements = sections.map(s => document.getElementById(s.id)).filter(Boolean);
+      for (let i = sectionElements.length - 1; i >= 0; i--) {
+        const el = sectionElements[i];
+        if (el && el.getBoundingClientRect().top < 200) {
+          setActiveSection(sections[i].id);
+          break;
+        }
+      }
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   const handleDownloadPDF = () => window.print();
 
   const handleNewValidation = () => {
     sessionStorage.removeItem("validationData");
     sessionStorage.removeItem("validationResult");
     navigate("/input?paid=true");
+  };
+
+  const scrollToTop = () => window.scrollTo({ top: 0, behavior: "smooth" });
+
+  const scrollToSection = (id: string) => {
+    document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
   if (!result) return null;
@@ -232,6 +296,37 @@ const Result = () => {
         <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-success/5 rounded-full blur-[100px]" />
       </div>
 
+      {/* Floating Section Nav — desktop only */}
+      <div className="fixed left-4 top-1/2 -translate-y-1/2 z-50 hidden xl:flex flex-col gap-1 print:hidden">
+        {sections.map((section) => (
+          <button
+            key={section.id}
+            onClick={() => scrollToSection(section.id)}
+            className={`group flex items-center gap-2 px-3 py-2 rounded-lg text-xs transition-all ${
+              activeSection === section.id
+                ? "bg-primary/15 text-primary border border-primary/30"
+                : "text-muted-foreground hover:text-foreground hover:bg-card"
+            }`}
+          >
+            {section.icon}
+            <span className="hidden group-hover:inline">{section.label}</span>
+          </button>
+        ))}
+      </div>
+
+      {/* Back to Top */}
+      {showBackToTop && (
+        <motion.button
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.8 }}
+          onClick={scrollToTop}
+          className="fixed bottom-8 right-8 z-50 w-12 h-12 rounded-full bg-primary text-primary-foreground flex items-center justify-center shadow-lg shadow-primary/25 hover:scale-105 transition-transform print:hidden"
+        >
+          <ChevronUp className="w-5 h-5" />
+        </motion.button>
+      )}
+
       {/* Navigation */}
       <nav className="luxury-container py-8 relative z-10 print:hidden">
         <div className="flex items-center justify-between">
@@ -239,7 +334,7 @@ const Result = () => {
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shadow-lg shadow-primary/20">
               <Sparkles className="w-5 h-5 text-primary-foreground" />
             </div>
-            <span className="font-bold text-lg">IdeaValidator</span>
+            <span className="font-bold text-lg">ValidateFirst</span>
           </div>
           <ShareButtons verdict={result.verdict} confidenceScore={confidenceScore} />
         </div>
@@ -250,36 +345,59 @@ const Result = () => {
           {/* Multi-Agent Badge */}
           <MultiAgentBadge agents={result.analysis_agents} />
 
-          {/* Verdict Hero */}
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-center mb-12"
-          >
-            <div className={`inline-flex flex-col items-center gap-4 px-16 py-12 rounded-3xl ${v.containerClass}`}>
-              {v.icon}
-              <div>
-                <h1 className="text-6xl font-bold mb-2">{v.title}</h1>
-                <p className="text-lg opacity-80">{v.description}</p>
+          {/* ═══════ VERDICT HERO ═══════ */}
+          <div id="verdict">
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="text-center mb-12"
+            >
+              <div className={`inline-flex flex-col items-center gap-4 px-16 py-12 rounded-3xl ${v.containerClass}`}>
+                {v.icon}
+                <div>
+                  <h1 className="text-6xl font-bold mb-2">{v.title}</h1>
+                  <p className="text-lg opacity-80">{v.description}</p>
+                </div>
               </div>
-            </div>
-            {result.verdict_reasoning && (
-              <motion.p 
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.3 }}
-                className="mt-6 text-muted-foreground max-w-xl mx-auto"
+              {result.verdict_reasoning && (
+                <motion.p 
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.3 }}
+                  className="mt-6 text-muted-foreground max-w-xl mx-auto"
+                >
+                  {result.verdict_reasoning}
+                </motion.p>
+              )}
+            </motion.div>
+          </div>
+
+          {/* ═══════ EXECUTIVE SUMMARY (BoardroomSummary) ═══════ */}
+          <div id="executive">
+            {(result.executive_bullets?.length || result.bottom_line) && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                className="mb-6"
               >
-                {result.verdict_reasoning}
-              </motion.p>
+                <BoardroomSummary
+                  verdict={result.verdict}
+                  confidence_score={confidenceScore}
+                  executive_bullets={result.executive_bullets}
+                  key_metrics={result.key_metrics}
+                  risk_opportunity_balance={result.risk_opportunity_balance}
+                  bottom_line={result.bottom_line}
+                />
+              </motion.div>
             )}
-          </motion.div>
+          </div>
 
           {/* Confidence Meter */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
             className="mb-6"
           >
             <ConfidenceMeter score={confidenceScore} />
@@ -291,8 +409,8 @@ const Result = () => {
             {(result.eli8_summary || result.founder_fit_questions?.length) && (
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.12 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
               >
                 <FounderFitQuestions
                   questions={result.founder_fit_questions || []}
@@ -301,62 +419,67 @@ const Result = () => {
               </motion.div>
             )}
 
-            {/* Demand Psychology */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.15 }}
-            >
-              <ResultCard icon={<Brain className="w-5 h-5" />} title="Demand Psychology">
-                <p className="text-muted-foreground leading-relaxed mb-4">
-                  {result.demand_psychology}
-                </p>
-                {(result.pain_realism.type || result.pain_realism.frequency) && (
-                  <PainTypeIndicator 
-                    type={result.pain_realism.type || "vitamin"} 
-                    frequency={result.pain_realism.frequency || "monthly"} 
-                  />
-                )}
-              </ResultCard>
-            </motion.div>
+            {/* ═══════ PSYCHOLOGY SECTION ═══════ */}
+            <div id="psychology">
+              {/* Demand Psychology */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                className="mb-6"
+              >
+                <ResultCard icon={<Brain className="w-5 h-5" />} title="Demand Psychology">
+                  <p className="text-muted-foreground leading-relaxed mb-4">
+                    {result.demand_psychology}
+                  </p>
+                  {(result.pain_realism.type || result.pain_realism.frequency) && (
+                    <PainTypeIndicator 
+                      type={result.pain_realism.type || "vitamin"} 
+                      frequency={result.pain_realism.frequency || "monthly"} 
+                    />
+                  )}
+                </ResultCard>
+              </motion.div>
 
-            {/* Pain Score */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-            >
-              <ResultCard icon={<Target className="w-5 h-5" />} title="Pain Reality Score">
-                <div className="flex items-center gap-6 mb-4">
-                  <span className="text-6xl font-bold">{result.pain_realism.score}</span>
-                  <div>
-                    <p className="text-sm text-muted-foreground">out of 10</p>
-                    <span className={`inline-block mt-1 px-3 py-1 rounded-full text-xs font-medium capitalize ${
-                      result.pain_realism.urgency === "high" ? "bg-success/20 text-success" :
-                      result.pain_realism.urgency === "medium" ? "bg-primary/20 text-primary" :
-                      "bg-destructive/20 text-destructive"
-                    }`}>
-                      {result.pain_realism.urgency} urgency
-                    </span>
+              {/* Pain Score */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+              >
+                <ResultCard icon={<Target className="w-5 h-5" />} title="Pain Reality Score">
+                  <div className="flex items-center gap-6 mb-4">
+                    <span className="text-6xl font-bold">{result.pain_realism.score}</span>
+                    <div>
+                      <p className="text-sm text-muted-foreground">out of 10</p>
+                      <span className={`inline-block mt-1 px-3 py-1 rounded-full text-xs font-medium capitalize ${
+                        result.pain_realism.urgency === "high" ? "bg-success/20 text-success" :
+                        result.pain_realism.urgency === "medium" ? "bg-primary/20 text-primary" :
+                        "bg-destructive/20 text-destructive"
+                      }`}>
+                        {result.pain_realism.urgency} urgency
+                      </span>
+                    </div>
                   </div>
-                </div>
-                <div className="h-4 bg-muted rounded-full overflow-hidden">
-                  <motion.div 
-                    initial={{ width: 0 }}
-                    animate={{ width: `${result.pain_realism.score * 10}%` }}
-                    transition={{ duration: 1, delay: 0.5 }}
-                    className={`h-full ${painColor}`} 
-                  />
-                </div>
-              </ResultCard>
-            </motion.div>
+                  <div className="h-4 bg-muted rounded-full overflow-hidden">
+                    <motion.div 
+                      initial={{ width: 0 }}
+                      whileInView={{ width: `${result.pain_realism.score * 10}%` }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 1, delay: 0.3 }}
+                      className={`h-full ${painColor}`} 
+                    />
+                  </div>
+                </ResultCard>
+              </motion.div>
+            </div>
 
-            {/* Research Trail (Mom Test, Assumptions, Dealbreakers) */}
+            {/* Research Trail */}
             {(result.key_assumptions?.length || result.dealbreakers?.length || result.mom_test_pass !== undefined) && (
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.22 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
               >
                 <ResearchTrail
                   keyAssumptions={result.key_assumptions || []}
@@ -367,55 +490,146 @@ const Result = () => {
               </motion.div>
             )}
 
-            {/* Market Analysis */}
-            {result.market_analysis && (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.25 }}
-              >
-                <MarketAnalysis 
-                  tam_estimate={result.market_analysis.tam_estimate}
-                  competitors={result.market_analysis.competitors}
-                  competitive_advantage={result.market_analysis.competitive_advantage}
-                />
-              </motion.div>
-            )}
+            {/* ═══════ REGIONAL & CULTURAL SECTION ═══════ */}
+            <div id="regional">
+              {result.regional_analysis && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  className="mb-6"
+                >
+                  <RegionalAnalysis
+                    regional_viability_score={result.regional_analysis.regional_viability_score}
+                    cultural_fit_analysis={typeof result.regional_analysis.cultural_fit_analysis === 'string' 
+                      ? result.regional_analysis.cultural_fit_analysis 
+                      : result.regional_analysis.cultural_fit_analysis?.alignment_factors?.join('. ')}
+                    localization_requirements={result.regional_analysis.localization_requirements}
+                    pricing_recommendations={result.regional_analysis.pricing_recommendations?.local_price_range}
+                    distribution_strategy={result.regional_analysis.distribution_strategy?.primary_channels?.join(', ')}
+                    regulatory_checklist={result.regional_analysis.regulatory_checklist}
+                    infrastructure_dependencies={
+                      result.regional_analysis.infrastructure_dependencies?.key_infrastructure_risks || 
+                      (Array.isArray(result.regional_analysis.infrastructure_dependencies) ? result.regional_analysis.infrastructure_dependencies : [])
+                    }
+                    local_competitor_map={result.regional_analysis.local_competitor_map?.map((c: any) => ({
+                      name: c.name,
+                      strength: c.strength || "moderate",
+                      local_advantage: c.weakness || c.local_advantage || ""
+                    }))}
+                    country={result.geographic_context?.country}
+                    state={result.geographic_context?.state}
+                    cityTier={result.geographic_context?.cityTier}
+                  />
+                </motion.div>
+              )}
 
-            {/* Competitor Chart */}
-            {result.market_analysis?.competitors && result.market_analysis.competitors.length > 0 && (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.27 }}
-              >
-                <CompetitorChart
-                  competitors={result.market_analysis.competitors}
-                  yourEdge={result.market_analysis.competitive_advantage}
-                />
-              </motion.div>
-            )}
+              {result.regional_analysis?.cultural_fit_analysis && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                >
+                  <CulturalFit
+                    trust_culture_alignment={result.regional_analysis.cultural_fit_analysis?.score || 6}
+                    payment_preference_match={result.regional_analysis.payment_landscape?.subscription_readiness === "high" ? 8 : result.regional_analysis.payment_landscape?.subscription_readiness === "medium" ? 6 : 4}
+                    communication_style_fit={result.regional_analysis.cultural_fit_analysis?.score ? Math.max(result.regional_analysis.cultural_fit_analysis.score - 1, 3) : 6}
+                    local_market_timing={result.regional_analysis.local_market_psychology?.brand_vs_price === "brand-loyal" ? "good" : "moderate"}
+                    cultural_insights={result.regional_analysis.cultural_fit_analysis?.alignment_factors || []}
+                    buying_behavior={result.regional_analysis.local_market_psychology?.decision_style}
+                    trust_signals_needed={result.regional_analysis.local_market_psychology?.trust_signals_needed || []}
+                  />
+                </motion.div>
+              )}
+            </div>
 
-            {/* Unit Economics */}
-            {result.unit_economics && (
+            {/* ═══════ MARKET SECTION ═══════ */}
+            <div id="market">
+              {result.market_analysis && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  className="mb-6"
+                >
+                  <MarketAnalysis 
+                    tam_estimate={result.market_analysis.tam_estimate}
+                    competitors={result.market_analysis.competitors}
+                    competitive_advantage={result.market_analysis.competitive_advantage}
+                  />
+                </motion.div>
+              )}
+
+              {result.market_analysis?.competitors && result.market_analysis.competitors.length > 0 && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                >
+                  <CompetitorChart
+                    competitors={result.market_analysis.competitors}
+                    yourEdge={result.market_analysis.competitive_advantage}
+                  />
+                </motion.div>
+              )}
+            </div>
+
+            {/* ═══════ ECONOMICS SECTION ═══════ */}
+            <div id="economics">
+              {result.unit_economics && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  className="mb-6"
+                >
+                  <UnitEconomics
+                    unit_economics={result.unit_economics}
+                    revenue_model={result.revenue_model}
+                  />
+                </motion.div>
+              )}
+
+              {/* Pricing Psychology */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.28 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                className="mb-6"
               >
-                <UnitEconomics
-                  unit_economics={result.unit_economics}
-                  revenue_model={result.revenue_model}
-                />
+                <ResultCard icon={<DollarSign className="w-5 h-5" />} title="Pricing Psychology">
+                  <div className="flex items-baseline gap-4 mb-4">
+                    <span className="text-4xl font-bold text-primary">{result.pricing_psychology.suggested}</span>
+                    <span className="text-sm text-muted-foreground">recommended</span>
+                  </div>
+                  <p className="text-muted-foreground mb-4">{result.pricing_psychology.reason}</p>
+                  {result.pricing_psychology.anchor_strategy && (
+                    <div className="p-4 bg-primary/5 border border-primary/10 rounded-xl">
+                      <p className="text-sm font-medium text-primary mb-1">Anchoring Strategy</p>
+                      <p className="text-sm text-muted-foreground">{result.pricing_psychology.anchor_strategy}</p>
+                    </div>
+                  )}
+                </ResultCard>
               </motion.div>
-            )}
+
+              {/* USP Analysis */}
+              {result.usp_analysis && (result.usp_analysis.personalized_usp || result.usp_analysis.positioning_statement) && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                >
+                  <USPAnalysis usp_analysis={result.usp_analysis} />
+                </motion.div>
+              )}
+            </div>
 
             {/* Timeline Roadmap */}
             {result.timeline_to_revenue && (
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.29 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
               >
                 <TimelineRoadmap
                   timeline_to_revenue={result.timeline_to_revenue}
@@ -424,84 +638,90 @@ const Result = () => {
               </motion.div>
             )}
 
-            {/* Execution Risks */}
-            {result.execution_risks && (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.30 }}
-              >
-                <ExecutionRisks
-                  execution_risks={result.execution_risks}
-                  regulatory_concerns={result.regulatory_concerns}
-                  legal_considerations={result.legal_considerations}
-                />
-              </motion.div>
-            )}
+            {/* ═══════ EXECUTION SECTION ═══════ */}
+            <div id="execution">
+              {result.execution_risks && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  className="mb-6"
+                >
+                  <ExecutionRisks
+                    execution_risks={result.execution_risks}
+                    regulatory_concerns={result.regulatory_concerns}
+                    legal_considerations={result.legal_considerations}
+                  />
+                </motion.div>
+              )}
 
-            {/* CEO Patterns */}
-            {result.ceo_patterns && (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.305 }}
-              >
-                <CEOPatterns ceo_patterns={result.ceo_patterns} />
-              </motion.div>
-            )}
+              {/* CEO Patterns */}
+              {result.ceo_patterns && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  className="mb-6"
+                >
+                  <CEOPatterns ceo_patterns={result.ceo_patterns} />
+                </motion.div>
+              )}
 
-            {/* Network Effects */}
-            {result.network_effects && (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.31 }}
-              >
-                <NetworkEffects
-                  network_effects={result.network_effects}
-                  winner_take_all={result.market_analysis?.winner_take_all}
-                  market_maturity={result.market_analysis?.market_maturity}
-                />
-              </motion.div>
-            )}
+              {/* Network Effects */}
+              {result.network_effects && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  className="mb-6"
+                >
+                  <NetworkEffects
+                    network_effects={result.network_effects}
+                    winner_take_all={result.market_analysis?.winner_take_all}
+                    market_maturity={result.market_analysis?.market_maturity}
+                  />
+                </motion.div>
+              )}
 
-            {/* Founder Market Fit */}
-            {result.founder_market_fit && (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.315 }}
-              >
-                <FounderMarketFit
-                  founder_market_fit={result.founder_market_fit}
-                  founder_archetype={result.ceo_patterns?.founder_archetype}
-                  similar_founders={result.similar_founders}
-                />
-              </motion.div>
-            )}
+              {/* Founder Market Fit */}
+              {result.founder_market_fit && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  className="mb-6"
+                >
+                  <FounderMarketFit
+                    founder_market_fit={result.founder_market_fit}
+                    founder_archetype={result.ceo_patterns?.founder_archetype}
+                    similar_founders={result.similar_founders}
+                  />
+                </motion.div>
+              )}
 
-            {/* Distribution Channels */}
-            {result.distribution_channels && result.distribution_channels.length > 0 && (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.32 }}
-              >
-                <DistributionChannels channels={result.distribution_channels} />
-              </motion.div>
-            )}
+              {/* Distribution Channels */}
+              {result.distribution_channels && result.distribution_channels.length > 0 && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                >
+                  <DistributionChannels channels={result.distribution_channels} />
+                </motion.div>
+              )}
+            </div>
 
             {/* Market Timing */}
             {result.market_analysis?.market_timing && (
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.31 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
               >
                 <ResultCard icon={<Clock className="w-5 h-5" />} title="Market Timing">
                   <div className="flex items-center gap-4">
                     <div className={`px-4 py-2 rounded-xl text-sm font-medium capitalize ${
-                      result.market_analysis.market_timing === "good" 
+                      result.market_analysis.market_timing === "good" || result.market_analysis.market_timing === "perfect"
                         ? "bg-success/20 text-success" 
                         : result.market_analysis.market_timing === "moderate"
                         ? "bg-primary/20 text-primary"
@@ -520,8 +740,8 @@ const Result = () => {
             {/* Buying Friction */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.32 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
             >
               <ResultCard icon={<AlertTriangle className="w-5 h-5" />} title="Buying Friction">
                 <ul className="space-y-3">
@@ -541,39 +761,18 @@ const Result = () => {
             {result.objection_handling && result.objection_handling.length > 0 && (
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.35 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
               >
                 <ObjectionHandler objections={result.objection_handling} />
               </motion.div>
             )}
 
-            {/* Pricing */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.38 }}
-            >
-              <ResultCard icon={<DollarSign className="w-5 h-5" />} title="Pricing Psychology">
-                <div className="flex items-baseline gap-4 mb-4">
-                  <span className="text-4xl font-bold text-primary">{result.pricing_psychology.suggested}</span>
-                  <span className="text-sm text-muted-foreground">recommended</span>
-                </div>
-                <p className="text-muted-foreground mb-4">{result.pricing_psychology.reason}</p>
-                {result.pricing_psychology.anchor_strategy && (
-                  <div className="p-4 bg-primary/5 border border-primary/10 rounded-xl">
-                    <p className="text-sm font-medium text-primary mb-1">💡 Anchoring Strategy</p>
-                    <p className="text-sm text-muted-foreground">{result.pricing_psychology.anchor_strategy}</p>
-                  </div>
-                )}
-              </ResultCard>
-            </motion.div>
-
             {/* Neuroscience */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
             >
               <NeurosciencePanel 
                 dopamine_triggers={result.neuroscience.dopamine_triggers || result.neuroscience.value_triggers || []}
@@ -584,12 +783,27 @@ const Result = () => {
               />
             </motion.div>
 
+            {/* Personalized Blueprint */}
+            {result.personalized_blueprint && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+              >
+                <PersonalizedBlueprint
+                  blueprint={result.personalized_blueprint}
+                  founder_specific_advice={result.founder_specific_advice}
+                  risk_mitigation_plan={result.risk_mitigation_plan}
+                />
+              </motion.div>
+            )}
+
             {/* Pivot Suggestions */}
             {result.verdict === "PIVOT" && result.pivot_suggestions && result.pivot_suggestions.length > 0 && (
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.45 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
               >
                 <ResultCard icon={<Lightbulb className="w-5 h-5" />} title="Pivot Suggestions">
                   <ul className="space-y-3">
@@ -606,25 +820,27 @@ const Result = () => {
               </motion.div>
             )}
 
-            {/* Enhanced Action Plan */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.5 }}
-            >
-              <ActionPlan
-                immediate_plan={result.immediate_plan}
-                what_would_change_verdict={result.what_would_change_verdict}
-                recommended_reading={result.recommended_reading}
-              />
-            </motion.div>
+            {/* ═══════ ACTION PLAN ═══════ */}
+            <div id="action">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+              >
+                <ActionPlan
+                  immediate_plan={result.immediate_plan}
+                  what_would_change_verdict={result.what_would_change_verdict}
+                  recommended_reading={result.recommended_reading}
+                />
+              </motion.div>
+            </div>
           </div>
 
           {/* Actions */}
           <motion.div 
             initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.6 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
             className="mt-12 flex flex-col sm:flex-row gap-4 print:hidden"
           >
             <LuxuryButton onClick={handleDownloadPDF} variant="secondary">
@@ -653,7 +869,7 @@ const Result = () => {
 };
 
 const ResultCard = ({ icon, title, children }: { icon: React.ReactNode; title: string; children: React.ReactNode }) => (
-  <div className="glass-card rounded-2xl p-8">
+  <div className="premium-card rounded-2xl p-8">
     <div className="flex items-center gap-3 mb-6">
       <div className="text-primary">{icon}</div>
       <h3 className="text-lg font-semibold">{title}</h3>
