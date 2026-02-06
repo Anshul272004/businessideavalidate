@@ -5,8 +5,61 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-// CEO Success Patterns Multi-Agent Neuro-Validation Protocol
-// Patterns from 100,000+ analyzed founders: Bezos, Musk, Zuckerberg, Dorsey, Jobs, Thiel, Hormozi, YC companies
+// ═══════ INPUT VALIDATION ═══════
+function sanitizeInput(input: string, maxLength: number): string {
+  if (!input || typeof input !== "string") return "";
+  // Strip HTML tags and trim
+  return input.replace(/<[^>]*>/g, "").trim().slice(0, maxLength);
+}
+
+const VALID_ENUMS: Record<string, string[]> = {
+  platform: ["digital", "physical", "hybrid"],
+  stage: ["concept", "validated", "mvp", "revenue"],
+  cityTier: ["metro", "tier-1", "tier-2", "tier-3", "rural"],
+  marketMaturity: ["nascent", "emerging", "developed", "saturated"],
+  customerLocation: ["local", "national", "global"],
+  paymentMaturity: ["cash-heavy", "digital-emerging", "digital-first"],
+  trustCulture: ["relationship", "transaction", "hybrid"],
+  regulatoryEnvironment: ["light", "moderate", "heavy", "uncertain"],
+  infrastructure: ["excellent", "good", "developing", "challenging"],
+  age: ["under-25", "25-35", "35-45", "45-plus"],
+  coreSkill: ["technical", "sales", "operations", "content", "generalist"],
+  industryYears: ["0-2", "2-5", "5-10", "10-plus"],
+  energyLevel: ["side-project", "part-time", "full-time", "obsessed"],
+  previousBusiness: ["none", "failed", "small-exit", "big-exit"],
+  budget: ["zero", "under-50k", "50k-200k", "200k-plus"],
+  monthlyBurn: ["under-5k", "5k-15k", "15k-50k", "50k-plus"],
+  riskTolerance: ["low", "medium", "high"],
+  hoursPerDay: ["1-2", "4-6", "8-plus", "all-waking"],
+  deadline: ["fast-money", "12-months", "long-term"],
+  investorAccess: ["none", "angels", "vcs", "institutional"],
+  customerAccess: ["cold", "warm", "hot", "existing"],
+  goal: ["lifestyle", "agency", "saas", "venture", "acquisition"],
+};
+
+function validateEnum(value: string | undefined, field: string): string {
+  if (!value) return "";
+  const allowed = VALID_ENUMS[field];
+  if (allowed && !allowed.includes(value)) return "";
+  return value;
+}
+
+// ═══════ RATE LIMITING ═══════
+const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
+
+function checkRateLimit(ip: string): boolean {
+  const now = Date.now();
+  const limit = rateLimitMap.get(ip);
+  if (!limit || now > limit.resetAt) {
+    rateLimitMap.set(ip, { count: 1, resetAt: now + 3600000 }); // 1 hour
+    return true;
+  }
+  if (limit.count >= 5) return false;
+  limit.count++;
+  return true;
+}
+
+// ═══════ AGENT PROMPTS ═══════
 const agentPrompts = {
   dopamineDetective: `You are the "Dopamine Detective" - an expert in demand psychology and buying motivation. 
 Analyze using proven patterns from 100,000+ successful founders:
@@ -42,13 +95,12 @@ Apply CEO patterns from 100,000+ founders (Musk's first principles, Bezos's flyw
 
 1. **TAM/SAM/SOM Analysis** - Total, Serviceable, Obtainable market with realistic estimates
 2. **Competitor Mapping** - Top 3-5 competitors with EXPLOITABLE weaknesses
-3. **Market Timing** - Is now the right time? (like Airbnb during recession, Uber with smartphone adoption)
+3. **Market Timing** - Is now the right time?
 4. **Network Effects Potential** - Does the product get better with more users?
 5. **Pricing Psychology** - Anchoring, decoy effect, value-based pricing
 6. **Unit Economics Deep Dive** - CAC, LTV, margins, payback period, contribution margin
-7. **Revenue Model Fit** - Which model fits best? Subscription, transactional, freemium?
+7. **Revenue Model Fit** - Which model fits best?
 8. **Winner-Take-All Dynamics** - Is this market prone to monopoly?
-9. **Blue Ocean vs Red Ocean** - Is this an existing market or creating new demand?
 
 Return ONLY a JSON object:
 {
@@ -73,7 +125,7 @@ Return ONLY a JSON object:
   "unit_economics": {
     "estimated_cac": "$X estimate",
     "estimated_ltv": "$X estimate",
-    "ltv_cac_ratio": "X:1 (healthy is >3:1)",
+    "ltv_cac_ratio": "X:1",
     "estimated_margin": "X% gross margin",
     "payback_period": "X months",
     "contribution_margin": "X%",
@@ -97,7 +149,6 @@ Apply learnings from 100,000+ startup post-mortems and CEO failure patterns:
 6. **Execution Risk Matrix** - Team, tech, capital, time constraints
 7. **Founder-Market Fit Signals** - Does this founder have unique advantages?
 8. **Distribution Viability** - How will customers actually discover this?
-9. **Founder Background Analysis** - How does their background affect success odds?
 
 Return ONLY a JSON object:
 {
@@ -150,16 +201,13 @@ Apply learnings from legendary founders and match patterns:
 5. **Buffett Circle of Competence** - Does founder understand this deeply?
 6. **Hormozi Value Equation** - Dream outcome × Perceived likelihood / Time delay × Effort
 7. **YC Startup Patterns** - Does this match patterns of successful YC companies?
-8. **Jobs Reality Distortion** - Is there vision that seems impossible but achievable?
-9. **Dorsey Simplicity** - Is the core value proposition crystal clear?
-10. **Anti-Patterns** - Warning signs from failed startups
+8. **Anti-Patterns** - Warning signs from failed startups
 
 FOUNDER PROFILE ANALYSIS:
 Based on the founder's background, experience, budget, goals, and previous business history, analyze:
 - How their unique background creates unfair advantages
 - What blind spots they might have
 - Similar successful founders with matching profiles
-- Optimal path based on their constraints and goals
 
 Return ONLY a JSON object:
 {
@@ -191,7 +239,7 @@ Return ONLY a JSON object:
     "archetype": "visionary" | "operator" | "technical" | "domain-expert" | "hustler" | "builder-seller",
     "unfair_advantages": ["advantage based on background"],
     "blind_spots": ["potential blind spot based on experience"],
-    "similar_successful_founders": ["founder who matches profile", "another match"],
+    "similar_successful_founders": ["founder who matches profile"],
     "optimal_path": "Personalized recommendation based on background, budget, and goals"
   },
   "scalability_score": number 1-10,
@@ -219,17 +267,17 @@ Given the founder's unique background, experience, and competitive advantages, g
 
 Return ONLY a JSON object:
 {
-  "personalized_usp": "One sentence that captures unique value only this founder can deliver",
+  "personalized_usp": "One sentence that captures unique value",
   "tagline_options": ["option1", "option2", "option3"],
   "story_framework": {
     "hook": "Opening that grabs attention",
     "struggle": "The problem they personally experienced",
     "insight": "The unique insight they discovered",
     "solution": "How their solution is different",
-    "vision": "The bigger picture they're working toward"
+    "vision": "The bigger picture"
   },
   "credibility_anchors": ["What from their background builds trust"],
-  "positioning_statement": "For [target] who [need], [product] is the [category] that [benefit] because [reason to believe]",
+  "positioning_statement": "For [target] who [need], [product] is the [category] that [benefit]",
   "brand_dna": {
     "values": ["value1", "value2", "value3"],
     "personality": "How the brand should feel",
@@ -244,15 +292,13 @@ Return ONLY a JSON object:
 Analyze based on the founder's specific location and target market:
 
 1. **Local Market Psychology** - How do people in this region make buying decisions?
-2. **Cultural Trust Factors** - What proof points work in this culture? (testimonials vs credentials vs referrals)
-3. **Payment Behavior** - How do customers prefer to pay? (UPI, cards, cash, EMI, COD)
+2. **Cultural Trust Factors** - What proof points work in this culture?
+3. **Payment Behavior** - How do customers prefer to pay?
 4. **Competition Dynamics** - Local vs global competitor positioning
 5. **Regulatory Environment** - Country/state specific rules and compliance
 6. **Infrastructure Reality** - Internet, logistics, banking, talent availability
-7. **Pricing Localization** - What price points work in this market? Purchasing power parity
-8. **Distribution Channels** - What channels work in this geography? (WhatsApp, Instagram, local marketplaces)
-9. **Cultural Adoption Patterns** - How do new products spread? (word of mouth, influencers, traditional media)
-10. **Regional Risk Factors** - Political stability, currency risk, market access barriers
+7. **Pricing Localization** - What price points work in this market?
+8. **Distribution Channels** - What channels work in this geography?
 
 Return ONLY a JSON object:
 {
@@ -276,7 +322,7 @@ Return ONLY a JSON object:
     "subscription_readiness": "high" | "medium" | "low",
     "recommended_pricing_model": "recommendation based on local behavior"
   },
-  "localization_requirements": ["requirement1", "requirement2", "requirement3"],
+  "localization_requirements": ["requirement1", "requirement2"],
   "pricing_recommendations": {
     "local_price_range": "$X-Y in local context",
     "purchasing_power_adjustment": "X% vs US pricing",
@@ -323,15 +369,11 @@ CUSTOMER PSYCHOLOGY:
 3. **Authority Bias** - Will expert endorsements drive adoption?
 4. **Scarcity Effect** - Can urgency/exclusivity drive purchases?
 5. **Status Quo Bias** - How hard is it to change behavior?
-6. **Paradox of Choice** - Is simplicity an advantage?
-7. **Reciprocity Principle** - Can free value drive conversion?
-8. **Commitment Escalation** - Can small yeses lead to big purchases?
+6. **Reciprocity Principle** - Can free value drive conversion?
 
 PERSUASION PSYCHOLOGY:
 1. **Cialdini's Principles** - Which apply? (reciprocity, scarcity, authority, consistency, liking, consensus)
-2. **Hormozi Value Equation** - Dream outcome × Likelihood / Time × Effort
-3. **Jobs-to-be-Done** - What functional, emotional, social jobs does this do?
-4. **Peak-End Rule** - What memories will customers have?
+2. **Jobs-to-be-Done** - What functional, emotional, social jobs does this do?
 
 Return ONLY a JSON object:
 {
@@ -388,21 +430,17 @@ COGNITIVE BIAS ANALYST: {biasAnalysis}
 FOUNDER CONTEXT: {founderContext}
 
 Synthesize a final verdict. Be BRUTALLY HONEST like a top-tier VC who has seen 10,000 pitches.
-Apply the "friend who works at Goldman" test - tell the hard truth even if it hurts.
 
 WEIGHT FACTORS BASED ON FOUNDER'S CONTEXT:
-- If in emerging market (India Tier-2, SEA, Africa): Weight regional factors 30%, adapt pricing expectations
+- If in emerging market: Weight regional factors 30%, adapt pricing expectations
 - If LIFESTYLE business: Weight pain/demand (50%), execution feasibility (30%), unit economics (20%)
 - If GROWTH business: Weight market size (40%), unit economics (30%), execution (30%)
 - If UNICORN potential: Weight market size (30%), network effects (25%), timing (25%), team (20%)
-- If EXIT focused: Weight acquisition fit (40%), defensibility (30%), growth trajectory (30%)
 
 BIAS ADJUSTMENT:
 - Factor in founder bias warnings to adjust confidence scores
 - Highlight if founder optimism may be inflating projections
 - Provide reality-adjusted success probability
-
-Generate executive-style summary bullets that could be presented in a boardroom.
 
 Return ONLY a JSON object:
 {
@@ -434,8 +472,8 @@ Return ONLY a JSON object:
     "risks": ["risk 1", "risk 2"]
   },
   "bottom_line": "One paragraph boardroom-ready summary",
-  "eli8_summary": "Explain to an 8-year-old why this will/won't work in 2-3 sentences",
-  "one_liner": "One sentence that captures the core insight",
+  "eli8_summary": "Explain to an 8-year-old why this will/won't work",
+  "one_liner": "One sentence core insight",
   "personalized_blueprint": {
     "phase_1": {"title": "Phase name", "duration": "X weeks", "actions": ["action1", "action2"], "budget_needed": "$X", "goal": "What success looks like"},
     "phase_2": {"title": "Phase name", "duration": "X weeks", "actions": ["action1", "action2"], "budget_needed": "$X", "goal": "What success looks like"},
@@ -443,7 +481,7 @@ Return ONLY a JSON object:
     "phase_4": {"title": "Phase name", "duration": "X months", "actions": ["action1", "action2"], "budget_needed": "$X", "goal": "What success looks like"}
   },
   "immediate_plan": [
-    {"day": "Day 1", "action": "specific action tailored to their budget/time", "goal": "what success looks like"},
+    {"day": "Day 1", "action": "specific action", "goal": "what success looks like"},
     {"day": "Day 3", "action": "specific action", "goal": "what success looks like"},
     {"day": "Week 1", "action": "specific action", "goal": "what success looks like"},
     {"day": "Week 2", "action": "specific action", "goal": "what success looks like"},
@@ -451,7 +489,7 @@ Return ONLY a JSON object:
   ],
   "pivot_suggestions": ["suggestion 1", "suggestion 2"] | null,
   "what_would_change_verdict": ["factor that would upgrade/downgrade the verdict"],
-  "key_assumptions": ["assumption to validate 1", "assumption 2", "assumption 3"],
+  "key_assumptions": ["assumption to validate 1", "assumption 2"],
   "dealbreakers": ["what could kill this"],
   "unfair_advantages_needed": ["what would make this unstoppable"],
   "success_probability": "X% chance of reaching $10k MRR",
@@ -464,16 +502,11 @@ Return ONLY a JSON object:
     "profitability_months": number,
     "million_arr_months": number | null
   },
-  "founder_specific_advice": "2-3 sentences of advice specific to their background and situation",
+  "founder_specific_advice": "2-3 sentences specific to their background",
   "founder_fit_questions": ["Deep question 1", "Deep question 2", "Deep question 3"],
   "recommended_reading": ["Book or resource 1", "Book or resource 2"],
-  "similar_successful_founders": ["Founder who did something similar", "Another example"],
-  "risk_mitigation_plan": ["How to reduce biggest risk 1", "How to reduce biggest risk 2"],
-  "psychology_insights": {
-    "customer_primary_driver": "What really motivates purchase",
-    "objection_handling": ["objection and counter"],
-    "trust_building_sequence": ["step1", "step2"]
-  }
+  "similar_successful_founders": ["Founder who did something similar"],
+  "risk_mitigation_plan": ["How to reduce biggest risk 1", "How to reduce biggest risk 2"]
 }`
 };
 
@@ -483,7 +516,7 @@ async function callAgent(
   userContext: string,
   apiKey: string
 ): Promise<any> {
-  console.log(`🤖 Starting ${agentName}...`);
+  console.log(`[Agent] Starting ${agentName}...`);
   
   const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
     method: "POST",
@@ -505,7 +538,8 @@ async function callAgent(
     const status = response.status;
     if (status === 429) throw new Error("429");
     if (status === 402) throw new Error("402");
-    throw new Error(`Agent ${agentName} failed: ${status}`);
+    console.error(`[Agent] ${agentName} failed with status ${status}`);
+    throw new Error(`Agent failed: ${status}`);
   }
 
   const data = await response.json();
@@ -514,81 +548,89 @@ async function callAgent(
   try {
     const jsonMatch = content.match(/```(?:json)?\s*([\s\S]*?)```/);
     const jsonStr = jsonMatch ? jsonMatch[1].trim() : content.trim();
-    console.log(`✅ ${agentName} completed`);
+    console.log(`[Agent] ${agentName} completed successfully`);
     return JSON.parse(jsonStr);
   } catch {
-    console.error(`Failed to parse ${agentName} response:`, content);
+    console.error(`[Agent] Failed to parse ${agentName} response`);
     return null;
   }
 }
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
+    return new Response("ok", { headers: corsHeaders });
   }
 
   try {
-    const { 
-      idea, 
-      targetCustomer, 
-      price, 
-      experience, 
-      platform, 
-      stage,
-      // Founder profile fields
-      background,
-      education,
-      industryExperience,
-      previousBusiness,
-      budget,
-      timeCommitment,
-      goal,
-      brandVision,
-      competitiveAdvantage,
-      uniqueInsight,
-      // Geographic & Cultural fields (NEW)
-      country,
-      state,
-      cityTier,
-      marketMaturity,
-      customerLocation,
-      paymentMaturity,
-      trustCulture,
-      regulatoryEnvironment,
-      infrastructure,
-      investorAccess,
-      customerAccess,
-      age,
-      coreSkill,
-      industryYears,
-      energyLevel,
-      monthlyBurn,
-      riskTolerance,
-      hoursPerDay,
-      deadline
-    } = await req.json();
+    // Rate limiting
+    const clientIP = req.headers.get("x-forwarded-for") || req.headers.get("cf-connecting-ip") || "unknown";
+    if (!checkRateLimit(clientIP)) {
+      console.log(`[Security] Rate limit exceeded for ${clientIP}`);
+      return new Response(
+        JSON.stringify({ error: "Too many requests. Please try again later." }),
+        { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    const body = await req.json();
+
+    // ═══════ VALIDATE & SANITIZE ALL INPUTS ═══════
+    const idea = sanitizeInput(body.idea, 2000);
+    const targetCustomer = sanitizeInput(body.targetCustomer, 1000);
+    const price = sanitizeInput(body.price, 20);
+    const uniqueInsight = sanitizeInput(body.uniqueInsight, 500);
+    const competitiveAdvantage = sanitizeInput(body.competitiveAdvantage, 500);
+    const country = sanitizeInput(body.country, 100);
+    const state = sanitizeInput(body.state, 100);
+
+    // Validate enums
+    const platform = validateEnum(body.platform, "platform");
+    const stage = validateEnum(body.stage, "stage");
+    const cityTier = validateEnum(body.cityTier, "cityTier");
+    const marketMaturity = validateEnum(body.marketMaturity, "marketMaturity");
+    const customerLocation = validateEnum(body.customerLocation, "customerLocation");
+    const paymentMaturity = validateEnum(body.paymentMaturity, "paymentMaturity");
+    const trustCulture = validateEnum(body.trustCulture, "trustCulture");
+    const regulatoryEnvironment = validateEnum(body.regulatoryEnvironment, "regulatoryEnvironment");
+    const infrastructure = validateEnum(body.infrastructure, "infrastructure");
+    const age = validateEnum(body.age, "age");
+    const coreSkill = validateEnum(body.coreSkill, "coreSkill");
+    const industryYears = validateEnum(body.industryYears, "industryYears");
+    const energyLevel = validateEnum(body.energyLevel, "energyLevel");
+    const previousBusiness = validateEnum(body.previousBusiness, "previousBusiness");
+    const budget = validateEnum(body.budget, "budget");
+    const monthlyBurn = validateEnum(body.monthlyBurn, "monthlyBurn");
+    const riskTolerance = validateEnum(body.riskTolerance, "riskTolerance");
+    const hoursPerDay = validateEnum(body.hoursPerDay, "hoursPerDay");
+    const deadline = validateEnum(body.deadline, "deadline");
+    const investorAccess = validateEnum(body.investorAccess, "investorAccess");
+    const customerAccess = validateEnum(body.customerAccess, "customerAccess");
+    const goal = validateEnum(body.goal, "goal");
 
     if (!idea || !targetCustomer) {
       return new Response(
-        JSON.stringify({ error: "Missing required fields" }),
+        JSON.stringify({ error: "Business idea and target customer are required." }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
     
-    // Default price if not provided
     const finalPrice = price || "Not specified";
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) {
-      throw new Error("LOVABLE_API_KEY is not configured");
+      console.error("[Config] LOVABLE_API_KEY is not configured");
+      return new Response(
+        JSON.stringify({ error: "Analysis service is temporarily unavailable." }),
+        { status: 503, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
     }
 
-    // Build comprehensive founder context with geographic data
+    // Build comprehensive context
     const founderContext = `
 FOUNDER PROFILE:
 - Age Range: ${age || "Not specified"}
 - Core Skill: ${coreSkill || "Not specified"}
-- Industry Experience: ${industryYears || industryExperience || "Not specified"}
+- Industry Experience: ${industryYears || "Not specified"}
 - Previous Business: ${previousBusiness || "None"}
 - Energy Level: ${energyLevel || "Full-time"}
 - Hours Per Day: ${hoursPerDay || "Not specified"}
@@ -637,16 +679,13 @@ PLATFORM/DELIVERY: ${platform || "Not specified"}
 
 CURRENT STAGE: ${stage || "Just an idea"}
 
-FOUNDER EXPERIENCE LEVEL: ${experience || "Not specified"}
-
 Analyze with brutal honesty using patterns from 100,000+ successful and failed startups.
-Apply the "friend who works at Goldman" test - tell the hard truth, not what they want to hear.
 Consider all real-world factors including REGIONAL MARKET DYNAMICS, cultural trust patterns, 
 local competition, payment behaviors, and infrastructure limitations.
-Tailor your analysis and recommendations to this specific founder's background, budget, location, and goals.`;
+Tailor analysis to this specific founder's background, budget, location, and goals.`;
 
-    // Run all SEVEN specialist agents in PARALLEL
-    console.log("🧠 Starting 100K CEO Pattern Multi-Agent Analysis with Regional + Cognitive Bias Intelligence...");
+    // Run all 7 specialist agents in PARALLEL
+    console.log("[Analysis] Starting 7-Agent Multi-Dimensional Analysis...");
     
     const [dopamineResult, moneyResult, amygdalaResult, ceoResult, uspResult, regionalResult, biasResult] = await Promise.all([
       callAgent("DopamineDetective", agentPrompts.dopamineDetective, userContext, LOVABLE_API_KEY),
@@ -658,9 +697,9 @@ Tailor your analysis and recommendations to this specific founder's background, 
       callAgent("CognitiveBiasAnalyst", agentPrompts.cognitivebiasAnalyst, userContext, LOVABLE_API_KEY),
     ]);
 
-    console.log("✅ All 7 agents completed, synthesizing verdict...");
+    console.log("[Analysis] All 7 agents completed, synthesizing verdict...");
 
-    // Now synthesize the verdict with all agent findings including regional and bias
+    // Synthesize with all agent findings
     const synthesisPrompt = agentPrompts.verdictSynthesizer
       .replace("{dopamineAnalysis}", JSON.stringify(dopamineResult || {}))
       .replace("{moneyAnalysis}", JSON.stringify(moneyResult || {}))
@@ -673,9 +712,8 @@ Tailor your analysis and recommendations to this specific founder's background, 
 
     const verdictResult = await callAgent("VerdictSynthesizer", synthesisPrompt, userContext, LOVABLE_API_KEY);
 
-    // Combine all results into the final response
+    // Combine all results
     const finalResult = {
-      // Demand Psychology (from Dopamine Detective)
       demand_psychology: dopamineResult?.demand_analysis || "Analysis pending",
       pain_realism: {
         score: dopamineResult?.pain_score || 5,
@@ -688,10 +726,7 @@ Tailor your analysis and recommendations to this specific founder's background, 
       willingness_to_pay: dopamineResult?.willingness_to_pay_signal || "moderate",
       existing_alternatives: dopamineResult?.existing_alternatives || [],
       why_alternatives_fail: dopamineResult?.why_alternatives_fail || "",
-      emotional_vs_rational: dopamineResult?.emotional_vs_rational || "both",
-      purchase_psychology: dopamineResult?.purchase_psychology || "",
 
-      // Market Analysis (from Money Trail)
       market_analysis: {
         tam_estimate: moneyResult?.tam_estimate || "Requires research",
         sam_estimate: moneyResult?.sam_estimate || "",
@@ -703,18 +738,12 @@ Tailor your analysis and recommendations to this specific founder's background, 
         timing_reason: moneyResult?.timing_reason || "",
         market_maturity: moneyResult?.market_maturity || "growing",
         winner_take_all: moneyResult?.winner_take_all ?? false,
-        blue_ocean: moneyResult?.blue_ocean ?? false,
-        market_position: moneyResult?.market_position || "",
       },
 
-      // Network Effects (from Money Trail)
       network_effects: moneyResult?.network_effects || null,
-
-      // Unit Economics (from Money Trail)
       unit_economics: moneyResult?.unit_economics || null,
       revenue_model: moneyResult?.revenue_model || "subscription",
 
-      // Pricing (from Money Trail)
       pricing_psychology: {
         fair: true,
         suggested: moneyResult?.suggested_price || `$${price}`,
@@ -722,7 +751,6 @@ Tailor your analysis and recommendations to this specific founder's background, 
         anchor_strategy: moneyResult?.anchor_strategy || "Consider tiered pricing",
       },
 
-      // Friction & Risk (from Amygdala Audit)
       buying_friction: amygdalaResult?.buying_friction || ["Needs validation"],
       trust_barriers: amygdalaResult?.trust_barriers || [],
       objection_handling: amygdalaResult?.objection_handling || [],
@@ -730,17 +758,10 @@ Tailor your analysis and recommendations to this specific founder's background, 
       regulatory_concerns: amygdalaResult?.regulatory_concerns || null,
       legal_considerations: amygdalaResult?.legal_considerations || null,
       industry_barriers: amygdalaResult?.industry_barriers || null,
-
-      // Execution Risks (from Amygdala Audit)
       execution_risks: amygdalaResult?.execution_risks || null,
-      
-      // Founder-Market Fit (from Amygdala Audit)
       founder_market_fit: amygdalaResult?.founder_market_fit || null,
-      
-      // Distribution (from Amygdala Audit)
       distribution_channels: amygdalaResult?.distribution_channels || null,
 
-      // Neuroscience Layer
       neuroscience: {
         dopamine_triggers: dopamineResult?.dopamine_triggers || [],
         oxytocin_factors: amygdalaResult?.oxytocin_factors || [],
@@ -749,7 +770,6 @@ Tailor your analysis and recommendations to this specific founder's background, 
         trust_difficulty: amygdalaResult?.trust_difficulty || "medium",
       },
 
-      // CEO Pattern Analysis (from CEO Pattern Matcher)
       ceo_patterns: {
         pattern_matches: ceoResult?.pattern_matches || null,
         yc_pattern_match: ceoResult?.yc_pattern_match || null,
@@ -764,7 +784,6 @@ Tailor your analysis and recommendations to this specific founder's background, 
         pivot_risk: ceoResult?.pivot_risk || null,
       },
 
-      // USP & Positioning (from USP Generator)
       usp_analysis: {
         personalized_usp: uspResult?.personalized_usp || null,
         tagline_options: uspResult?.tagline_options || [],
@@ -775,27 +794,20 @@ Tailor your analysis and recommendations to this specific founder's background, 
         differentiation_matrix: uspResult?.differentiation_matrix || [],
       },
 
-      // Regional Analysis (from Regional Market Analyst - NEW)
       regional_analysis: {
-        regional_viability_score: regionalResult?.regional_viability_score || 5,
+        regional_viability_score: regionalResult?.regional_viability_score || 50,
         cultural_fit_analysis: regionalResult?.cultural_fit_analysis || null,
-        local_market_psychology: regionalResult?.local_market_psychology || null,
+        local_market_psychology: regionalResult?.market_psychology || null,
         localization_requirements: regionalResult?.localization_requirements || [],
         pricing_recommendations: regionalResult?.pricing_recommendations || null,
         distribution_strategy: regionalResult?.distribution_strategy || null,
         regulatory_checklist: regionalResult?.regulatory_checklist || [],
-        infrastructure_dependencies: regionalResult?.infrastructure_dependencies || [],
+        infrastructure_dependencies: regionalResult?.infrastructure_dependencies || null,
         local_competitor_map: regionalResult?.local_competitor_map || [],
-        cultural_insights: regionalResult?.cultural_insights || [],
-        trust_signals_needed: regionalResult?.trust_signals_needed || [],
-        buying_behavior: regionalResult?.buying_behavior || null,
-        local_market_timing: regionalResult?.local_market_timing || "moderate",
-        expansion_path: regionalResult?.expansion_path || null,
-        localization_cost_estimate: regionalResult?.localization_cost_estimate || "medium",
-        local_success_factors: regionalResult?.local_success_factors || [],
+        regional_success_probability: regionalResult?.regional_success_probability || null,
+        payment_landscape: regionalResult?.payment_landscape || null,
       },
       
-      // Founder's geographic context
       geographic_context: {
         country: country || null,
         state: state || null,
@@ -803,7 +815,21 @@ Tailor your analysis and recommendations to this specific founder's background, 
         marketMaturity: marketMaturity || null,
       },
 
-      // Verdict (from Synthesizer)
+      // Cognitive Bias Analysis
+      cognitive_bias_analysis: {
+        founder_bias_warnings: biasResult?.founder_bias_warnings || [],
+        founder_reality_score: biasResult?.founder_reality_score || 5,
+        blind_spot_analysis: biasResult?.blind_spot_analysis || null,
+        customer_psychology: biasResult?.customer_psychology || null,
+        persuasion_leverage: biasResult?.persuasion_leverage || null,
+        loss_aversion_angle: biasResult?.loss_aversion_angle || null,
+        social_proof_strategy: biasResult?.social_proof_strategy || null,
+        jobs_to_be_done: biasResult?.jobs_to_be_done || null,
+        neuromarketing_insights: biasResult?.neuromarketing_insights || null,
+        bias_adjusted_success_probability: biasResult?.bias_adjusted_success_probability || null,
+      },
+
+      // Verdict
       confidence_score: verdictResult?.confidence_score || 50,
       verdict: verdictResult?.verdict || "PIVOT",
       verdict_probability: verdictResult?.verdict_probability || null,
@@ -812,6 +838,7 @@ Tailor your analysis and recommendations to this specific founder's background, 
       key_metrics: verdictResult?.key_metrics || [],
       risk_opportunity_balance: verdictResult?.risk_opportunity_balance || null,
       bottom_line: verdictResult?.bottom_line || null,
+      bias_adjusted_verdict: verdictResult?.bias_adjusted_verdict || null,
       one_liner: verdictResult?.one_liner || "",
       eli8_summary: verdictResult?.eli8_summary || "",
       success_probability: verdictResult?.success_probability || "Unknown",
@@ -836,34 +863,40 @@ Tailor your analysis and recommendations to this specific founder's background, 
       dealbreakers: verdictResult?.dealbreakers || [],
       unfair_advantages_needed: verdictResult?.unfair_advantages_needed || [],
 
-      // Meta info
-      analysis_agents: ["Dopamine Detective", "Money Trail", "Amygdala Audit", "CEO Pattern Matcher", "USP Generator", "Regional Market Analyst", "Verdict Synthesizer"],
-      analysis_version: "4.0-regional-intelligence",
+      analysis_agents: [
+        "Dopamine Detective", "Money Trail", "Amygdala Audit", 
+        "CEO Pattern Matcher", "USP Generator", "Regional Market Analyst", 
+        "Cognitive Bias Analyst", "Verdict Synthesizer"
+      ],
+      analysis_version: "5.0-cognitive-bias-security",
     };
+
+    console.log("[Analysis] Complete. Verdict:", finalResult.verdict, "Score:", finalResult.confidence_score);
 
     return new Response(JSON.stringify(finalResult), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (error) {
-    console.error("Validation error:", error);
+    console.error("[Error] Validation error:", error);
     
     if (error instanceof Error) {
       if (error.message === "429") {
         return new Response(
-          JSON.stringify({ error: "Rate limit exceeded. Please try again later." }),
+          JSON.stringify({ error: "Too many requests. Please try again later." }),
           { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
       if (error.message === "402") {
         return new Response(
-          JSON.stringify({ error: "AI credits exhausted. Please add credits to continue." }),
+          JSON.stringify({ error: "Service credits exhausted. Please try again later." }),
           { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
     }
     
+    // Generic error — never expose internal details
     return new Response(
-      JSON.stringify({ error: error instanceof Error ? error.message : "Unknown error" }),
+      JSON.stringify({ error: "Analysis failed. Please try again." }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }

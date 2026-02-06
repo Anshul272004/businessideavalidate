@@ -8,41 +8,77 @@ import {
   Shield, 
   CheckCircle2,
   Lock,
-  Zap
+  Zap,
+  Globe,
+  Eye,
+  Crown,
+  Fingerprint
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
-// Multi-Agent Analysis Stages
+// All 8 Analysis Stages (7 agents + synthesis)
 const analysisAgents = [
   {
     name: "Dopamine Detective",
-    icon: <Brain className="w-6 h-6" />,
-    description: "Analyzing demand psychology & buying motivation",
+    icon: <Brain className="w-5 h-5" />,
+    description: "Scanning demand psychology and buying motivation",
     color: "from-purple-500 to-pink-500",
     bgColor: "bg-purple-500/20",
     textColor: "text-purple-400",
   },
   {
     name: "Money Trail",
-    icon: <DollarSign className="w-6 h-6" />,
-    description: "Mapping market size & competitor weaknesses",
+    icon: <DollarSign className="w-5 h-5" />,
+    description: "Mapping market dynamics and unit economics",
     color: "from-emerald-500 to-teal-500",
     bgColor: "bg-emerald-500/20",
     textColor: "text-emerald-400",
   },
   {
     name: "Amygdala Audit",
-    icon: <Shield className="w-6 h-6" />,
-    description: "Evaluating risk factors & trust barriers",
+    icon: <Shield className="w-5 h-5" />,
+    description: "Evaluating execution risks and trust barriers",
     color: "from-orange-500 to-red-500",
     bgColor: "bg-orange-500/20",
     textColor: "text-orange-400",
   },
   {
+    name: "CEO Pattern Matcher",
+    icon: <Crown className="w-5 h-5" />,
+    description: "Matching against 100,000+ founder patterns",
+    color: "from-amber-500 to-yellow-500",
+    bgColor: "bg-amber-500/20",
+    textColor: "text-amber-400",
+  },
+  {
+    name: "USP Generator",
+    icon: <Sparkles className="w-5 h-5" />,
+    description: "Crafting your unique positioning",
+    color: "from-cyan-500 to-blue-500",
+    bgColor: "bg-cyan-500/20",
+    textColor: "text-cyan-400",
+  },
+  {
+    name: "Regional Analyst",
+    icon: <Globe className="w-5 h-5" />,
+    description: "Analyzing geographic and cultural factors",
+    color: "from-indigo-500 to-violet-500",
+    bgColor: "bg-indigo-500/20",
+    textColor: "text-indigo-400",
+  },
+  {
+    name: "Cognitive Bias Analyst",
+    icon: <Fingerprint className="w-5 h-5" />,
+    description: "Detecting founder and customer biases",
+    color: "from-rose-500 to-pink-500",
+    bgColor: "bg-rose-500/20",
+    textColor: "text-rose-400",
+  },
+  {
     name: "Verdict Synthesizer",
-    icon: <Zap className="w-6 h-6" />,
-    description: "Compiling brutally honest assessment",
+    icon: <Zap className="w-5 h-5" />,
+    description: "Compiling boardroom-ready assessment",
     color: "from-primary to-amber-500",
     bgColor: "bg-primary/20",
     textColor: "text-primary",
@@ -50,14 +86,16 @@ const analysisAgents = [
 ];
 
 const insights = [
-  "89% of startups fail because they solve the wrong problem",
-  "The best ideas address daily, recurring pain points",
-  "Price anchoring can increase conversions by 300%",
-  "Trust takes 7+ positive interactions to build",
-  "Loss aversion is 2x stronger than gain motivation",
-  "Social proof increases purchase intent by 63%",
-  "The Mom Test: Would strangers pay before seeing it?",
-  "Painkiller products outsell vitamins 10:1",
+  { text: "89% of startups fail because they solve the wrong problem", category: "Market Psychology" },
+  { text: "Loss aversion is 2x stronger than gain motivation — use it in your positioning", category: "Neuroscience" },
+  { text: "The Dunning-Kruger Effect causes 73% of founders to overestimate market readiness", category: "Cognitive Bias" },
+  { text: "Price anchoring can increase conversions by 300% when done correctly", category: "Pricing Psychology" },
+  { text: "Confirmation bias is the #1 killer of objective market validation", category: "Founder Bias" },
+  { text: "Social proof increases purchase intent by 63% across all demographics", category: "Trust Psychology" },
+  { text: "Painkiller products outsell vitamin products 10:1 in early-stage markets", category: "Demand Science" },
+  { text: "Trust takes 7+ positive interactions to build but 1 negative to destroy", category: "Behavioral Science" },
+  { text: "Founders in emerging markets who localize pricing see 3.5x higher conversion", category: "Regional Intelligence" },
+  { text: "The sunk cost fallacy keeps 40% of founders committed to failing ideas too long", category: "Decision Science" },
 ];
 
 const Loading = () => {
@@ -76,8 +114,8 @@ const Loading = () => {
 
     const formData = JSON.parse(formDataStr);
 
-    // Agent progression (3 parallel + 1 synthesis = ~15 seconds total)
-    const agentTimings = [0, 4000, 8000, 12000]; // When each agent "completes"
+    // Agent progression — spread across ~20 seconds for 8 agents
+    const agentTimings = [0, 2500, 5000, 7500, 10000, 12500, 15000, 17500];
     
     agentTimings.forEach((time, index) => {
       setTimeout(() => {
@@ -88,25 +126,25 @@ const Loading = () => {
       }, time);
     });
 
-    // Mark all complete near the end
+    // Mark all agents complete near the end
     setTimeout(() => {
-      setCompletedAgents([0, 1, 2, 3]);
-    }, 14000);
+      setCompletedAgents([0, 1, 2, 3, 4, 5, 6, 7]);
+    }, 19000);
 
-    // Progress bar
+    // Progress bar — smooth increment to 90%
     const progressInterval = setInterval(() => {
       setProgress((prev) => {
         if (prev >= 90) return 90;
-        return prev + 0.6;
+        return prev + 0.45;
       });
     }, 100);
 
     // Insight rotation
     const insightInterval = setInterval(() => {
       setInsightIndex((prev) => (prev + 1) % insights.length);
-    }, 3500);
+    }, 4000);
 
-    // API call
+    // API call — pass ALL form data fields
     const validateIdea = async () => {
       try {
         const { data, error } = await supabase.functions.invoke("validate-idea", {
@@ -114,16 +152,45 @@ const Loading = () => {
             idea: formData.idea,
             targetCustomer: formData.targetCustomer,
             price: formData.price,
-            experience: formData.experience,
             platform: formData.platform,
             stage: formData.stage,
+            uniqueInsight: formData.uniqueInsight,
+            // Location
+            country: formData.country,
+            state: formData.state,
+            cityTier: formData.cityTier,
+            marketMaturity: formData.marketMaturity,
+            // Market Culture
+            customerLocation: formData.customerLocation,
+            paymentMaturity: formData.paymentMaturity,
+            trustCulture: formData.trustCulture,
+            regulatoryEnvironment: formData.regulatoryEnvironment,
+            infrastructure: formData.infrastructure,
+            // Founder
+            age: formData.age,
+            coreSkill: formData.coreSkill,
+            industryYears: formData.industryYears,
+            energyLevel: formData.energyLevel,
+            previousBusiness: formData.previousBusiness,
+            // Capital
+            budget: formData.budget,
+            monthlyBurn: formData.monthlyBurn,
+            riskTolerance: formData.riskTolerance,
+            // Network & Time
+            hoursPerDay: formData.hoursPerDay,
+            deadline: formData.deadline,
+            investorAccess: formData.investorAccess,
+            customerAccess: formData.customerAccess,
+            // Outcome
+            goal: formData.goal,
+            competitiveAdvantage: formData.competitiveAdvantage,
           },
         });
 
         if (error) throw error;
 
         setProgress(100);
-        setCompletedAgents([0, 1, 2, 3]);
+        setCompletedAgents([0, 1, 2, 3, 4, 5, 6, 7]);
         sessionStorage.setItem("validationResult", JSON.stringify(data));
         
         setTimeout(() => navigate("/result"), 800);
@@ -135,7 +202,7 @@ const Loading = () => {
         } else if (error.message?.includes("402")) {
           toast.error("AI credits exhausted.");
         } else {
-          toast.error("Failed to analyze. Please try again.");
+          toast.error("Analysis failed. Please try again.");
         }
         
         setTimeout(() => navigate("/input?paid=true"), 2000);
@@ -150,6 +217,8 @@ const Loading = () => {
     };
   }, [navigate]);
 
+  const progressMarkers = [0, 25, 50, 75, 100];
+
   return (
     <div className="min-h-screen bg-background flex items-center justify-center overflow-hidden">
       {/* Ambient Background */}
@@ -157,22 +226,21 @@ const Loading = () => {
         <motion.div 
           animate={{ 
             scale: [1, 1.2, 1],
-            opacity: [0.1, 0.2, 0.1]
+            opacity: [0.08, 0.15, 0.08]
           }}
           transition={{ duration: 4, repeat: Infinity }}
           className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-primary/10 rounded-full blur-[150px]" 
         />
       </div>
 
-      <div className="luxury-container text-center relative z-10 max-w-3xl mx-auto px-4">
+      <div className="luxury-container text-center relative z-10 max-w-4xl mx-auto px-4">
         {/* Main Brain Animation */}
         <motion.div 
           initial={{ scale: 0.8, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
-          className="relative mb-10"
+          className="relative mb-8"
         >
-          <div className="w-28 h-28 mx-auto relative">
-            {/* Pulsing rings */}
+          <div className="w-24 h-24 mx-auto relative">
             <motion.div 
               animate={{ scale: [1, 1.5], opacity: [0.3, 0] }}
               transition={{ duration: 2, repeat: Infinity }}
@@ -183,29 +251,59 @@ const Loading = () => {
               transition={{ duration: 2, repeat: Infinity, delay: 0.5 }}
               className="absolute inset-0 rounded-full border border-primary" 
             />
-            
-            {/* Main icon */}
             <motion.div 
               animate={{ rotate: [0, 360] }}
               transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
               className="absolute inset-2 rounded-full bg-gradient-to-br from-primary/30 to-transparent"
             />
-            <div className="relative w-28 h-28 rounded-full bg-card border border-primary/50 flex items-center justify-center">
+            <div className="relative w-24 h-24 rounded-full bg-card border border-primary/50 flex items-center justify-center">
               <motion.div
                 animate={{ scale: [1, 1.1, 1] }}
                 transition={{ duration: 2, repeat: Infinity }}
               >
-                <Brain className="w-12 h-12 text-primary" />
+                <Brain className="w-10 h-10 text-primary" />
               </motion.div>
             </div>
           </div>
         </motion.div>
 
-        {/* Multi-Agent Status */}
-        <div className="mb-10">
-          <p className="text-sm text-muted-foreground mb-4">Multi-Agent Analysis in Progress</p>
-          
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        {/* Large Progress Number */}
+        <motion.div 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="mb-2"
+        >
+          <span className="text-5xl font-bold font-mono gradient-text">{Math.floor(progress)}%</span>
+        </motion.div>
+        <p className="text-sm text-muted-foreground mb-8">7-Agent Multi-Dimensional Analysis</p>
+
+        {/* Progress Bar with Scale Markers */}
+        <div className="max-w-lg mx-auto mb-10">
+          <div className="relative h-3 bg-card rounded-full overflow-hidden border border-border">
+            <motion.div
+              className="h-full rounded-full bg-gradient-to-r from-primary via-primary to-success"
+              initial={{ width: 0 }}
+              animate={{ width: `${progress}%` }}
+              transition={{ duration: 0.3 }}
+            />
+          </div>
+          {/* Scale markers */}
+          <div className="flex justify-between mt-2">
+            {progressMarkers.map((marker) => (
+              <span 
+                key={marker} 
+                className={`text-xs font-mono ${progress >= marker ? 'text-primary' : 'text-muted-foreground/50'}`}
+              >
+                {marker}%
+              </span>
+            ))}
+          </div>
+        </div>
+
+        {/* Agent Grid — 8 agents in 2 rows of 4 */}
+        <div className="mb-8">
+          <p className="text-xs text-muted-foreground mb-4 uppercase tracking-wider">Specialist Agents</p>
+          <div className="grid grid-cols-4 gap-2 md:gap-3">
             {analysisAgents.map((agent, index) => {
               const isActive = currentAgent === index;
               const isComplete = completedAgents.includes(index);
@@ -215,31 +313,33 @@ const Loading = () => {
                   key={agent.name}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.1 }}
-                  className={`relative p-4 rounded-xl border transition-all duration-300 ${
+                  transition={{ delay: index * 0.05 }}
+                  className={`relative p-3 md:p-4 rounded-xl border transition-all duration-300 ${
                     isComplete 
                       ? "bg-success/10 border-success/30" 
                       : isActive 
                       ? `${agent.bgColor} border-primary/30` 
-                      : "bg-card border-border"
+                      : "bg-card/50 border-border/50"
                   }`}
                 >
-                  {/* Active indicator */}
+                  {/* Active glow */}
                   {isActive && !isComplete && (
                     <motion.div
-                      animate={{ opacity: [0.5, 1, 0.5] }}
+                      animate={{ opacity: [0.3, 0.8, 0.3] }}
                       transition={{ duration: 1.5, repeat: Infinity }}
                       className={`absolute inset-0 rounded-xl bg-gradient-to-r ${agent.color} opacity-10`}
                     />
                   )}
                   
                   <div className="relative">
-                    <div className={`w-10 h-10 mx-auto mb-2 rounded-lg flex items-center justify-center ${
+                    <div className={`w-8 h-8 mx-auto mb-1.5 rounded-lg flex items-center justify-center ${
                       isComplete ? "bg-success/20 text-success" : `${agent.bgColor} ${agent.textColor}`
                     }`}>
-                      {isComplete ? <CheckCircle2 className="w-5 h-5" /> : agent.icon}
+                      {isComplete ? <CheckCircle2 className="w-4 h-4" /> : agent.icon}
                     </div>
-                    <p className={`text-xs font-medium ${isComplete ? "text-success" : isActive ? agent.textColor : "text-muted-foreground"}`}>
+                    <p className={`text-[10px] md:text-xs font-medium leading-tight ${
+                      isComplete ? "text-success" : isActive ? agent.textColor : "text-muted-foreground/70"
+                    }`}>
                       {agent.name}
                     </p>
                   </div>
@@ -249,7 +349,7 @@ const Loading = () => {
           </div>
         </div>
 
-        {/* Current Agent Display */}
+        {/* Current Agent Description */}
         <AnimatePresence mode="wait">
           <motion.div
             key={currentAgent}
@@ -259,44 +359,33 @@ const Loading = () => {
             className="mb-8"
           >
             <div className={`inline-flex items-center gap-2 px-5 py-2.5 rounded-full border ${analysisAgents[currentAgent]?.bgColor} border-primary/20`}>
-              <span className={analysisAgents[currentAgent]?.textColor}>
+              <motion.span
+                animate={{ rotate: [0, 5, -5, 0] }}
+                transition={{ duration: 1.5, repeat: Infinity }}
+                className={analysisAgents[currentAgent]?.textColor}
+              >
                 {analysisAgents[currentAgent]?.icon}
-              </span>
+              </motion.span>
               <span className="font-medium text-sm">{analysisAgents[currentAgent]?.description}</span>
             </div>
           </motion.div>
         </AnimatePresence>
 
-        {/* Main Progress Bar */}
-        <div className="max-w-md mx-auto mb-8">
-          <div className="h-2 bg-card rounded-full overflow-hidden border border-border">
-            <motion.div
-              className="h-full gradient-bar"
-              initial={{ width: 0 }}
-              animate={{ width: `${progress}%` }}
-              transition={{ duration: 0.3 }}
-            />
-          </div>
-          <div className="flex items-center justify-between mt-3 text-sm">
-            <span className="text-muted-foreground flex items-center gap-2">
-              <Sparkles className="w-4 h-4 text-primary" />
-              Analyzing...
-            </span>
-            <span className="font-mono text-primary">{Math.floor(progress)}%</span>
-          </div>
-        </div>
-
-        {/* Insight Carousel */}
+        {/* Psychology Insight Carousel */}
         <AnimatePresence mode="wait">
           <motion.div
             key={insightIndex}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="max-w-md mx-auto p-5 bg-card/50 border border-border/50 rounded-xl"
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.4 }}
+            className="max-w-md mx-auto p-5 bg-card/60 border border-border/50 rounded-xl backdrop-blur-sm"
           >
-            <p className="text-sm text-muted-foreground">
-              💡 <span className="text-foreground">{insights[insightIndex]}</span>
+            <p className="text-[10px] text-primary font-semibold uppercase tracking-wider mb-2">
+              {insights[insightIndex].category}
+            </p>
+            <p className="text-sm text-foreground leading-relaxed">
+              {insights[insightIndex].text}
             </p>
           </motion.div>
         </AnimatePresence>
@@ -306,10 +395,17 @@ const Loading = () => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 1 }}
-          className="mt-10 flex items-center justify-center gap-2 text-xs text-muted-foreground"
+          className="mt-10 flex items-center justify-center gap-4 text-xs text-muted-foreground"
         >
-          <Lock className="w-3 h-3" />
-          Your idea is 100% confidential
+          <div className="flex items-center gap-1.5">
+            <Lock className="w-3 h-3" />
+            <span>100% Confidential</span>
+          </div>
+          <span className="w-px h-3 bg-border" />
+          <div className="flex items-center gap-1.5">
+            <Eye className="w-3 h-3" />
+            <span>Your data is never stored</span>
+          </div>
         </motion.div>
       </div>
     </div>
