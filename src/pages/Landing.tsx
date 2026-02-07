@@ -1,7 +1,8 @@
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { LuxuryButton } from "@/components/ui/luxury-button";
-import { ArrowRight, Target, Brain, Shield, Sparkles, CheckCircle, Globe2, Users, TrendingUp, Zap } from "lucide-react";
+import { ArrowRight, Target, Brain, Shield, Sparkles, CheckCircle, Globe2, Users, TrendingUp, Zap, LogOut, User } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
 import HowItWorks from "@/components/landing/HowItWorks";
 import Testimonials from "@/components/landing/Testimonials";
 import FAQ from "@/components/landing/FAQ";
@@ -19,6 +20,7 @@ import CEOPatternSection from "@/components/landing/CEOPatternSection";
 
 const Landing = () => {
   const navigate = useNavigate();
+  const { user, signOut } = useAuth();
 
   const handleValidateClick = () => {
     navigate("/input?paid=true");
@@ -78,9 +80,38 @@ const Landing = () => {
                 Pricing
               </button>
             </div>
-            <LuxuryButton onClick={handleValidateClick} size="sm">
-              Validate My Idea
-            </LuxuryButton>
+            <div className="flex items-center gap-3">
+              {user ? (
+                <>
+                  <span className="hidden sm:flex items-center gap-1.5 text-xs text-muted-foreground">
+                    <User className="w-3.5 h-3.5" />
+                    {user.email?.split("@")[0]}
+                  </span>
+                  <LuxuryButton onClick={handleValidateClick} size="sm">
+                    Validate My Idea
+                  </LuxuryButton>
+                  <button
+                    onClick={() => signOut()}
+                    className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
+                    title="Sign out"
+                  >
+                    <LogOut className="w-4 h-4" />
+                  </button>
+                </>
+              ) : (
+                <>
+                  <button
+                    onClick={() => navigate("/auth")}
+                    className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    Sign In
+                  </button>
+                  <LuxuryButton onClick={() => navigate("/auth")} size="sm">
+                    Get Started
+                  </LuxuryButton>
+                </>
+              )}
+            </div>
           </motion.div>
         </div>
       </nav>
