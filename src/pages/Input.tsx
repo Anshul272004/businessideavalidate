@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { LuxuryButton } from "@/components/ui/luxury-button";
 import { 
@@ -71,8 +71,6 @@ interface FormData {
 
 const Input = () => {
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  const isPaid = searchParams.get("paid") === "true";
   const [currentStep, setCurrentStep] = useState(1);
 
   const [formData, setFormData] = useState<FormData>({
@@ -140,28 +138,6 @@ const Input = () => {
   ];
   const totalSteps = 7;
   const progressPercent = Math.round((currentStep / totalSteps) * 100);
-
-  if (!isPaid) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="luxury-container text-center max-w-md"
-        >
-          <Target className="w-12 h-12 text-primary mx-auto mb-6" />
-          <h1 className="text-2xl font-semibold mb-4">Access Required</h1>
-          <p className="text-muted-foreground mb-8">
-            This evaluation requires a paid plan.
-          </p>
-          <LuxuryButton onClick={() => navigate("/pricing")} size="lg">
-            View Pricing
-            <ArrowRight className="ml-2 h-5 w-5" />
-          </LuxuryButton>
-        </motion.div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-background">
