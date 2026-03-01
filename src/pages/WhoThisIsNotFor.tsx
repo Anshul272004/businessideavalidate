@@ -43,6 +43,14 @@ const isFor = [
     title: "Anyone who's burned time on the wrong idea before",
     description: "If you've learned the hard way once, this helps you not learn it again.",
   },
+  {
+    title: "Angel investors before writing their first check",
+    description: "Evaluate opportunities through the same lens top investors use—psychology, execution risk, and regional fit.",
+  },
+  {
+    title: "Operators evaluating new product lines",
+    description: "When expanding your business portfolio, validate before committing resources to a new direction.",
+  },
 ];
 
 const WhoThisIsNotFor = () => {
@@ -60,7 +68,7 @@ const WhoThisIsNotFor = () => {
             <ArrowLeft className="w-4 h-4" />
             <span>Back</span>
           </button>
-          <LuxuryButton onClick={() => navigate("/input?paid=true")} size="sm">
+          <LuxuryButton onClick={() => navigate("/input")} size="sm">
             Evaluate Decision
           </LuxuryButton>
         </div>
@@ -163,7 +171,7 @@ const WhoThisIsNotFor = () => {
           className="text-center"
         >
           <p className="text-muted-foreground mb-6">Still here? Good. You're ready.</p>
-          <LuxuryButton onClick={() => navigate("/input?paid=true")} size="lg" className="group">
+          <LuxuryButton onClick={() => navigate("/input")} size="lg" className="group">
             Evaluate Your Decision
             <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
           </LuxuryButton>

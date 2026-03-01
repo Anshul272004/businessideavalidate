@@ -11,7 +11,7 @@ const plans = [
     period: "per evaluation",
     features: [
       "Single idea evaluation",
-      "4 analysis agents",
+      "5 analysis agents",
       "GO / PIVOT / KILL verdict",
       "Basic action steps",
       "48-hour email support",
@@ -26,8 +26,10 @@ const plans = [
     period: "per evaluation",
     features: [
       "Single idea evaluation",
-      "6 analysis agents (full suite)",
+      "8 analysis agents (full suite)",
       "Founder-market fit analysis",
+      "Cognitive bias detection",
+      "Regional market intelligence",
       "Personalized blueprint",
       "Unit economics projection",
       "Distribution channel mapping",
@@ -47,6 +49,7 @@ const plans = [
       "5 idea evaluations per quarter",
       "Everything in Founder",
       "Compare ideas side-by-side",
+      "Validation history dashboard",
       "Monthly trend updates",
       "Direct analyst access",
       "White-label reports",
@@ -127,7 +130,7 @@ const Pricing = () => {
               </div>
 
               <LuxuryButton 
-                onClick={() => navigate("/input?paid=true")}
+                onClick={() => navigate("/input")}
                 className={`w-full mb-6 ${!plan.popular && "bg-secondary text-secondary-foreground hover:bg-secondary/80"}`}
               >
                 {plan.cta}

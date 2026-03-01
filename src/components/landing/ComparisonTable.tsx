@@ -11,7 +11,10 @@ interface Feature {
 }
 
 const features: Feature[] = [
+  { name: "8 specialized analysis agents", us: true, chatgpt: false, consultant: false },
   { name: "Psychology-based analysis", us: true, chatgpt: false, consultant: true },
+  { name: "Cognitive bias detection", us: true, chatgpt: false, consultant: "partial" },
+  { name: "Regional market intelligence", us: true, chatgpt: false, consultant: "partial" },
   { name: "Neuroscience triggers", us: true, chatgpt: false, consultant: "partial" },
   { name: "Clear GO/PIVOT/KILL verdict", us: true, chatgpt: false, consultant: "partial" },
   { name: "Pricing psychology", us: true, chatgpt: false, consultant: true },

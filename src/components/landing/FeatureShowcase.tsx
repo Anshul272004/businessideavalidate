@@ -18,7 +18,7 @@ const features = [
   {
     icon: <Brain className="w-6 h-6" />,
     title: "Multi-Agent AI Analysis",
-    description: "4 specialized AI agents analyze your idea in parallel: Dopamine Detective, Money Trail, Amygdala Audit, and Verdict Synthesizer.",
+    description: "8 specialized AI agents analyze your idea in parallel — from demand psychology to cognitive bias detection.",
     gradient: "from-purple-500/20 to-pink-500/20",
   },
   {

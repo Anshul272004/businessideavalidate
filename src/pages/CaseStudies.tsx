@@ -113,9 +113,9 @@ const CaseStudies = () => {
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shadow-lg shadow-primary/20">
               <Sparkles className="w-5 h-5 text-primary-foreground" />
             </div>
-            <span className="font-bold text-xl">IdeaValidator</span>
+            <span className="font-bold text-xl">ValidateFirst</span>
           </button>
-          <LuxuryButton onClick={() => navigate("/input?paid=true")} size="sm">
+          <LuxuryButton onClick={() => navigate("/input")} size="sm">
             Validate My Idea
           </LuxuryButton>
         </div>
@@ -266,7 +266,7 @@ const CaseStudies = () => {
           <p className="text-muted-foreground mb-8">
             Join 2,847+ founders who've made better decisions with our validation
           </p>
-          <LuxuryButton onClick={() => navigate("/input?paid=true")} size="lg" className="glow-box">
+          <LuxuryButton onClick={() => navigate("/input")} size="lg" className="glow-box">
             Validate My Idea
             <ArrowRight className="w-5 h-5 ml-2" />
           </LuxuryButton>

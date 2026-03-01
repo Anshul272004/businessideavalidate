@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
@@ -100,6 +101,7 @@ const insights = [
 
 const Loading = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [currentAgent, setCurrentAgent] = useState(0);
   const [progress, setProgress] = useState(0);
   const [insightIndex, setInsightIndex] = useState(0);
@@ -192,6 +194,23 @@ const Loading = () => {
         setProgress(100);
         setCompletedAgents([0, 1, 2, 3, 4, 5, 6, 7]);
         sessionStorage.setItem("validationResult", JSON.stringify(data));
+
+        // Save to database
+        if (user) {
+          try {
+            await supabase.from("validations").insert({
+              user_id: user.id,
+              idea_summary: formData.idea?.substring(0, 500) || "Untitled idea",
+              target_customer: formData.targetCustomer || null,
+              verdict: data.verdict,
+              confidence_score: data.confidence_score || null,
+              result_data: data,
+              form_data: formData,
+            } as any);
+          } catch (e) {
+            console.error("Failed to save validation:", e);
+          }
+        }
         
         setTimeout(() => navigate("/result"), 800);
       } catch (error: any) {
@@ -205,7 +224,7 @@ const Loading = () => {
           toast.error("Analysis failed. Please try again.");
         }
         
-        setTimeout(() => navigate("/input?paid=true"), 2000);
+        setTimeout(() => navigate("/input"), 2000);
       }
     };
 
@@ -275,7 +294,8 @@ const Loading = () => {
         >
           <span className="text-5xl font-bold font-mono gradient-text">{Math.floor(progress)}%</span>
         </motion.div>
-        <p className="text-sm text-muted-foreground mb-8">7-Agent Multi-Dimensional Analysis</p>
+        <p className="text-sm text-muted-foreground mb-2">8-Agent Multi-Dimensional Analysis</p>
+        <p className="text-xs text-muted-foreground/60 mb-6">Estimated time: ~30 seconds</p>
 
         {/* Progress Bar with Scale Markers */}
         <div className="max-w-lg mx-auto mb-10">

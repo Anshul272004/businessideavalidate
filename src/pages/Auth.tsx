@@ -35,7 +35,7 @@ const Auth = () => {
   // Redirect if already authenticated
   useEffect(() => {
     if (user) {
-      navigate("/input?paid=true");
+      navigate("/input");
     }
   }, [user, navigate]);
 
