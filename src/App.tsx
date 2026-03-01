@@ -14,6 +14,7 @@ import Pricing from "./pages/Pricing";
 import CaseStudies from "./pages/CaseStudies";
 import Methodology from "./pages/Methodology";
 import WhoThisIsNotFor from "./pages/WhoThisIsNotFor";
+import Dashboard from "./pages/Dashboard";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -28,6 +29,11 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Landing />} />
             <Route path="/auth" element={<Auth />} />
+            <Route path="/dashboard" element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            } />
             <Route path="/input" element={
               <ProtectedRoute>
                 <Input />

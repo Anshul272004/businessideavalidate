@@ -23,7 +23,7 @@ const Landing = () => {
   const { user, signOut } = useAuth();
 
   const handleValidateClick = () => {
-    navigate("/input?paid=true");
+    navigate("/input");
   };
 
   return (
@@ -83,6 +83,12 @@ const Landing = () => {
             <div className="flex items-center gap-3">
               {user ? (
                 <>
+                  <button
+                    onClick={() => navigate("/dashboard")}
+                    className="text-sm text-muted-foreground hover:text-foreground transition-colors hidden md:block"
+                  >
+                    My Reports
+                  </button>
                   <span className="hidden sm:flex items-center gap-1.5 text-xs text-muted-foreground">
                     <User className="w-3.5 h-3.5" />
                     {user.email?.split("@")[0]}
@@ -127,7 +133,7 @@ const Landing = () => {
             className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-8"
           >
             <Sparkles className="w-4 h-4 text-primary" />
-            <span className="text-sm font-medium text-primary">Pre-Investment Decision System</span>
+            <span className="text-sm font-medium text-primary">8-Agent Pre-Investment Decision System</span>
           </motion.div>
 
           {/* Main headline - Emotional hook */}
@@ -161,7 +167,7 @@ const Landing = () => {
             transition={{ duration: 0.5, delay: 0.25 }}
             className="text-sm text-muted-foreground mb-10"
           >
-            Inspired by how top investors evaluate opportunities. Powered by 7 specialized AI agents.
+            Inspired by how top investors evaluate opportunities. Powered by 8 specialized AI agents.
           </motion.p>
 
           {/* CTA with outcome */}
@@ -218,7 +224,7 @@ const Landing = () => {
             <StepCard 
               number="2" 
               title="We analyze everything" 
-              description="7 AI agents evaluate psychology, risk, regional fit & execution"
+              description="8 AI agents evaluate psychology, risk, regional fit, biases & execution"
               icon={<Brain className="w-5 h-5" />}
             />
             <StepCard 
@@ -322,7 +328,7 @@ const Landing = () => {
             Decision dimensions we <span className="font-serif italic font-normal gradient-text">evaluate</span>
           </h2>
           <p className="text-muted-foreground max-w-2xl mx-auto">
-            7 specialized AI agents analyze your idea across critical success factors
+            8 specialized AI agents analyze your idea across critical success factors
           </p>
         </div>
         
@@ -367,7 +373,7 @@ const Landing = () => {
           className="flex flex-wrap gap-8 items-center justify-center text-sm text-muted-foreground"
         >
           {[
-            { icon: <Brain className="w-4 h-4" />, text: "7 parallel analysis agents" },
+            { icon: <Brain className="w-4 h-4" />, text: "8 parallel analysis agents" },
             { icon: <Shield className="w-4 h-4" />, text: "Confidential processing" },
             { icon: <Target className="w-4 h-4" />, text: "Evidence-based verdicts" },
             { icon: <Globe2 className="w-4 h-4" />, text: "Regional market intelligence" },

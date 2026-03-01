@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { LuxuryButton } from "@/components/ui/luxury-button";
-import { ArrowLeft, ArrowRight, Brain, Target, Shield, Scale, TrendingUp, Users } from "lucide-react";
+import { ArrowLeft, ArrowRight, Brain, Target, Shield, Scale, TrendingUp, Users, Globe, Fingerprint } from "lucide-react";
 
 const frameworks = [
   {
@@ -33,6 +33,18 @@ const frameworks = [
     title: "USP Generator",
     description: "Creates personalized positioning based on your unique background. Builds a narrative only you can credibly tell.",
     factors: ["Credibility anchor identification", "Story framework creation", "Differentiation matrix"],
+  },
+  {
+    icon: <Globe className="w-6 h-6" />,
+    title: "Regional Market Analyst",
+    description: "Evaluates geographic and cultural factors. Analyzes local market psychology, payment landscapes, and infrastructure dependencies.",
+    factors: ["Cultural fit scoring", "Local competitor mapping", "Infrastructure risk assessment"],
+  },
+  {
+    icon: <Fingerprint className="w-6 h-6" />,
+    title: "Cognitive Bias Analyst",
+    description: "Detects founder and customer biases that distort validation. Adjusts the verdict for human delusion and blind spots.",
+    factors: ["Confirmation bias detection", "Dunning-Kruger assessment", "Reality score calibration"],
   },
   {
     icon: <Scale className="w-6 h-6" />,
@@ -76,7 +88,7 @@ const Methodology = () => {
             <ArrowLeft className="w-4 h-4" />
             <span>Back</span>
           </button>
-          <LuxuryButton onClick={() => navigate("/input?paid=true")} size="sm">
+          <LuxuryButton onClick={() => navigate("/input")} size="sm">
             Evaluate Decision
           </LuxuryButton>
         </div>
@@ -131,7 +143,7 @@ const Methodology = () => {
           viewport={{ once: true }}
           className="mb-24"
         >
-          <h2 className="text-sm text-muted-foreground mb-8 uppercase tracking-wide">The Six Analysis Agents</h2>
+          <h2 className="text-sm text-muted-foreground mb-8 uppercase tracking-wide">The Eight Analysis Agents</h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {frameworks.map((framework, i) => (
               <motion.div
@@ -191,7 +203,7 @@ const Methodology = () => {
           viewport={{ once: true }}
           className="text-center"
         >
-          <LuxuryButton onClick={() => navigate("/input?paid=true")} size="lg" className="group">
+          <LuxuryButton onClick={() => navigate("/input")} size="lg" className="group">
             Evaluate Your Decision
             <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
           </LuxuryButton>

@@ -31,10 +31,12 @@ const problems = [
 const mistakes = [
   "Asking friends who will not be honest",
   "Building before validating demand",
-  "Trusting gut feeling over evidence",
+  "Trusting gut feeling over evidence (confirmation bias)",
   "Using generic AI that avoids hard truths",
   "Skipping founder-market fit analysis",
   "Ignoring execution difficulty",
+  "The Dunning-Kruger Effect — overestimating readiness",
+  "73% of founders suffer from confirmation bias",
 ];
 
 const ProblemAgitation = () => {

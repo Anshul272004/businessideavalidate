@@ -198,6 +198,7 @@ const sections = [
   { id: "market", label: "Market", icon: <Target className="w-3.5 h-3.5" /> },
   { id: "economics", label: "Economics", icon: <DollarSign className="w-3.5 h-3.5" /> },
   { id: "execution", label: "Execution", icon: <AlertTriangle className="w-3.5 h-3.5" /> },
+  { id: "biases", label: "Biases", icon: <Fingerprint className="w-3.5 h-3.5" /> },
   { id: "action", label: "Action Plan", icon: <Lightbulb className="w-3.5 h-3.5" /> },
 ];
 
@@ -248,7 +249,7 @@ const Result = () => {
   const handleNewValidation = () => {
     sessionStorage.removeItem("validationData");
     sessionStorage.removeItem("validationResult");
-    navigate("/input?paid=true");
+    navigate("/input");
   };
 
   const scrollToTop = () => window.scrollTo({ top: 0, behavior: "smooth" });
@@ -819,6 +820,113 @@ const Result = () => {
                 </ResultCard>
               </motion.div>
             )}
+
+            {/* ═══════ COGNITIVE BIAS SECTION ═══════ */}
+            <div id="biases">
+              {result.cognitive_bias_analysis && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  className="mb-6"
+                >
+                  <ResultCard icon={<Fingerprint className="w-5 h-5" />} title="Cognitive Bias Analysis">
+                    {/* Founder Bias Warnings */}
+                    {result.cognitive_bias_analysis.founder_bias_warnings && (
+                      <div className="mb-6">
+                        <h4 className="text-sm font-semibold mb-3 text-foreground">Founder Bias Warnings</h4>
+                        <div className="space-y-2">
+                          {(Array.isArray(result.cognitive_bias_analysis.founder_bias_warnings) 
+                            ? result.cognitive_bias_analysis.founder_bias_warnings 
+                            : []
+                          ).map((warning: any, i: number) => {
+                            const severity = typeof warning === 'object' ? (warning.severity || 'warning') : 'warning';
+                            const text = typeof warning === 'object' ? (warning.bias || warning.warning || JSON.stringify(warning)) : warning;
+                            const severityConfig = {
+                              critical: { bg: "bg-destructive/10", text: "text-destructive", badge: "Critical" },
+                              warning: { bg: "bg-primary/10", text: "text-primary", badge: "Warning" },
+                              minor: { bg: "bg-muted", text: "text-muted-foreground", badge: "Minor" },
+                            };
+                            const config = severityConfig[severity as keyof typeof severityConfig] || severityConfig.warning;
+                            return (
+                              <div key={i} className={`flex items-start gap-3 p-3 rounded-lg ${config.bg}`}>
+                                <span className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded-full ${config.bg} ${config.text} border border-current/20`}>
+                                  {config.badge}
+                                </span>
+                                <span className="text-sm text-muted-foreground">{text}</span>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Reality Score */}
+                    {result.cognitive_bias_analysis.founder_reality_score != null && (
+                      <div className="mb-6">
+                        <h4 className="text-sm font-semibold mb-3 text-foreground">Founder Reality Score</h4>
+                        <div className="flex items-center gap-4">
+                          <span className="text-4xl font-bold text-primary">{result.cognitive_bias_analysis.founder_reality_score}</span>
+                          <div className="flex-1">
+                            <div className="h-3 bg-muted rounded-full overflow-hidden">
+                              <motion.div 
+                                initial={{ width: 0 }}
+                                whileInView={{ width: `${(result.cognitive_bias_analysis.founder_reality_score / 10) * 100}%` }}
+                                viewport={{ once: true }}
+                                transition={{ duration: 1 }}
+                                className="h-full bg-primary rounded-full"
+                              />
+                            </div>
+                            <p className="text-xs text-muted-foreground mt-1">out of 10 — how grounded your assumptions are</p>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Blind Spot Analysis */}
+                    {result.cognitive_bias_analysis.blind_spot_analysis && (
+                      <div className="mb-6">
+                        <h4 className="text-sm font-semibold mb-3 text-foreground">Blind Spot Analysis</h4>
+                        <p className="text-sm text-muted-foreground leading-relaxed">
+                          {typeof result.cognitive_bias_analysis.blind_spot_analysis === 'string' 
+                            ? result.cognitive_bias_analysis.blind_spot_analysis 
+                            : JSON.stringify(result.cognitive_bias_analysis.blind_spot_analysis)}
+                        </p>
+                      </div>
+                    )}
+
+                    {/* Customer Psychology */}
+                    {result.cognitive_bias_analysis.customer_psychology && (
+                      <div className="mb-6">
+                        <h4 className="text-sm font-semibold mb-3 text-foreground">Customer Psychology</h4>
+                        <div className="grid grid-cols-2 gap-3">
+                          {result.cognitive_bias_analysis.customer_psychology.primary_motivator && (
+                            <div className="p-3 rounded-lg bg-muted/50">
+                              <p className="text-xs text-muted-foreground mb-1">Primary Motivator</p>
+                              <p className="text-sm font-medium">{result.cognitive_bias_analysis.customer_psychology.primary_motivator}</p>
+                            </div>
+                          )}
+                          {result.cognitive_bias_analysis.customer_psychology.decision_speed && (
+                            <div className="p-3 rounded-lg bg-muted/50">
+                              <p className="text-xs text-muted-foreground mb-1">Decision Speed</p>
+                              <p className="text-sm font-medium capitalize">{result.cognitive_bias_analysis.customer_psychology.decision_speed}</p>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Bias-Adjusted Success Probability */}
+                    {result.cognitive_bias_analysis.bias_adjusted_success_probability && (
+                      <div className="p-4 bg-primary/5 border border-primary/10 rounded-xl">
+                        <p className="text-sm font-medium text-primary mb-1">Bias-Adjusted Success Probability</p>
+                        <p className="text-2xl font-bold text-primary">{result.cognitive_bias_analysis.bias_adjusted_success_probability}</p>
+                      </div>
+                    )}
+                  </ResultCard>
+                </motion.div>
+              )}
+            </div>
 
             {/* ═══════ ACTION PLAN ═══════ */}
             <div id="action">
