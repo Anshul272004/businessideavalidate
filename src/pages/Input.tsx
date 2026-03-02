@@ -679,7 +679,7 @@ const Input = () => {
                       <div>
                         <p className="font-medium mb-1">What happens next</p>
                         <p className="text-sm text-muted-foreground">
-                          Six analysis agents will evaluate your situation against 100,000+ founder patterns, 
+                          Eight analysis agents will evaluate your situation against 100,000+ founder patterns, 
                           including regional market dynamics. You will receive a GO, PIVOT, or KILL verdict 
                           with supporting evidence tailored to your location and market culture.
                         </p>

@@ -80,8 +80,13 @@
   body {
     @apply bg-background text-foreground antialiased;
     font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11", "tnum";
     letter-spacing: -0.01em;
+  }
+
+  /* Tabular figures for all numbers */
+  .tabular-nums, .font-mono {
+    font-variant-numeric: tabular-nums;
   }
 
   h1, h2, h3, h4, h5, h6 {
@@ -389,6 +394,39 @@
 
 .hover-glow:hover {
   box-shadow: 0 0 30px -10px hsl(var(--glow-primary) / 0.3);
+}
+
+/* Verdict glow text */
+.verdict-go h1, .verdict-go .text-6xl {
+  text-shadow: 0 0 30px hsl(var(--success) / 0.4);
+}
+.verdict-pivot h1, .verdict-pivot .text-6xl {
+  text-shadow: 0 0 30px hsl(var(--primary) / 0.4);
+}
+.verdict-kill h1, .verdict-kill .text-6xl {
+  text-shadow: 0 0 30px hsl(var(--destructive) / 0.4);
+}
+
+/* Breathing CTA glow */
+@keyframes breathing-glow {
+  0%, 100% {
+    box-shadow: 0 0 20px -8px hsl(var(--glow-primary) / 0.2);
+  }
+  50% {
+    box-shadow: 0 0 35px -8px hsl(var(--glow-primary) / 0.4);
+  }
+}
+
+.animate-breathing-glow {
+  animation: breathing-glow 3s ease-in-out infinite;
+}
+
+/* Click haptic feedback */
+.haptic-click {
+  transition: transform 0.15s ease-out;
+}
+.haptic-click:active {
+  transform: scale(0.97);
 }
 
 /* Print styles */
