@@ -25,7 +25,7 @@ const FinalCTA = () => {
           Know before you commit.
         </p>
         <LuxuryButton 
-          onClick={() => navigate("/input?paid=true")} 
+          onClick={() => navigate("/input")} 
           size="lg" 
           className="group"
         >

@@ -2,6 +2,7 @@ import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { LuxuryButton } from "@/components/ui/luxury-button";
+import { useAuth } from "@/hooks/useAuth";
 import {
   Download,
   Brain,
@@ -44,6 +45,9 @@ import PersonalizedBlueprint from "@/components/result/PersonalizedBlueprint";
 import BoardroomSummary from "@/components/result/BoardroomSummary";
 import RegionalAnalysis from "@/components/result/RegionalAnalysis";
 import CulturalFit from "@/components/result/CulturalFit";
+import VerdictShareCard from "@/components/result/VerdictShareCard";
+import KeyTakeaways from "@/components/result/KeyTakeaways";
+import ReferralPrompt from "@/components/result/ReferralPrompt";
 
 interface ValidationResult {
   demand_psychology: string;
@@ -204,10 +208,12 @@ const sections = [
 
 const Result = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [result, setResult] = useState<ValidationResult | null>(null);
   const [originalIdea, setOriginalIdea] = useState("");
   const [showBackToTop, setShowBackToTop] = useState(false);
   const [activeSection, setActiveSection] = useState("verdict");
+  const userName = user?.email?.split("@")[0] || "";
 
   useEffect(() => {
     const storedResult = sessionStorage.getItem("validationResult");
@@ -337,7 +343,10 @@ const Result = () => {
             </div>
             <span className="font-bold text-lg">ValidateFirst</span>
           </div>
-          <ShareButtons verdict={result.verdict} confidenceScore={confidenceScore} />
+          <div className="flex items-center gap-3">
+            <ShareButtons verdict={result.verdict} confidenceScore={confidenceScore} />
+            <VerdictShareCard verdict={result.verdict} confidenceScore={confidenceScore} ideaSummary={originalIdea} />
+          </div>
         </div>
       </nav>
 
@@ -345,6 +354,17 @@ const Result = () => {
         <div className="max-w-4xl mx-auto">
           {/* Multi-Agent Badge */}
           <MultiAgentBadge agents={result.analysis_agents} />
+
+          {/* Personalized greeting */}
+          {userName && (
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="text-sm text-muted-foreground mb-4"
+            >
+              <span className="font-medium text-primary">{userName}</span>, here's your verdict
+            </motion.p>
+          )}
 
           {/* ═══════ VERDICT HERO ═══════ */}
           <div id="verdict">
@@ -372,6 +392,14 @@ const Result = () => {
               )}
             </motion.div>
           </div>
+
+          {/* ═══════ KEY TAKEAWAYS ═══════ */}
+          <KeyTakeaways
+            verdict={result.verdict}
+            verdictReasoning={result.verdict_reasoning}
+            executiveBullets={result.executive_bullets}
+            bottomLine={result.bottom_line}
+          />
 
           {/* ═══════ EXECUTIVE SUMMARY (BoardroomSummary) ═══════ */}
           <div id="executive">
@@ -960,6 +988,9 @@ const Result = () => {
               Validate Another
             </LuxuryButton>
           </motion.div>
+
+          {/* Referral Prompt */}
+          <ReferralPrompt />
 
           {/* Disclaimer */}
           <div className="mt-16 pt-8 border-t border-border">

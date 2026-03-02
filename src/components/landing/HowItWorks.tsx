@@ -13,7 +13,7 @@ const steps = [
     icon: <Brain className="w-6 h-6" />,
     step: "02",
     title: "We analyze everything",
-    description: "7 specialized AI agents analyze psychology, regional risk, execution feasibility, and market dynamics in parallel.",
+    description: "8 specialized AI agents analyze psychology, regional risk, execution feasibility, and market dynamics in parallel.",
     time: "2 minutes",
   },
   {
