@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useCallback, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { LuxuryButton } from "@/components/ui/luxury-button";
@@ -15,7 +15,8 @@ import {
   Network,
   Shield,
   CheckCircle2,
-  MapPin
+  MapPin,
+  Sparkles
 } from "lucide-react";
 import { 
   countries, 
@@ -69,9 +70,12 @@ interface FormData {
   competitiveAdvantage: string;
 }
 
+const timeEstimates = ["~3 min", "~3 min", "~2 min", "~2 min", "~1 min", "~1 min", "< 1 min"];
+
 const Input = () => {
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(1);
+  const [showConfetti, setShowConfetti] = useState(false);
 
   const [formData, setFormData] = useState<FormData>({
     idea: "",
@@ -112,19 +116,15 @@ const Input = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    setShowConfetti(true);
     sessionStorage.setItem("validationData", JSON.stringify(formData));
-    navigate("/loading");
+    setTimeout(() => navigate("/loading"), 1200);
   };
 
   const isStepComplete = (step: number) => {
     if (step === 1) return formData.idea.length > 20 && formData.targetCustomer.length > 10;
     if (step === 2) return formData.country !== "";
-    if (step === 3) return true;
-    if (step === 4) return true;
-    if (step === 5) return true;
-    if (step === 6) return true;
-    if (step === 7) return true;
-    return false;
+    return true;
   };
 
   const stepConfig = [
@@ -141,6 +141,58 @@ const Input = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      {/* Confetti Celebration */}
+      <AnimatePresence>
+        {showConfetti && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[200] pointer-events-none overflow-hidden"
+          >
+            {Array.from({ length: 50 }).map((_, i) => (
+              <motion.div
+                key={i}
+                initial={{
+                  x: Math.random() * window.innerWidth,
+                  y: -20,
+                  rotate: 0,
+                  scale: Math.random() * 0.5 + 0.5,
+                }}
+                animate={{
+                  y: window.innerHeight + 20,
+                  rotate: Math.random() * 720 - 360,
+                  x: Math.random() * window.innerWidth,
+                }}
+                transition={{
+                  duration: Math.random() * 1.5 + 1,
+                  delay: Math.random() * 0.3,
+                  ease: "easeIn",
+                }}
+                className="absolute w-3 h-3 rounded-sm"
+                style={{
+                  backgroundColor: [
+                    "hsl(42 78% 50%)", "hsl(155 65% 38%)", "hsl(200 80% 55%)",
+                    "hsl(0 72% 51%)", "hsl(280 60% 50%)", "hsl(38 92% 50%)",
+                  ][i % 6],
+                }}
+              />
+            ))}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.5 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.3, type: "spring" }}
+              className="absolute inset-0 flex items-center justify-center"
+            >
+              <div className="text-center">
+                <Sparkles className="w-12 h-12 text-primary mx-auto mb-3" />
+                <p className="text-2xl font-bold gradient-text">Analysis Starting!</p>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Ambient Background */}
       <div className="fixed inset-0 pointer-events-none">
         <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-primary/5 rounded-full blur-[150px]" />
@@ -158,29 +210,17 @@ const Input = () => {
             Back
           </button>
           
-          {/* Progress Circle */}
           <div className="flex items-center gap-4">
+            {/* Time estimate */}
+            <span className="text-xs text-muted-foreground flex items-center gap-1.5">
+              <Clock className="w-3.5 h-3.5" />
+              {timeEstimates[currentStep - 1]} remaining
+            </span>
+            {/* Progress Circle */}
             <div className="relative w-12 h-12">
               <svg className="w-12 h-12 -rotate-90">
-                <circle
-                  cx="24"
-                  cy="24"
-                  r="20"
-                  stroke="currentColor"
-                  strokeWidth="3"
-                  fill="none"
-                  className="text-border"
-                />
-                <circle
-                  cx="24"
-                  cy="24"
-                  r="20"
-                  stroke="currentColor"
-                  strokeWidth="3"
-                  fill="none"
-                  strokeDasharray={`${progressPercent * 1.26} 126`}
-                  className="text-primary transition-all duration-300"
-                />
+                <circle cx="24" cy="24" r="20" stroke="currentColor" strokeWidth="3" fill="none" className="text-border" />
+                <circle cx="24" cy="24" r="20" stroke="currentColor" strokeWidth="3" fill="none" strokeDasharray={`${progressPercent * 1.26} 126`} className="text-primary transition-all duration-300" />
               </svg>
               <span className="absolute inset-0 flex items-center justify-center text-xs font-semibold">
                 {progressPercent}%
@@ -340,7 +380,7 @@ const Input = () => {
                           key={country.code}
                           type="button"
                           onClick={() => setFormData({ ...formData, country: country.code, state: "" })}
-                          className={`option-card ${formData.country === country.code ? "selected" : ""}`}
+                          className={`option-card haptic-click ${formData.country === country.code ? "selected" : ""}`}
                         >
                           <span className="text-xl mb-1 block">{country.flag}</span>
                           <span className="text-sm font-medium">{country.name}</span>
@@ -361,7 +401,7 @@ const Input = () => {
                             key={state.code}
                             type="button"
                             onClick={() => setFormData({ ...formData, state: state.code })}
-                            className={`option-card ${formData.state === state.code ? "selected" : ""}`}
+                            className={`option-card haptic-click ${formData.state === state.code ? "selected" : ""}`}
                           >
                             <span className="text-sm font-medium">{state.name}</span>
                           </button>
@@ -718,7 +758,7 @@ const Input = () => {
               ) : (
                 <LuxuryButton
                   type="submit"
-                  className="group"
+                  className="group animate-breathing-glow"
                   size="lg"
                 >
                   Begin Analysis
@@ -748,7 +788,7 @@ const OptionGrid = ({
         key={option.value}
         type="button"
         onClick={() => onChange(option.value)}
-        className={`option-card ${value === option.value ? "selected" : ""}`}
+        className={`option-card haptic-click ${value === option.value ? "selected" : ""}`}
       >
         <span className="text-sm font-medium block">{option.label}</span>
         {option.desc && <span className="text-xs opacity-60 mt-0.5 block">{option.desc}</span>}

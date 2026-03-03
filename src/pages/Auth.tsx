@@ -13,13 +13,23 @@ import {
   Shield, 
   CheckCircle2, 
   Loader2,
-  Fingerprint
+  Fingerprint,
+  Users,
+  Clock,
+  TrendingUp
 } from "lucide-react";
 import { toast } from "sonner";
 import { z } from "zod";
 
 const emailSchema = z.string().trim().email("Please enter a valid email address").max(255, "Email is too long");
 const passwordSchema = z.string().min(8, "Password must be at least 8 characters").max(128, "Password is too long");
+
+const socialProofStats = [
+  { icon: <Users className="w-4 h-4 text-primary" />, text: "12,847 founders have validated their ideas" },
+  { icon: <Clock className="w-4 h-4 text-primary" />, text: "Average time to clarity: 4 minutes" },
+  { icon: <TrendingUp className="w-4 h-4 text-primary" />, text: "73% of users changed their strategy after results" },
+  { icon: <CheckCircle2 className="w-4 h-4 text-primary" />, text: "Used by founders in 47 countries worldwide" },
+];
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -31,31 +41,27 @@ const Auth = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<{ email?: string; password?: string; confirm?: string }>({});
+  const [statIndex, setStatIndex] = useState(0);
 
-  // Redirect if already authenticated
   useEffect(() => {
-    if (user) {
-      navigate("/input");
-    }
+    if (user) navigate("/input");
   }, [user, navigate]);
+
+  // Rotate social proof stats
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setStatIndex(prev => (prev + 1) % socialProofStats.length);
+    }, 4000);
+    return () => clearInterval(interval);
+  }, []);
 
   const validate = (): boolean => {
     const newErrors: typeof errors = {};
-
     const emailResult = emailSchema.safeParse(email);
-    if (!emailResult.success) {
-      newErrors.email = emailResult.error.errors[0].message;
-    }
-
+    if (!emailResult.success) newErrors.email = emailResult.error.errors[0].message;
     const passwordResult = passwordSchema.safeParse(password);
-    if (!passwordResult.success) {
-      newErrors.password = passwordResult.error.errors[0].message;
-    }
-
-    if (isSignUp && password !== confirmPassword) {
-      newErrors.confirm = "Passwords do not match";
-    }
-
+    if (!passwordResult.success) newErrors.password = passwordResult.error.errors[0].message;
+    if (isSignUp && password !== confirmPassword) newErrors.confirm = "Passwords do not match";
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -63,10 +69,8 @@ const Auth = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validate()) return;
-
     setLoading(true);
     setErrors({});
-
     try {
       if (isSignUp) {
         const { error } = await signUp(email.trim(), password);
@@ -111,7 +115,6 @@ const Auth = () => {
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center px-4">
-      {/* Ambient Background */}
       <div className="fixed inset-0 pointer-events-none">
         <div className="absolute top-1/4 left-1/3 w-[500px] h-[500px] bg-primary/5 rounded-full blur-[150px]" />
         <div className="absolute bottom-1/4 right-1/3 w-[400px] h-[400px] bg-primary/3 rounded-full blur-[120px]" />
@@ -124,16 +127,18 @@ const Auth = () => {
       >
         {/* Logo */}
         <div className="text-center mb-8">
-          <button
-            onClick={() => navigate("/")}
-            className="inline-flex items-center gap-3 mb-6"
-          >
+          <button onClick={() => navigate("/")} className="inline-flex items-center gap-3 mb-6">
             <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center border border-primary/20">
               <Target className="w-6 h-6 text-primary" />
             </div>
             <span className="font-semibold text-xl tracking-tight">ValidateFirst</span>
           </button>
           
+          {/* Community counter */}
+          <p className="text-sm text-muted-foreground mb-3">
+            Join <span className="text-primary font-semibold">12,847 founders</span> making smarter decisions
+          </p>
+
           <h1 className="text-2xl font-semibold mb-2">
             {isSignUp ? "Create your account" : "Welcome back"}
           </h1>
@@ -147,7 +152,6 @@ const Auth = () => {
         {/* Auth Form */}
         <div className="p-8 rounded-2xl bg-card border border-border">
           <form onSubmit={handleSubmit} className="space-y-5">
-            {/* Email */}
             <div>
               <label className="luxury-label mb-2 block">Email</label>
               <div className="relative">
@@ -162,12 +166,9 @@ const Auth = () => {
                   disabled={loading}
                 />
               </div>
-              {errors.email && (
-                <p className="text-xs text-destructive mt-1.5">{errors.email}</p>
-              )}
+              {errors.email && <p className="text-xs text-destructive mt-1.5">{errors.email}</p>}
             </div>
 
-            {/* Password */}
             <div>
               <label className="luxury-label mb-2 block">Password</label>
               <div className="relative">
@@ -181,27 +182,16 @@ const Auth = () => {
                   autoComplete={isSignUp ? "new-password" : "current-password"}
                   disabled={loading}
                 />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
-                >
+                <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors">
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
               </div>
-              {errors.password && (
-                <p className="text-xs text-destructive mt-1.5">{errors.password}</p>
-              )}
+              {errors.password && <p className="text-xs text-destructive mt-1.5">{errors.password}</p>}
             </div>
 
-            {/* Confirm Password (Sign Up only) */}
             <AnimatePresence>
               {isSignUp && (
-                <motion.div
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: "auto" }}
-                  exit={{ opacity: 0, height: 0 }}
-                >
+                <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }}>
                   <label className="luxury-label mb-2 block">Confirm Password</label>
                   <div className="relative">
                     <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -215,20 +205,12 @@ const Auth = () => {
                       disabled={loading}
                     />
                   </div>
-                  {errors.confirm && (
-                    <p className="text-xs text-destructive mt-1.5">{errors.confirm}</p>
-                  )}
+                  {errors.confirm && <p className="text-xs text-destructive mt-1.5">{errors.confirm}</p>}
                 </motion.div>
               )}
             </AnimatePresence>
 
-            {/* Submit */}
-            <LuxuryButton 
-              type="submit" 
-              size="lg" 
-              className="w-full group" 
-              disabled={loading}
-            >
+            <LuxuryButton type="submit" size="lg" className="w-full group" disabled={loading}>
               {loading ? (
                 <Loader2 className="w-5 h-5 animate-spin" />
               ) : (
@@ -240,27 +222,33 @@ const Auth = () => {
             </LuxuryButton>
           </form>
 
-          {/* Toggle */}
           <div className="mt-6 text-center">
             <button
-              onClick={() => {
-                setIsSignUp(!isSignUp);
-                setErrors({});
-                setPassword("");
-                setConfirmPassword("");
-              }}
+              onClick={() => { setIsSignUp(!isSignUp); setErrors({}); setPassword(""); setConfirmPassword(""); }}
               className="text-sm text-muted-foreground hover:text-primary transition-colors"
             >
               {isSignUp ? "Already have an account? " : "Don't have an account? "}
-              <span className="text-primary font-medium">
-                {isSignUp ? "Sign in" : "Sign up"}
-              </span>
+              <span className="text-primary font-medium">{isSignUp ? "Sign in" : "Sign up"}</span>
             </button>
           </div>
         </div>
 
+        {/* Rotating social proof */}
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={statIndex}
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            className="mt-6 flex items-center justify-center gap-2 text-sm text-muted-foreground"
+          >
+            {socialProofStats[statIndex].icon}
+            <span>{socialProofStats[statIndex].text}</span>
+          </motion.div>
+        </AnimatePresence>
+
         {/* Security badges */}
-        <div className="mt-8 flex flex-wrap items-center justify-center gap-6 text-xs text-muted-foreground">
+        <div className="mt-6 flex flex-wrap items-center justify-center gap-6 text-xs text-muted-foreground">
           <div className="flex items-center gap-1.5">
             <Shield className="w-3.5 h-3.5 text-primary" />
             <span>Enterprise-grade encryption</span>

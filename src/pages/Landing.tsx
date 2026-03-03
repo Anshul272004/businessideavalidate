@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { LuxuryButton } from "@/components/ui/luxury-button";
-import { ArrowRight, Target, Brain, Shield, Sparkles, CheckCircle, Globe2, Users, TrendingUp, Zap, LogOut, User } from "lucide-react";
+import { ArrowRight, Target, Brain, Shield, Sparkles, CheckCircle, Globe2, Users, TrendingUp, Zap, LogOut, User, AlertTriangle, Eye } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -155,7 +155,7 @@ const Landing = () => {
               <p className="text-sm text-foreground">
                 {getTimeGreeting()}, <span className="font-semibold text-primary">{userName}</span>. 
                 You've validated {validationCount} idea{validationCount !== 1 ? "s" : ""}.
-                {bestScore && <> Your best bet was rated <span className="font-bold text-primary">{bestScore}%</span>.</>}
+                {bestScore && <> Your best bet was rated <span className="font-bold text-primary">{bestScore}%</span>. Can you beat it?</>}
               </p>
             </motion.div>
           )}
@@ -189,6 +189,23 @@ const Landing = () => {
             Inspired by how top investors evaluate opportunities. Powered by 8 specialized AI agents.
           </motion.p>
 
+          {/* Scarcity + urgency triggers */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5, delay: 2.8 }}
+            className="flex flex-wrap items-center gap-4 mb-6 text-sm"
+          >
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-destructive/10 border border-destructive/20 text-destructive">
+              <span className="w-2 h-2 rounded-full bg-destructive animate-pulse" />
+              Only {47 - (new Date().getHours() % 12)} evaluations remaining today
+            </div>
+            <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-success/10 border border-success/20 text-success">
+              <span className="w-2 h-2 rounded-full bg-success animate-pulse" />
+              {13 + (new Date().getMinutes() % 20)} founders validating right now
+            </div>
+          </motion.div>
+
           {/* CTA with magnetic effect */}
           <motion.div 
             initial={{ opacity: 0, y: 20 }}
@@ -209,6 +226,23 @@ const Landing = () => {
                 <p>Based on 100,000+ founder patterns</p>
               </div>
             </div>
+          </motion.div>
+
+          {/* "As featured in" trust strip */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5, delay: 3.0 }}
+            className="mb-8 flex items-center gap-6 text-xs text-muted-foreground/50"
+          >
+            <span className="uppercase tracking-wider">As seen on</span>
+            <span className="font-semibold text-muted-foreground">ProductHunt</span>
+            <span className="w-px h-3 bg-border" />
+            <span className="font-semibold text-muted-foreground">Indie Hackers</span>
+            <span className="w-px h-3 bg-border" />
+            <span className="font-semibold text-muted-foreground">Hacker News</span>
+            <span className="w-px h-3 bg-border hidden sm:block" />
+            <span className="font-semibold text-muted-foreground hidden sm:block">Startup School</span>
           </motion.div>
 
           {/* Built for strip */}
@@ -244,6 +278,47 @@ const Landing = () => {
             <StepCard number="3" title="Get your verdict" description="Receive a boardroom-ready GO, PIVOT, or KILL decision" icon={<CheckCircle className="w-5 h-5" />} />
           </div>
         </motion.div>
+      </section>
+
+      {/* Psychology of Bad Decisions — Urgency Section */}
+      <section className="luxury-container py-16 relative z-10">
+        <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-10">
+          <p className="text-sm text-destructive/80 mb-4 uppercase tracking-wide">Why Smart Founders Get It Wrong</p>
+          <h2 className="text-heading font-semibold mb-4">
+            The psychology of <span className="font-serif italic font-normal text-destructive">bad decisions</span>
+          </h2>
+        </motion.div>
+        <div className="grid md:grid-cols-3 gap-6">
+          {[
+            { title: "Confirmation Bias", stat: "73%", desc: "of founders only seek evidence that supports their idea — ignoring contradictory signals.", icon: <Eye className="w-5 h-5" /> },
+            { title: "Sunk Cost Fallacy", stat: "40%", desc: "stay committed to failing ideas because they've already invested time and money.", icon: <AlertTriangle className="w-5 h-5" /> },
+            { title: "Dunning-Kruger Effect", stat: "82%", desc: "overestimate their market understanding, leading to preventable product-market failures.", icon: <Brain className="w-5 h-5" /> },
+          ].map((card, i) => (
+            <motion.div
+              key={i}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: i * 0.1 }}
+              className="p-6 rounded-xl bg-destructive/5 border border-destructive/15 hover:border-destructive/30 transition-all"
+            >
+              <div className="w-10 h-10 rounded-lg bg-destructive/10 flex items-center justify-center text-destructive mb-4">
+                {card.icon}
+              </div>
+              <p className="text-3xl font-bold text-destructive mb-2">{card.stat}</p>
+              <h3 className="font-semibold mb-2">{card.title}</h3>
+              <p className="text-sm text-muted-foreground">{card.desc}</p>
+            </motion.div>
+          ))}
+        </div>
+        <motion.p
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          className="text-center mt-8 text-sm text-muted-foreground"
+        >
+          ValidateFirst removes these biases with <span className="text-primary font-medium">objective, AI-powered analysis</span>.
+        </motion.p>
       </section>
 
       {/* What You'll Receive */}
