@@ -21,6 +21,7 @@ export type Database = {
           form_data: Json | null
           id: string
           idea_summary: string
+          notes: string | null
           result_data: Json
           target_customer: string | null
           user_id: string
@@ -32,6 +33,7 @@ export type Database = {
           form_data?: Json | null
           id?: string
           idea_summary: string
+          notes?: string | null
           result_data: Json
           target_customer?: string | null
           user_id: string
@@ -43,6 +45,7 @@ export type Database = {
           form_data?: Json | null
           id?: string
           idea_summary?: string
+          notes?: string | null
           result_data?: Json
           target_customer?: string | null
           user_id?: string

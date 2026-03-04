@@ -49,6 +49,8 @@ import CulturalFit from "@/components/result/CulturalFit";
 import VerdictShareCard from "@/components/result/VerdictShareCard";
 import KeyTakeaways from "@/components/result/KeyTakeaways";
 import ReferralPrompt from "@/components/result/ReferralPrompt";
+import VerdictRadarChart from "@/components/result/VerdictRadarChart";
+import DeepResearchButton from "@/components/result/DeepResearchButton";
 
 interface ValidationResult {
   demand_psychology: string;
@@ -467,6 +469,23 @@ const Result = () => {
             )}
           </div>
 
+          {/* Verdict Radar Chart */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="mb-6"
+          >
+            <VerdictRadarChart
+              painScore={result.pain_realism.score}
+              confidenceScore={confidenceScore}
+              founderFitScore={result.founder_market_fit?.score}
+              regionalScore={result.regional_analysis?.regional_viability_score}
+              marketTiming={result.market_analysis?.market_timing}
+              executionRisk={result.execution_risks?.tech_complexity}
+            />
+          </motion.div>
+
           {/* Confidence Meter */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -545,8 +564,8 @@ const Result = () => {
                     />
                   </div>
                 </ResultCard>
-              </motion.div>
-            </div>
+                </motion.div>
+              </div>
 
             {/* Research Trail */}
             {(result.key_assumptions?.length || result.dealbreakers?.length || result.mom_test_pass !== undefined) && (
@@ -620,18 +639,21 @@ const Result = () => {
             {/* ═══════ MARKET SECTION ═══════ */}
             <div id="market">
               {result.market_analysis && (
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  className="mb-6"
-                >
-                  <MarketAnalysis 
-                    tam_estimate={result.market_analysis.tam_estimate}
-                    competitors={result.market_analysis.competitors}
-                    competitive_advantage={result.market_analysis.competitive_advantage}
-                  />
-                </motion.div>
+                <>
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    className="mb-6"
+                  >
+                    <MarketAnalysis 
+                      tam_estimate={result.market_analysis.tam_estimate}
+                      competitors={result.market_analysis.competitors}
+                      competitive_advantage={result.market_analysis.competitive_advantage}
+                    />
+                  </motion.div>
+                  <DeepResearchButton section="Market" originalIdea={originalIdea} validationResult={result} />
+                </>
               )}
 
               {result.market_analysis?.competitors && result.market_analysis.competitors.length > 0 && (
@@ -646,6 +668,7 @@ const Result = () => {
                   />
                 </motion.div>
               )}
+              <DeepResearchButton section="Competitors" originalIdea={originalIdea} validationResult={result} />
             </div>
 
             {/* ═══════ ECONOMICS SECTION ═══════ */}
@@ -684,7 +707,7 @@ const Result = () => {
                     </div>
                   )}
                 </ResultCard>
-              </motion.div>
+                </motion.div>
 
               {/* USP Analysis */}
               {result.usp_analysis && (result.usp_analysis.personalized_usp || result.usp_analysis.positioning_statement) && (
@@ -728,8 +751,8 @@ const Result = () => {
                   />
                 </motion.div>
               )}
+              <DeepResearchButton section="Execution" originalIdea={originalIdea} validationResult={result} />
 
-              {/* CEO Patterns */}
               {result.ceo_patterns && (
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
