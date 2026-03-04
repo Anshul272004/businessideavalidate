@@ -26,6 +26,9 @@ import LiveCounterStrip from "@/components/landing/LiveCounterStrip";
 import WallOfVerdicts from "@/components/landing/WallOfVerdicts";
 import ScrollProgress from "@/components/landing/ScrollProgress";
 import MagneticButton from "@/components/shared/MagneticButton";
+import LandingChatbot from "@/components/landing/LandingChatbot";
+import OnboardingOverlay from "@/components/landing/OnboardingOverlay";
+import { AnimatePresence } from "framer-motion";
 
 const getTimeGreeting = () => {
   const h = new Date().getHours();
@@ -39,6 +42,19 @@ const Landing = () => {
   const { user, signOut } = useAuth();
   const [validationCount, setValidationCount] = useState(0);
   const [bestScore, setBestScore] = useState<number | null>(null);
+  const [showOnboarding, setShowOnboarding] = useState(false);
+
+  // Check first visit for onboarding
+  useEffect(() => {
+    if (!localStorage.getItem("hasSeenOnboarding")) {
+      setShowOnboarding(true);
+    }
+  }, []);
+
+  const handleOnboardingComplete = () => {
+    setShowOnboarding(false);
+    localStorage.setItem("hasSeenOnboarding", "true");
+  };
 
   // Fetch user stats for personalization
   useEffect(() => {
@@ -65,6 +81,19 @@ const Landing = () => {
 
   return (
     <div className="min-h-screen bg-background overflow-hidden">
+      {/* Onboarding Overlay */}
+      <AnimatePresence>
+        {showOnboarding && (
+          <OnboardingOverlay
+            onComplete={handleOnboardingComplete}
+            onStartValidation={() => navigate("/input")}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* AI Landing Chatbot */}
+      <LandingChatbot />
+
       {/* Animated Gradient Mesh Background */}
       <GradientMesh />
 

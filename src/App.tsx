@@ -18,6 +18,7 @@ import Methodology from "./pages/Methodology";
 import WhoThisIsNotFor from "./pages/WhoThisIsNotFor";
 import Dashboard from "./pages/Dashboard";
 import NotFound from "./pages/NotFound";
+import MobileNav from "./components/shared/MobileNav";
 
 const queryClient = new QueryClient();
 
@@ -59,6 +60,7 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <AnimatedRoutes />
+          <MobileNav />
         </BrowserRouter>
       </AuthProvider>
     </TooltipProvider>

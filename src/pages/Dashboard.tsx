@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
@@ -7,9 +7,11 @@ import { LuxuryButton } from "@/components/ui/luxury-button";
 import { 
   Target, ArrowLeft, ArrowRight, CheckCircle2, RefreshCw, 
   AlertTriangle, Calendar, TrendingUp, Loader2, Sparkles,
-  Flame, BarChart3, User, Award, Zap, Crown, Mail, GitCompare
+  Flame, BarChart3, User, Award, Zap, Crown, Mail, GitCompare,
+  StickyNote, Save
 } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip";
+import { toast } from "sonner";
 
 interface ValidationRecord {
   id: string;
@@ -20,6 +22,7 @@ interface ValidationRecord {
   result_data: any;
   form_data: any;
   created_at: string;
+  notes: string | null;
 }
 
 const verdictConfig = {
@@ -51,7 +54,9 @@ const Dashboard = () => {
   const [compareMode, setCompareMode] = useState(false);
   const [compareIds, setCompareIds] = useState<string[]>([]);
   const [showDigestPrompt, setShowDigestPrompt] = useState(true);
-
+  const [editingNotes, setEditingNotes] = useState<string | null>(null);
+  const [noteText, setNoteText] = useState("");
+  const [savingNote, setSavingNote] = useState(false);
   const userName = user?.email?.split("@")[0] || "Founder";
 
   useEffect(() => {
@@ -103,6 +108,23 @@ const Dashboard = () => {
     const archetypes: Record<string, string> = { technical: "Builder", sales: "Hustler", operations: "Operator", content: "Storyteller", generalist: "Visionary" };
     return archetypes[fd.coreSkill] || "Founder";
   };
+
+  // Save notes
+  const saveNote = useCallback(async (id: string, notes: string) => {
+    setSavingNote(true);
+    const { error } = await supabase
+      .from("validations")
+      .update({ notes: notes || null } as any)
+      .eq("id", id);
+    if (error) {
+      toast.error("Failed to save note");
+    } else {
+      setValidations(prev => prev.map(v => v.id === id ? { ...v, notes } : v));
+      toast.success("Note saved");
+    }
+    setSavingNote(false);
+    setEditingNotes(null);
+  }, []);
 
   // Comparison data
   const compareItems = compareIds.map(id => validations.find(v => v.id === id)).filter(Boolean) as ValidationRecord[];
@@ -383,6 +405,49 @@ const Dashboard = () => {
                             </span>
                           )}
                         </div>
+                        {/* Notes */}
+                        {(v.notes || editingNotes === v.id) && (
+                          <div className="mt-3 ml-[22px]" onClick={(e) => e.stopPropagation()}>
+                            {editingNotes === v.id ? (
+                              <div className="flex items-start gap-2">
+                                <textarea
+                                  className="flex-1 bg-muted/50 border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary/50 resize-none min-h-[60px]"
+                                  value={noteText}
+                                  onChange={(e) => setNoteText(e.target.value)}
+                                  placeholder="Add your notes, thoughts, next steps..."
+                                  autoFocus
+                                />
+                                <button
+                                  onClick={() => saveNote(v.id, noteText)}
+                                  disabled={savingNote}
+                                  className="p-2 rounded-lg bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
+                                >
+                                  <Save className="w-4 h-4" />
+                                </button>
+                              </div>
+                            ) : (
+                              <p className="text-xs text-muted-foreground italic">
+                                <StickyNote className="w-3 h-3 inline mr-1" />{v.notes}
+                              </p>
+                            )}
+                          </div>
+                        )}
+                        {!v.notes && editingNotes !== v.id && (
+                          <button
+                            onClick={(e) => { e.stopPropagation(); setEditingNotes(v.id); setNoteText(""); }}
+                            className="mt-2 ml-[22px] text-[10px] text-muted-foreground hover:text-primary transition-colors flex items-center gap-1"
+                          >
+                            <StickyNote className="w-3 h-3" /> Add note
+                          </button>
+                        )}
+                        {v.notes && editingNotes !== v.id && (
+                          <button
+                            onClick={(e) => { e.stopPropagation(); setEditingNotes(v.id); setNoteText(v.notes || ""); }}
+                            className="mt-1 ml-[22px] text-[10px] text-muted-foreground hover:text-primary transition-colors"
+                          >
+                            Edit note
+                          </button>
+                        )}
                       </div>
                       <div className={`flex items-center gap-2 px-4 py-2 rounded-xl ${config.bg} ${config.border} border ${config.color} flex-shrink-0`}>
                         {config.icon}

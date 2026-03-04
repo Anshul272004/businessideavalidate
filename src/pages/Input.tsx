@@ -298,7 +298,14 @@ const Input = () => {
                   className="space-y-6"
                 >
                   <div>
-                    <label className="luxury-label mb-3 block">What is your business idea?</label>
+                    <div className="flex items-center justify-between mb-1">
+                      <label className="luxury-label block">What is your business idea?</label>
+                      <span className={`text-[10px] font-medium ${
+                        formData.idea.length < 30 ? "text-destructive" : formData.idea.length < 100 ? "text-primary" : "text-success"
+                      }`}>
+                        {formData.idea.length < 30 ? "Too short" : formData.idea.length < 100 ? "Good" : "Detailed"} ({formData.idea.length})
+                      </span>
+                    </div>
                     <textarea
                       className="luxury-textarea min-h-[140px]"
                       placeholder="Describe the problem you solve and your solution. Be specific about the value you create."
@@ -309,7 +316,14 @@ const Input = () => {
                   </div>
 
                   <div>
-                    <label className="luxury-label mb-3 block">Who is your target customer?</label>
+                    <div className="flex items-center justify-between mb-1">
+                      <label className="luxury-label block">Who is your target customer?</label>
+                      <span className={`text-[10px] font-medium ${
+                        formData.targetCustomer.length < 20 ? "text-destructive" : formData.targetCustomer.length < 60 ? "text-primary" : "text-success"
+                      }`}>
+                        {formData.targetCustomer.length < 20 ? "Too short" : formData.targetCustomer.length < 60 ? "Good" : "Detailed"} ({formData.targetCustomer.length})
+                      </span>
+                    </div>
                     <textarea
                       className="luxury-textarea min-h-[100px]"
                       placeholder="Describe your ideal customer with specifics: role, company size, pain point, current solution."
