@@ -14,6 +14,166 @@ export type Database = {
   }
   public: {
     Tables: {
+      report_artifacts: {
+        Row: {
+          artifact_type: string
+          content_json: Json
+          created_at: string
+          id: string
+          markdown: string | null
+          research_run_id: string | null
+          status: string
+          title: string | null
+          updated_at: string
+          user_id: string
+          validation_id: string | null
+          version: number
+        }
+        Insert: {
+          artifact_type: string
+          content_json?: Json
+          created_at?: string
+          id?: string
+          markdown?: string | null
+          research_run_id?: string | null
+          status?: string
+          title?: string | null
+          updated_at?: string
+          user_id: string
+          validation_id?: string | null
+          version?: number
+        }
+        Update: {
+          artifact_type?: string
+          content_json?: Json
+          created_at?: string
+          id?: string
+          markdown?: string | null
+          research_run_id?: string | null
+          status?: string
+          title?: string | null
+          updated_at?: string
+          user_id?: string
+          validation_id?: string | null
+          version?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "report_artifacts_research_run_id_fkey"
+            columns: ["research_run_id"]
+            isOneToOne: false
+            referencedRelation: "research_runs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "report_artifacts_validation_id_fkey"
+            columns: ["validation_id"]
+            isOneToOne: false
+            referencedRelation: "validations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      research_runs: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          id: string
+          mode: string
+          provider_data: Json
+          query: string | null
+          result_data: Json
+          started_at: string
+          status: string
+          summary: string | null
+          updated_at: string
+          user_id: string
+          validation_id: string | null
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          mode?: string
+          provider_data?: Json
+          query?: string | null
+          result_data?: Json
+          started_at?: string
+          status?: string
+          summary?: string | null
+          updated_at?: string
+          user_id: string
+          validation_id?: string | null
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          mode?: string
+          provider_data?: Json
+          query?: string | null
+          result_data?: Json
+          started_at?: string
+          status?: string
+          summary?: string | null
+          updated_at?: string
+          user_id?: string
+          validation_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "research_runs_validation_id_fkey"
+            columns: ["validation_id"]
+            isOneToOne: false
+            referencedRelation: "validations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      research_sources: {
+        Row: {
+          created_at: string
+          id: string
+          metadata: Json
+          relevance_score: number | null
+          research_run_id: string
+          snippet: string | null
+          source_type: string
+          title: string | null
+          url: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          metadata?: Json
+          relevance_score?: number | null
+          research_run_id: string
+          snippet?: string | null
+          source_type?: string
+          title?: string | null
+          url: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          metadata?: Json
+          relevance_score?: number | null
+          research_run_id?: string
+          snippet?: string | null
+          source_type?: string
+          title?: string | null
+          url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "research_sources_research_run_id_fkey"
+            columns: ["research_run_id"]
+            isOneToOne: false
+            referencedRelation: "research_runs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       validations: {
         Row: {
           confidence_score: number | null

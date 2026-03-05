@@ -34,7 +34,12 @@ import {
 interface FormData {
   // Step 1: The Idea
   idea: string;
+  problem: string;
+  solution: string;
   targetCustomer: string;
+  targetSegment: string;
+  industry: string;
+  revenueModel: string;
   price: string;
   platform: "digital" | "physical" | "hybrid";
   stage: "concept" | "validated" | "mvp" | "revenue";
@@ -79,7 +84,12 @@ const Input = () => {
 
   const [formData, setFormData] = useState<FormData>({
     idea: "",
+    problem: "",
+    solution: "",
     targetCustomer: "",
+    targetSegment: "",
+    industry: "",
+    revenueModel: "subscription",
     price: "",
     platform: "digital",
     stage: "concept",
@@ -122,7 +132,15 @@ const Input = () => {
   };
 
   const isStepComplete = (step: number) => {
-    if (step === 1) return formData.idea.length > 20 && formData.targetCustomer.length > 10;
+    if (step === 1) {
+      return (
+        formData.idea.length > 20 &&
+        formData.problem.length > 20 &&
+        formData.solution.length > 20 &&
+        formData.targetCustomer.length > 10 &&
+        formData.industry.trim().length > 1
+      );
+    }
     if (step === 2) return formData.country !== "";
     return true;
   };
@@ -299,7 +317,7 @@ const Input = () => {
                 >
                   <div>
                     <div className="flex items-center justify-between mb-1">
-                      <label className="luxury-label block">What is your business idea?</label>
+                      <label className="luxury-label block">What is the startup idea?</label>
                       <span className={`text-[10px] font-medium ${
                         formData.idea.length < 30 ? "text-destructive" : formData.idea.length < 100 ? "text-primary" : "text-success"
                       }`}>
@@ -307,45 +325,54 @@ const Input = () => {
                       </span>
                     </div>
                     <textarea
-                      className="luxury-textarea min-h-[140px]"
-                      placeholder="Describe the problem you solve and your solution. Be specific about the value you create."
+                      className="luxury-textarea min-h-[120px]"
+                      placeholder="Describe the business in one crisp paragraph: what it is, who it serves, and why now."
                       value={formData.idea}
                       onChange={(e) => setFormData({ ...formData, idea: e.target.value })}
                       required
                     />
                   </div>
 
-                  <div>
-                    <div className="flex items-center justify-between mb-1">
-                      <label className="luxury-label block">Who is your target customer?</label>
-                      <span className={`text-[10px] font-medium ${
-                        formData.targetCustomer.length < 20 ? "text-destructive" : formData.targetCustomer.length < 60 ? "text-primary" : "text-success"
-                      }`}>
-                        {formData.targetCustomer.length < 20 ? "Too short" : formData.targetCustomer.length < 60 ? "Good" : "Detailed"} ({formData.targetCustomer.length})
-                      </span>
+                  <div className="grid sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="luxury-label mb-3 block">Industry</label>
+                      <input
+                        type="text"
+                        className="luxury-input"
+                        placeholder="AI tools, fintech, healthtech, edtech..."
+                        value={formData.industry}
+                        onChange={(e) => setFormData({ ...formData, industry: e.target.value })}
+                        required
+                      />
                     </div>
-                    <textarea
-                      className="luxury-textarea min-h-[100px]"
-                      placeholder="Describe your ideal customer with specifics: role, company size, pain point, current solution."
-                      value={formData.targetCustomer}
-                      onChange={(e) => setFormData({ ...formData, targetCustomer: e.target.value })}
-                      required
-                    />
+                    <div>
+                      <label className="luxury-label mb-3 block">Target Segment</label>
+                      <input
+                        type="text"
+                        className="luxury-input"
+                        placeholder="Students, SMB founders, recruiters, clinics..."
+                        value={formData.targetSegment}
+                        onChange={(e) => setFormData({ ...formData, targetSegment: e.target.value })}
+                      />
+                    </div>
                   </div>
 
                   <div className="grid sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="luxury-label mb-3 block">Price Point (Monthly)</label>
-                      <div className="relative">
-                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground">$</span>
-                        <input
-                          type="text"
-                          className="luxury-input pl-8"
-                          placeholder="99"
-                          value={formData.price}
-                          onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-                        />
-                      </div>
+                      <label className="luxury-label mb-3 block">Revenue Model</label>
+                      <select
+                        className="luxury-input"
+                        value={formData.revenueModel}
+                        onChange={(e) => setFormData({ ...formData, revenueModel: e.target.value })}
+                      >
+                        <option value="subscription">Subscription</option>
+                        <option value="freemium">Freemium</option>
+                        <option value="marketplace">Marketplace</option>
+                        <option value="one-time">One-time purchase</option>
+                        <option value="enterprise-sales">Enterprise sales</option>
+                        <option value="advertising">Advertising</option>
+                        <option value="usage-based">Usage-based</option>
+                      </select>
                     </div>
                     <div>
                       <label className="luxury-label mb-3 block">Current Stage</label>
@@ -363,10 +390,92 @@ const Input = () => {
                   </div>
 
                   <div>
+                    <div className="flex items-center justify-between mb-1">
+                      <label className="luxury-label block">What painful problem exists?</label>
+                      <span className={`text-[10px] font-medium ${
+                        formData.problem.length < 30 ? "text-destructive" : formData.problem.length < 100 ? "text-primary" : "text-success"
+                      }`}>
+                        {formData.problem.length < 30 ? "Too short" : formData.problem.length < 100 ? "Good" : "Detailed"} ({formData.problem.length})
+                      </span>
+                    </div>
+                    <textarea
+                      className="luxury-textarea min-h-[100px]"
+                      placeholder="Describe the pain, the current frustration, and why it matters enough for people to pay attention."
+                      value={formData.problem}
+                      onChange={(e) => setFormData({ ...formData, problem: e.target.value })}
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <div className="flex items-center justify-between mb-1">
+                      <label className="luxury-label block">How does your solution solve it?</label>
+                      <span className={`text-[10px] font-medium ${
+                        formData.solution.length < 30 ? "text-destructive" : formData.solution.length < 100 ? "text-primary" : "text-success"
+                      }`}>
+                        {formData.solution.length < 30 ? "Too short" : formData.solution.length < 100 ? "Good" : "Detailed"} ({formData.solution.length})
+                      </span>
+                    </div>
+                    <textarea
+                      className="luxury-textarea min-h-[100px]"
+                      placeholder="Explain the product, the workflow, and the transformation users get after adopting it."
+                      value={formData.solution}
+                      onChange={(e) => setFormData({ ...formData, solution: e.target.value })}
+                      required
+                    />
+                  </div>
+
+                  <div>
+                    <div className="flex items-center justify-between mb-1">
+                      <label className="luxury-label block">Who is your target customer?</label>
+                      <span className={`text-[10px] font-medium ${
+                        formData.targetCustomer.length < 20 ? "text-destructive" : formData.targetCustomer.length < 60 ? "text-primary" : "text-success"
+                      }`}>
+                        {formData.targetCustomer.length < 20 ? "Too short" : formData.targetCustomer.length < 60 ? "Good" : "Detailed"} ({formData.targetCustomer.length})
+                      </span>
+                    </div>
+                    <textarea
+                      className="luxury-textarea min-h-[100px]"
+                      placeholder="Describe your ideal customer with specifics: role, company size, buying trigger, and current workaround."
+                      value={formData.targetCustomer}
+                      onChange={(e) => setFormData({ ...formData, targetCustomer: e.target.value })}
+                      required
+                    />
+                  </div>
+
+                  <div className="grid sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="luxury-label mb-3 block">Price Point</label>
+                      <div className="relative">
+                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground">$</span>
+                        <input
+                          type="text"
+                          className="luxury-input pl-8"
+                          placeholder="99 / month"
+                          value={formData.price}
+                          onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="luxury-label mb-3 block">Product Type</label>
+                      <select
+                        className="luxury-input"
+                        value={formData.platform}
+                        onChange={(e) => setFormData({ ...formData, platform: e.target.value as FormData["platform"] })}
+                      >
+                        <option value="digital">Digital</option>
+                        <option value="physical">Physical</option>
+                        <option value="hybrid">Hybrid</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <div>
                     <label className="luxury-label mb-3 block">What is your unique insight?</label>
                     <textarea
                       className="luxury-textarea"
-                      placeholder="What do you believe about this market that most people think is wrong?"
+                      placeholder="What do you believe about this market that most people miss or underestimate?"
                       value={formData.uniqueInsight}
                       onChange={(e) => setFormData({ ...formData, uniqueInsight: e.target.value })}
                     />
@@ -733,9 +842,8 @@ const Input = () => {
                       <div>
                         <p className="font-medium mb-1">What happens next</p>
                         <p className="text-sm text-muted-foreground">
-                          Eight analysis agents will evaluate your situation against 100,000+ founder patterns, 
-                          including regional market dynamics. You will receive a GO, PIVOT, or KILL verdict 
-                          with supporting evidence tailored to your location and market culture.
+                          Your idea goes through a fast multi-agent verdict first, then unlocks optional deep research
+                          with market intelligence, competitor analysis, strategy recommendations, and startup artifacts.
                         </p>
                       </div>
                     </div>

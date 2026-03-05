@@ -51,6 +51,7 @@ import KeyTakeaways from "@/components/result/KeyTakeaways";
 import ReferralPrompt from "@/components/result/ReferralPrompt";
 import VerdictRadarChart from "@/components/result/VerdictRadarChart";
 import DeepResearchButton from "@/components/result/DeepResearchButton";
+import StartupBriefCard from "@/components/result/StartupBriefCard";
 
 interface ValidationResult {
   demand_psychology: string;
@@ -194,6 +195,18 @@ interface ValidationResult {
   bias_adjusted_verdict?: any;
   // Cognitive bias agent data
   cognitive_bias_analysis?: any;
+  startup_brief?: {
+    idea?: string | null;
+    problem?: string | null;
+    solution?: string | null;
+    target_customer?: string | null;
+    target_segment?: string | null;
+    industry?: string | null;
+    revenue_model?: string | null;
+    price_point?: string | null;
+    platform?: string | null;
+    stage?: string | null;
+  } | null;
 }
 
 // Section definitions for floating nav
@@ -214,6 +227,8 @@ const Result = () => {
   const { user } = useAuth();
   const [result, setResult] = useState<ValidationResult | null>(null);
   const [originalIdea, setOriginalIdea] = useState("");
+  const [startupInput, setStartupInput] = useState<Record<string, any> | null>(null);
+  const [validationRecordId, setValidationRecordId] = useState<string | null>(null);
   const [showBackToTop, setShowBackToTop] = useState(false);
   const [activeSection, setActiveSection] = useState("verdict");
   const userName = user?.email?.split("@")[0] || "";
@@ -221,15 +236,18 @@ const Result = () => {
   useEffect(() => {
     const storedResult = sessionStorage.getItem("validationResult");
     const storedData = sessionStorage.getItem("validationData");
+    const storedValidationId = sessionStorage.getItem("validationRecordId");
     
     if (!storedResult) {
       navigate("/");
       return;
     }
     setResult(JSON.parse(storedResult));
+    setValidationRecordId(storedValidationId);
     
     if (storedData) {
       const data = JSON.parse(storedData);
+      setStartupInput(data);
       setOriginalIdea(data.idea || "");
     }
   }, [navigate]);
@@ -258,6 +276,7 @@ const Result = () => {
   const handleNewValidation = () => {
     sessionStorage.removeItem("validationData");
     sessionStorage.removeItem("validationResult");
+    sessionStorage.removeItem("validationRecordId");
     navigate("/input");
   };
 
@@ -297,6 +316,18 @@ const Result = () => {
 
   const confidenceScore = result.confidence_score || 
     (result.verdict === "GO" ? 75 : result.verdict === "PIVOT" ? 50 : 25);
+  const startupBrief = result.startup_brief || (startupInput ? {
+    idea: startupInput.idea,
+    problem: startupInput.problem,
+    solution: startupInput.solution,
+    target_customer: startupInput.targetCustomer,
+    target_segment: startupInput.targetSegment,
+    industry: startupInput.industry,
+    revenue_model: startupInput.revenueModel,
+    price_point: startupInput.price,
+    platform: startupInput.platform,
+    stage: startupInput.stage,
+  } : null);
 
   return (
     <div className="min-h-screen bg-background print:py-8">
@@ -469,6 +500,12 @@ const Result = () => {
             )}
           </div>
 
+          {startupBrief && (
+            <div className="mb-6">
+              <StartupBriefCard startupBrief={startupBrief} />
+            </div>
+          )}
+
           {/* Verdict Radar Chart */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -634,6 +671,7 @@ const Result = () => {
                   />
                 </motion.div>
               )}
+              <DeepResearchButton section="Regional" originalIdea={originalIdea} validationResult={result} formData={startupInput} validationId={validationRecordId} />
             </div>
 
             {/* ═══════ MARKET SECTION ═══════ */}
@@ -652,7 +690,7 @@ const Result = () => {
                       competitive_advantage={result.market_analysis.competitive_advantage}
                     />
                   </motion.div>
-                  <DeepResearchButton section="Market" originalIdea={originalIdea} validationResult={result} />
+                  <DeepResearchButton section="Market" originalIdea={originalIdea} validationResult={result} formData={startupInput} validationId={validationRecordId} />
                 </>
               )}
 
@@ -668,7 +706,7 @@ const Result = () => {
                   />
                 </motion.div>
               )}
-              <DeepResearchButton section="Competitors" originalIdea={originalIdea} validationResult={result} />
+              <DeepResearchButton section="Competitors" originalIdea={originalIdea} validationResult={result} formData={startupInput} validationId={validationRecordId} />
             </div>
 
             {/* ═══════ ECONOMICS SECTION ═══════ */}
@@ -707,7 +745,8 @@ const Result = () => {
                     </div>
                   )}
                 </ResultCard>
-                </motion.div>
+              </motion.div>
+              <DeepResearchButton section="Pricing" originalIdea={originalIdea} validationResult={result} formData={startupInput} validationId={validationRecordId} />
 
               {/* USP Analysis */}
               {result.usp_analysis && (result.usp_analysis.personalized_usp || result.usp_analysis.positioning_statement) && (
@@ -751,7 +790,7 @@ const Result = () => {
                   />
                 </motion.div>
               )}
-              <DeepResearchButton section="Execution" originalIdea={originalIdea} validationResult={result} />
+              <DeepResearchButton section="Execution" originalIdea={originalIdea} validationResult={result} formData={startupInput} validationId={validationRecordId} />
 
               {result.ceo_patterns && (
                 <motion.div
