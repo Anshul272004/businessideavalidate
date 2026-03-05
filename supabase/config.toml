@@ -5,3 +5,6 @@ verify_jwt = false
 
 [functions.follow-up]
 verify_jwt = false
+
+[functions.research-orchestrator]
+verify_jwt = false

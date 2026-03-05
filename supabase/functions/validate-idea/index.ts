@@ -615,7 +615,12 @@ serve(async (req) => {
 
     // ═══════ VALIDATE & SANITIZE ALL INPUTS ═══════
     const idea = sanitizeInput(body.idea, 2000);
+    const problem = sanitizeInput(body.problem, 1200);
+    const solution = sanitizeInput(body.solution, 1200);
     const targetCustomer = sanitizeInput(body.targetCustomer, 1000);
+    const targetSegment = sanitizeInput(body.targetSegment, 240);
+    const industry = sanitizeInput(body.industry, 180);
+    const revenueModel = sanitizeInput(body.revenueModel, 120);
     const price = sanitizeInput(body.price, 20);
     const uniqueInsight = sanitizeInput(body.uniqueInsight, 500);
     const competitiveAdvantage = sanitizeInput(body.competitiveAdvantage, 500);
@@ -654,6 +659,7 @@ serve(async (req) => {
     }
     
     const finalPrice = price || "Not specified";
+    const finalRevenueModel = revenueModel || "Not specified";
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) {
@@ -704,11 +710,15 @@ GEOGRAPHIC & CULTURAL CONTEXT:
 `;
 
     const userContext = `
-BUSINESS IDEA: ${idea}
-
-TARGET CUSTOMER: ${targetCustomer}
-
-PLANNED PRICE: ${finalPrice}
+STRUCTURED STARTUP BRIEF:
+- Idea: ${idea}
+- Problem: ${problem || "Not specified"}
+- Solution: ${solution || "Not specified"}
+- Target Customer: ${targetCustomer}
+- Target Segment: ${targetSegment || "Not specified"}
+- Industry: ${industry || "Not specified"}
+- Planned Revenue Model: ${finalRevenueModel}
+- Planned Price: ${finalPrice}
 
 ${founderContext}
 
@@ -721,7 +731,7 @@ CURRENT STAGE: ${stage || "Just an idea"}
 Analyze with brutal honesty using patterns from 100,000+ successful and failed startups.
 Consider all real-world factors including REGIONAL MARKET DYNAMICS, cultural trust patterns, 
 local competition, payment behaviors, and infrastructure limitations.
-Tailor analysis to this specific founder's background, budget, location, and goals.`;
+Tailor analysis to this specific founder's background, budget, location, goals, and business model.`;
 
     // Run all 7 specialist agents in PARALLEL
     console.log("[Analysis] Starting 7-Agent Multi-Dimensional Analysis...");
@@ -753,6 +763,18 @@ Tailor analysis to this specific founder's background, budget, location, and goa
 
     // Combine all results
     const finalResult = {
+      startup_brief: {
+        idea,
+        problem: problem || null,
+        solution: solution || null,
+        target_customer: targetCustomer,
+        target_segment: targetSegment || null,
+        industry: industry || null,
+        revenue_model: moneyResult?.revenue_model || revenueModel || null,
+        price_point: finalPrice,
+        platform: platform || null,
+        stage: stage || null,
+      },
       demand_psychology: dopamineResult?.demand_analysis || "Analysis pending",
       pain_realism: {
         score: dopamineResult?.pain_score || 5,
@@ -781,7 +803,7 @@ Tailor analysis to this specific founder's background, budget, location, and goa
 
       network_effects: moneyResult?.network_effects || null,
       unit_economics: moneyResult?.unit_economics || null,
-      revenue_model: moneyResult?.revenue_model || "subscription",
+      revenue_model: moneyResult?.revenue_model || revenueModel || "subscription",
 
       pricing_psychology: {
         fair: true,

@@ -60,6 +60,7 @@ const Loading = () => {
     }
 
     const formData = JSON.parse(formDataStr);
+    sessionStorage.removeItem("validationRecordId");
 
     // Generate personalized fun fact
     const countryName = countries.find(c => c.code === formData.country)?.name || "your region";
@@ -94,8 +95,17 @@ const Loading = () => {
       try {
         const { data, error } = await supabase.functions.invoke("validate-idea", {
           body: {
-            idea: formData.idea, targetCustomer: formData.targetCustomer, price: formData.price,
-            platform: formData.platform, stage: formData.stage, uniqueInsight: formData.uniqueInsight,
+            idea: formData.idea,
+            problem: formData.problem,
+            solution: formData.solution,
+            targetCustomer: formData.targetCustomer,
+            targetSegment: formData.targetSegment,
+            industry: formData.industry,
+            revenueModel: formData.revenueModel,
+            price: formData.price,
+            platform: formData.platform,
+            stage: formData.stage,
+            uniqueInsight: formData.uniqueInsight,
             country: formData.country, state: formData.state, cityTier: formData.cityTier,
             marketMaturity: formData.marketMaturity, customerLocation: formData.customerLocation,
             paymentMaturity: formData.paymentMaturity, trustCulture: formData.trustCulture,
@@ -114,15 +124,23 @@ const Loading = () => {
         sessionStorage.setItem("validationResult", JSON.stringify(data));
         if (user) {
           try {
-            await supabase.from("validations").insert({
-              user_id: user.id,
-              idea_summary: formData.idea?.substring(0, 500) || "Untitled idea",
-              target_customer: formData.targetCustomer || null,
-              verdict: data.verdict,
-              confidence_score: data.confidence_score || null,
-              result_data: data,
-              form_data: formData,
-            } as any);
+            const { data: savedValidation } = await supabase
+              .from("validations")
+              .insert({
+                user_id: user.id,
+                idea_summary: formData.idea?.substring(0, 500) || "Untitled idea",
+                target_customer: formData.targetCustomer || null,
+                verdict: data.verdict,
+                confidence_score: data.confidence_score || null,
+                result_data: data,
+                form_data: formData,
+              } as any)
+              .select("id")
+              .single();
+
+            if (savedValidation?.id) {
+              sessionStorage.setItem("validationRecordId", savedValidation.id);
+            }
           } catch (e) {
             console.error("Failed to save validation:", e);
           }
