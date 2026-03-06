@@ -4,11 +4,12 @@ import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { LuxuryButton } from "@/components/ui/luxury-button";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { 
   Target, ArrowLeft, ArrowRight, CheckCircle2, RefreshCw, 
   AlertTriangle, Calendar, TrendingUp, Loader2, Sparkles,
   Flame, BarChart3, User, Award, Zap, Crown, Mail, GitCompare,
-  StickyNote, Save
+  StickyNote, Save, BookOpen, FileText, Copy, Check
 } from "lucide-react";
 import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from "@/components/ui/tooltip";
 import { toast } from "sonner";
@@ -38,7 +39,6 @@ const getTimeGreeting = () => {
   return "Good evening";
 };
 
-// Achievement definitions
 const achievements = [
   { id: "first-blood", label: "First Blood", desc: "Validated your first idea", icon: <Zap className="w-4 h-4" />, threshold: 1 },
   { id: "serial-thinker", label: "Serial Thinker", desc: "Validated 3 ideas", icon: <Sparkles className="w-4 h-4" />, threshold: 3 },
@@ -57,19 +57,34 @@ const Dashboard = () => {
   const [editingNotes, setEditingNotes] = useState<string | null>(null);
   const [noteText, setNoteText] = useState("");
   const [savingNote, setSavingNote] = useState(false);
+  const [researchRuns, setResearchRuns] = useState<any[]>([]);
+  const [artifacts, setArtifacts] = useState<any[]>([]);
+  const [loadingResearch, setLoadingResearch] = useState(true);
+  const [loadingArtifacts, setLoadingArtifacts] = useState(true);
+  const [expandedResearch, setExpandedResearch] = useState<string | null>(null);
+  const [copiedArtifact, setCopiedArtifact] = useState<string | null>(null);
   const userName = user?.email?.split("@")[0] || "Founder";
 
   useEffect(() => {
-    const fetchValidations = async () => {
-      if (!user) return;
-      const { data, error } = await supabase
-        .from("validations")
-        .select("*")
-        .order("created_at", { ascending: false });
-      if (!error && data) setValidations(data as unknown as ValidationRecord[]);
-      setLoading(false);
-    };
-    fetchValidations();
+    if (!user) return;
+    // Fetch validations
+    supabase.from("validations").select("*").order("created_at", { ascending: false })
+      .then(({ data, error }) => {
+        if (!error && data) setValidations(data as unknown as ValidationRecord[]);
+        setLoading(false);
+      });
+    // Fetch research runs
+    supabase.from("research_runs").select("*").order("created_at", { ascending: false })
+      .then(({ data, error }) => {
+        if (!error && data) setResearchRuns(data);
+        setLoadingResearch(false);
+      });
+    // Fetch artifacts
+    supabase.from("report_artifacts").select("*").order("created_at", { ascending: false })
+      .then(({ data, error }) => {
+        if (!error && data) setArtifacts(data);
+        setLoadingArtifacts(false);
+      });
   }, [user]);
 
   const viewReport = (record: ValidationRecord) => {
@@ -86,7 +101,6 @@ const Dashboard = () => {
     navigate("/result");
   };
 
-  // Stats
   const goCount = validations.filter(v => v.verdict === "GO").length;
   const pivotCount = validations.filter(v => v.verdict === "PIVOT").length;
   const killCount = validations.filter(v => v.verdict === "KILL").length;
@@ -95,11 +109,8 @@ const Dashboard = () => {
     ? Math.round(validations.reduce((sum, v) => sum + (v.confidence_score || 0), 0) / validations.length)
     : 0;
   const streak = validations.length;
-
-  // Unlocked achievements
   const unlockedAchievements = achievements.filter(a => streak >= a.threshold);
 
-  // Founder archetype
   const getArchetype = () => {
     if (validations.length === 0) return null;
     const latest = validations[0];
@@ -109,25 +120,30 @@ const Dashboard = () => {
     return archetypes[fd.coreSkill] || "Founder";
   };
 
-  // Save notes
   const saveNote = useCallback(async (id: string, notes: string) => {
     setSavingNote(true);
-    const { error } = await supabase
-      .from("validations")
-      .update({ notes: notes || null } as any)
-      .eq("id", id);
-    if (error) {
-      toast.error("Failed to save note");
-    } else {
-      setValidations(prev => prev.map(v => v.id === id ? { ...v, notes } : v));
-      toast.success("Note saved");
-    }
+    const { error } = await supabase.from("validations").update({ notes: notes || null } as any).eq("id", id);
+    if (error) { toast.error("Failed to save note"); }
+    else { setValidations(prev => prev.map(v => v.id === id ? { ...v, notes } : v)); toast.success("Note saved"); }
     setSavingNote(false);
     setEditingNotes(null);
   }, []);
 
-  // Comparison data
   const compareItems = compareIds.map(id => validations.find(v => v.id === id)).filter(Boolean) as ValidationRecord[];
+
+  const copyArtifactMarkdown = (id: string, markdown: string) => {
+    navigator.clipboard.writeText(markdown || "");
+    setCopiedArtifact(id);
+    setTimeout(() => setCopiedArtifact(null), 2000);
+    toast.success("Copied to clipboard");
+  };
+
+  // Startup Score from latest validation
+  const latestValidation = validations[0];
+  const startupScore = latestValidation ? Math.round(
+    ((latestValidation.confidence_score || 50) * 0.6) +
+    ((latestValidation.result_data?.pain_realism?.score || 5) * 4)
+  ) : 0;
 
   return (
     <div className="min-h-screen bg-background">
@@ -148,18 +164,17 @@ const Dashboard = () => {
       </nav>
 
       <div className="luxury-container py-8 relative z-10">
-        {/* Personalized Header with Achievements */}
+        {/* Header */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
           <div className="flex items-start justify-between flex-wrap gap-4">
             <div>
               <p className="text-sm text-muted-foreground mb-1">{getTimeGreeting()}</p>
               <h1 className="text-3xl md:text-5xl font-semibold mb-3">
                 <span className="text-primary">{userName}'s</span>{" "}
-                <span className="font-serif italic font-normal gradient-text">Reports</span>
+                <span className="font-serif italic font-normal gradient-text">Founder OS</span>
               </h1>
-              <p className="text-muted-foreground">Your validation journey and past decisions</p>
+              <p className="text-muted-foreground">Your startup intelligence workspace</p>
             </div>
-            {/* Achievement Badges */}
             {unlockedAchievements.length > 0 && (
               <TooltipProvider>
                 <div className="flex items-center gap-2">
@@ -182,34 +197,23 @@ const Dashboard = () => {
           </div>
         </motion.div>
 
-        {/* Founder Profile Card */}
-        {validations.length > 0 && getArchetype() && (
-          <motion.div
-            initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.05 }}
-            className="mb-6 p-5 rounded-xl bg-card border border-border flex items-center gap-4 flex-wrap"
-          >
+        {/* Startup Score Card */}
+        {validations.length > 0 && (
+          <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }} className="mb-6 p-5 rounded-xl bg-card border border-border flex items-center gap-4 flex-wrap">
             <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center">
               <Crown className="w-6 h-6 text-primary" />
             </div>
             <div className="flex-1 min-w-[200px]">
-              <p className="text-xs text-muted-foreground uppercase tracking-wider mb-0.5">Founder Archetype</p>
-              <p className="text-lg font-semibold text-primary">{getArchetype()}</p>
+              <p className="text-xs text-muted-foreground uppercase tracking-wider mb-0.5">Startup Score</p>
+              <p className="text-lg font-semibold text-primary">{startupScore}/100</p>
+              <div className="h-2 bg-muted rounded-full overflow-hidden mt-1 max-w-[200px]">
+                <div className={`h-full rounded-full transition-all ${startupScore >= 70 ? "bg-success" : startupScore >= 40 ? "bg-primary" : "bg-destructive"}`} style={{ width: `${startupScore}%` }} />
+              </div>
             </div>
             <div className="flex gap-6 text-center">
-              <div>
-                <p className="text-2xl font-bold font-mono tabular-nums">{validations.length}</p>
-                <p className="text-xs text-muted-foreground">Ideas</p>
-              </div>
-              <div>
-                <p className="text-2xl font-bold font-mono tabular-nums text-primary">{avgScore}%</p>
-                <p className="text-xs text-muted-foreground">Avg Score</p>
-              </div>
-              <div>
-                <p className="text-2xl font-bold font-mono tabular-nums text-success">{goCount}</p>
-                <p className="text-xs text-muted-foreground">GO</p>
-              </div>
+              <div><p className="text-2xl font-bold font-mono tabular-nums">{validations.length}</p><p className="text-xs text-muted-foreground">Ideas</p></div>
+              <div><p className="text-2xl font-bold font-mono tabular-nums text-primary">{avgScore}%</p><p className="text-xs text-muted-foreground">Avg Score</p></div>
+              <div><p className="text-2xl font-bold font-mono tabular-nums text-success">{goCount}</p><p className="text-xs text-muted-foreground">GO</p></div>
             </div>
           </motion.div>
         )}
@@ -217,249 +221,243 @@ const Dashboard = () => {
         {/* Stats Strip */}
         {validations.length > 0 && (
           <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-6">
-            <div className="p-4 rounded-xl bg-card border border-border">
-              <p className="text-xs text-muted-foreground mb-1">Total Ideas</p>
-              <p className="text-2xl font-bold font-mono tabular-nums">{validations.length}</p>
-            </div>
-            <div className="p-4 rounded-xl bg-success/5 border border-success/20">
-              <p className="text-xs text-success mb-1">GO Verdicts</p>
-              <p className="text-2xl font-bold font-mono tabular-nums text-success">{goCount}</p>
-            </div>
-            <div className="p-4 rounded-xl bg-primary/5 border border-primary/20">
-              <p className="text-xs text-primary mb-1">PIVOT</p>
-              <p className="text-2xl font-bold font-mono tabular-nums text-primary">{pivotCount}</p>
-            </div>
-            <div className="p-4 rounded-xl bg-destructive/5 border border-destructive/20">
-              <p className="text-xs text-destructive mb-1">KILL</p>
-              <p className="text-2xl font-bold font-mono tabular-nums text-destructive">{killCount}</p>
-            </div>
-            <div className="p-4 rounded-xl bg-card border border-border">
-              <p className="text-xs text-muted-foreground mb-1">Best Score</p>
-              <p className="text-2xl font-bold font-mono tabular-nums text-primary">{bestScore}%</p>
-            </div>
+            <div className="p-4 rounded-xl bg-card border border-border"><p className="text-xs text-muted-foreground mb-1">Total Ideas</p><p className="text-2xl font-bold font-mono tabular-nums">{validations.length}</p></div>
+            <div className="p-4 rounded-xl bg-success/5 border border-success/20"><p className="text-xs text-success mb-1">GO Verdicts</p><p className="text-2xl font-bold font-mono tabular-nums text-success">{goCount}</p></div>
+            <div className="p-4 rounded-xl bg-primary/5 border border-primary/20"><p className="text-xs text-primary mb-1">PIVOT</p><p className="text-2xl font-bold font-mono tabular-nums text-primary">{pivotCount}</p></div>
+            <div className="p-4 rounded-xl bg-destructive/5 border border-destructive/20"><p className="text-xs text-destructive mb-1">KILL</p><p className="text-2xl font-bold font-mono tabular-nums text-destructive">{killCount}</p></div>
+            <div className="p-4 rounded-xl bg-card border border-border"><p className="text-xs text-muted-foreground mb-1">Best Score</p><p className="text-2xl font-bold font-mono tabular-nums text-primary">{bestScore}%</p></div>
           </motion.div>
         )}
 
-        {/* Streak + Milestones */}
+        {/* Streak */}
         {streak >= 2 && (
           <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.2 }} className="mb-6 flex items-center gap-3 flex-wrap">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20">
               <Flame className="w-4 h-4 text-primary" />
               <span className="text-sm font-medium text-primary">You're on a {streak}-idea streak!</span>
             </div>
-            {/* Next milestone */}
             {(() => {
               const next = achievements.find(a => streak < a.threshold);
               if (!next) return null;
-              return (
-                <span className="text-xs text-muted-foreground">
-                  {next.threshold - streak} more to unlock "{next.label}"
-                </span>
-              );
+              return <span className="text-xs text-muted-foreground">{next.threshold - streak} more to unlock "{next.label}"</span>;
             })()}
           </motion.div>
         )}
 
-        {/* Weekly Digest Prompt */}
-        {showDigestPrompt && validations.length >= 1 && (
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            className="mb-6 p-5 rounded-xl bg-card border border-border flex items-start gap-4"
-          >
-            <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
-              <Mail className="w-5 h-5 text-primary" />
-            </div>
-            <div className="flex-1">
-              <p className="font-medium mb-1">Want weekly market intelligence?</p>
-              <p className="text-sm text-muted-foreground mb-3">We'll notify you of trends relevant to your validated ideas.</p>
-              <div className="flex items-center gap-3">
-                <button className="px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors">
-                  I'm interested
-                </button>
-                <button onClick={() => setShowDigestPrompt(false)} className="text-xs text-muted-foreground hover:text-foreground transition-colors">
-                  Maybe later
-                </button>
-              </div>
-            </div>
-          </motion.div>
-        )}
+        {/* Tabbed Content */}
+        <Tabs defaultValue="validations" className="mt-6">
+          <TabsList className="mb-6">
+            <TabsTrigger value="validations" className="flex items-center gap-2">
+              <BarChart3 className="w-4 h-4" /> Validations
+            </TabsTrigger>
+            <TabsTrigger value="research" className="flex items-center gap-2">
+              <BookOpen className="w-4 h-4" /> Research Library
+            </TabsTrigger>
+            <TabsTrigger value="artifacts" className="flex items-center gap-2">
+              <FileText className="w-4 h-4" /> Artifacts
+            </TabsTrigger>
+          </TabsList>
 
-        {loading ? (
-          <div className="flex items-center justify-center py-24">
-            <Loader2 className="w-8 h-8 animate-spin text-primary" />
-          </div>
-        ) : validations.length === 0 ? (
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center py-24">
-            <div className="w-20 h-20 mx-auto rounded-2xl bg-primary/10 flex items-center justify-center mb-6">
-              <Sparkles className="w-10 h-10 text-primary" />
-            </div>
-            <h2 className="text-2xl font-semibold mb-3">No validations yet</h2>
-            <p className="text-muted-foreground mb-8 max-w-md mx-auto">
-              Start by validating your first business idea. Get a comprehensive GO, PIVOT, or KILL verdict.
-            </p>
-            <LuxuryButton onClick={() => navigate("/input")} size="lg" className="group">
-              Validate My First Idea
-              <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
-            </LuxuryButton>
-          </motion.div>
-        ) : (
-          <>
-            {/* Header + Actions */}
-            <div className="mb-6 flex items-center justify-between flex-wrap gap-3">
-              <h2 className="text-lg font-semibold flex items-center gap-2">
-                <BarChart3 className="w-5 h-5 text-primary" />
-                Validation History
-              </h2>
-              <div className="flex items-center gap-3">
-                {validations.length >= 2 && (
-                  <button
-                    onClick={() => { setCompareMode(!compareMode); setCompareIds([]); }}
-                    className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm transition-colors ${
-                      compareMode ? "bg-primary/10 text-primary border border-primary/30" : "text-muted-foreground hover:text-foreground"
-                    }`}
-                  >
-                    <GitCompare className="w-4 h-4" />
-                    {compareMode ? "Cancel Compare" : "Compare"}
-                  </button>
-                )}
-                <LuxuryButton onClick={() => navigate("/input")} size="sm" className="group">
-                  New Validation
-                  <ArrowRight className="ml-1 h-4 w-4 transition-transform group-hover:translate-x-1" />
-                </LuxuryButton>
-              </div>
-            </div>
-
-            {/* Comparison View */}
-            <AnimatePresence>
-              {compareMode && compareItems.length === 2 && (
-                <motion.div
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: "auto" }}
-                  exit={{ opacity: 0, height: 0 }}
-                  className="mb-6 grid md:grid-cols-2 gap-4"
-                >
-                  {compareItems.map((item, i) => {
-                    const cfg = verdictConfig[item.verdict];
-                    return (
-                      <div key={item.id} className={`p-6 rounded-xl border ${cfg.border} ${cfg.bg}`}>
-                        <div className="flex items-center gap-2 mb-3">
-                          {cfg.icon}
-                          <span className={`font-bold text-lg ${cfg.color}`}>{item.verdict}</span>
-                          <span className="font-mono text-sm text-muted-foreground ml-auto">{item.confidence_score}%</span>
-                        </div>
-                        <p className="text-sm font-medium mb-2 line-clamp-2">{item.idea_summary}</p>
-                        <p className="text-xs text-muted-foreground">{new Date(item.created_at).toLocaleDateString()}</p>
-                      </div>
-                    );
-                  })}
-                </motion.div>
-              )}
-            </AnimatePresence>
-
-            {compareMode && (
-              <p className="text-xs text-muted-foreground mb-4">
-                Select {2 - compareIds.length} idea{compareIds.length === 1 ? "" : "s"} to compare
-              </p>
+          {/* ═══════ VALIDATIONS TAB ═══════ */}
+          <TabsContent value="validations">
+            {/* Weekly Digest Prompt */}
+            {showDigestPrompt && validations.length >= 1 && (
+              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="mb-6 p-5 rounded-xl bg-card border border-border flex items-start gap-4">
+                <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0"><Mail className="w-5 h-5 text-primary" /></div>
+                <div className="flex-1">
+                  <p className="font-medium mb-1">Want weekly market intelligence?</p>
+                  <p className="text-sm text-muted-foreground mb-3">We'll notify you of trends relevant to your validated ideas.</p>
+                  <div className="flex items-center gap-3">
+                    <button className="px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors">I'm interested</button>
+                    <button onClick={() => setShowDigestPrompt(false)} className="text-xs text-muted-foreground hover:text-foreground transition-colors">Maybe later</button>
+                  </div>
+                </div>
+              </motion.div>
             )}
 
-            {/* Validation Timeline */}
-            <div className="space-y-3">
-              {validations.map((v, i) => {
-                const config = verdictConfig[v.verdict];
-                const isSelected = compareIds.includes(v.id);
-                return (
-                  <motion.div
-                    key={v.id}
-                    initial={{ opacity: 0, y: 15 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: i * 0.04 }}
-                    onClick={() => viewReport(v)}
-                    className={`group cursor-pointer p-6 rounded-xl bg-card border transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_12px_30px_-10px_hsl(42_78%_50%/0.15)] ${
-                      isSelected ? "border-primary/50 ring-2 ring-primary/20" : "border-border hover:border-primary/30"
-                    }`}
-                  >
-                    <div className="flex items-start justify-between gap-4">
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-3 mb-2">
-                          <div className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${
-                            v.verdict === "GO" ? "bg-success" : v.verdict === "PIVOT" ? "bg-primary" : "bg-destructive"
-                          }`} />
-                          <p className="font-semibold text-lg truncate">{v.idea_summary}</p>
-                        </div>
-                        {v.target_customer && (
-                          <p className="text-sm text-muted-foreground mb-3 truncate ml-[22px]">
-                            <User className="w-3 h-3 inline mr-1" />{v.target_customer}
-                          </p>
-                        )}
-                        <div className="flex items-center gap-4 text-xs text-muted-foreground ml-[22px]">
-                          <span className="flex items-center gap-1">
-                            <Calendar className="w-3.5 h-3.5" />
-                            {new Date(v.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
-                          </span>
-                          {v.confidence_score && (
-                            <span className="flex items-center gap-1">
-                              <TrendingUp className="w-3.5 h-3.5" />
-                              <span className="font-mono tabular-nums">{v.confidence_score}%</span> confidence
-                            </span>
-                          )}
-                        </div>
-                        {/* Notes */}
-                        {(v.notes || editingNotes === v.id) && (
-                          <div className="mt-3 ml-[22px]" onClick={(e) => e.stopPropagation()}>
-                            {editingNotes === v.id ? (
-                              <div className="flex items-start gap-2">
-                                <textarea
-                                  className="flex-1 bg-muted/50 border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary/50 resize-none min-h-[60px]"
-                                  value={noteText}
-                                  onChange={(e) => setNoteText(e.target.value)}
-                                  placeholder="Add your notes, thoughts, next steps..."
-                                  autoFocus
-                                />
-                                <button
-                                  onClick={() => saveNote(v.id, noteText)}
-                                  disabled={savingNote}
-                                  className="p-2 rounded-lg bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
-                                >
-                                  <Save className="w-4 h-4" />
-                                </button>
-                              </div>
-                            ) : (
-                              <p className="text-xs text-muted-foreground italic">
-                                <StickyNote className="w-3 h-3 inline mr-1" />{v.notes}
-                              </p>
-                            )}
+            {loading ? (
+              <div className="flex items-center justify-center py-24"><Loader2 className="w-8 h-8 animate-spin text-primary" /></div>
+            ) : validations.length === 0 ? (
+              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center py-24">
+                <div className="w-20 h-20 mx-auto rounded-2xl bg-primary/10 flex items-center justify-center mb-6"><Sparkles className="w-10 h-10 text-primary" /></div>
+                <h2 className="text-2xl font-semibold mb-3">No validations yet</h2>
+                <p className="text-muted-foreground mb-8 max-w-md mx-auto">Start by validating your first business idea.</p>
+                <LuxuryButton onClick={() => navigate("/input")} size="lg" className="group">
+                  Validate My First Idea <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
+                </LuxuryButton>
+              </motion.div>
+            ) : (
+              <>
+                <div className="mb-6 flex items-center justify-between flex-wrap gap-3">
+                  <h2 className="text-lg font-semibold flex items-center gap-2"><BarChart3 className="w-5 h-5 text-primary" /> Validation History</h2>
+                  <div className="flex items-center gap-3">
+                    {validations.length >= 2 && (
+                      <button onClick={() => { setCompareMode(!compareMode); setCompareIds([]); }} className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm transition-colors ${compareMode ? "bg-primary/10 text-primary border border-primary/30" : "text-muted-foreground hover:text-foreground"}`}>
+                        <GitCompare className="w-4 h-4" />{compareMode ? "Cancel Compare" : "Compare"}
+                      </button>
+                    )}
+                    <LuxuryButton onClick={() => navigate("/input")} size="sm" className="group">New Validation <ArrowRight className="ml-1 h-4 w-4 transition-transform group-hover:translate-x-1" /></LuxuryButton>
+                  </div>
+                </div>
+
+                <AnimatePresence>
+                  {compareMode && compareItems.length === 2 && (
+                    <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }} className="mb-6 grid md:grid-cols-2 gap-4">
+                      {compareItems.map((item) => {
+                        const cfg = verdictConfig[item.verdict];
+                        return (
+                          <div key={item.id} className={`p-6 rounded-xl border ${cfg.border} ${cfg.bg}`}>
+                            <div className="flex items-center gap-2 mb-3">{cfg.icon}<span className={`font-bold text-lg ${cfg.color}`}>{item.verdict}</span><span className="font-mono text-sm text-muted-foreground ml-auto">{item.confidence_score}%</span></div>
+                            <p className="text-sm font-medium mb-2 line-clamp-2">{item.idea_summary}</p>
+                            <p className="text-xs text-muted-foreground">{new Date(item.created_at).toLocaleDateString()}</p>
                           </div>
-                        )}
-                        {!v.notes && editingNotes !== v.id && (
-                          <button
-                            onClick={(e) => { e.stopPropagation(); setEditingNotes(v.id); setNoteText(""); }}
-                            className="mt-2 ml-[22px] text-[10px] text-muted-foreground hover:text-primary transition-colors flex items-center gap-1"
-                          >
-                            <StickyNote className="w-3 h-3" /> Add note
-                          </button>
-                        )}
-                        {v.notes && editingNotes !== v.id && (
-                          <button
-                            onClick={(e) => { e.stopPropagation(); setEditingNotes(v.id); setNoteText(v.notes || ""); }}
-                            className="mt-1 ml-[22px] text-[10px] text-muted-foreground hover:text-primary transition-colors"
-                          >
-                            Edit note
-                          </button>
-                        )}
-                      </div>
-                      <div className={`flex items-center gap-2 px-4 py-2 rounded-xl ${config.bg} ${config.border} border ${config.color} flex-shrink-0`}>
-                        {config.icon}
-                        <span className="font-bold text-sm">{v.verdict}</span>
+                        );
+                      })}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+
+                {compareMode && <p className="text-xs text-muted-foreground mb-4">Select {2 - compareIds.length} idea{compareIds.length === 1 ? "" : "s"} to compare</p>}
+
+                <div className="space-y-3">
+                  {validations.map((v, i) => {
+                    const config = verdictConfig[v.verdict];
+                    const isSelected = compareIds.includes(v.id);
+                    return (
+                      <motion.div key={v.id} initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.04 }} onClick={() => viewReport(v)}
+                        className={`group cursor-pointer p-6 rounded-xl bg-card border transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_12px_30px_-10px_hsl(42_78%_50%/0.15)] ${isSelected ? "border-primary/50 ring-2 ring-primary/20" : "border-border hover:border-primary/30"}`}
+                      >
+                        <div className="flex items-start justify-between gap-4">
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-3 mb-2">
+                              <div className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${v.verdict === "GO" ? "bg-success" : v.verdict === "PIVOT" ? "bg-primary" : "bg-destructive"}`} />
+                              <p className="font-semibold text-lg truncate">{v.idea_summary}</p>
+                            </div>
+                            {v.target_customer && <p className="text-sm text-muted-foreground mb-3 truncate ml-[22px]"><User className="w-3 h-3 inline mr-1" />{v.target_customer}</p>}
+                            <div className="flex items-center gap-4 text-xs text-muted-foreground ml-[22px]">
+                              <span className="flex items-center gap-1"><Calendar className="w-3.5 h-3.5" />{new Date(v.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}</span>
+                              {v.confidence_score && <span className="flex items-center gap-1"><TrendingUp className="w-3.5 h-3.5" /><span className="font-mono tabular-nums">{v.confidence_score}%</span> confidence</span>}
+                            </div>
+                            {(v.notes || editingNotes === v.id) && (
+                              <div className="mt-3 ml-[22px]" onClick={(e) => e.stopPropagation()}>
+                                {editingNotes === v.id ? (
+                                  <div className="flex items-start gap-2">
+                                    <textarea className="flex-1 bg-muted/50 border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary/50 resize-none min-h-[60px]" value={noteText} onChange={(e) => setNoteText(e.target.value)} placeholder="Add your notes..." autoFocus />
+                                    <button onClick={() => saveNote(v.id, noteText)} disabled={savingNote} className="p-2 rounded-lg bg-primary/10 text-primary hover:bg-primary/20 transition-colors"><Save className="w-4 h-4" /></button>
+                                  </div>
+                                ) : <p className="text-xs text-muted-foreground italic"><StickyNote className="w-3 h-3 inline mr-1" />{v.notes}</p>}
+                              </div>
+                            )}
+                            {!v.notes && editingNotes !== v.id && <button onClick={(e) => { e.stopPropagation(); setEditingNotes(v.id); setNoteText(""); }} className="mt-2 ml-[22px] text-[10px] text-muted-foreground hover:text-primary transition-colors flex items-center gap-1"><StickyNote className="w-3 h-3" /> Add note</button>}
+                            {v.notes && editingNotes !== v.id && <button onClick={(e) => { e.stopPropagation(); setEditingNotes(v.id); setNoteText(v.notes || ""); }} className="mt-1 ml-[22px] text-[10px] text-muted-foreground hover:text-primary transition-colors">Edit note</button>}
+                          </div>
+                          <div className={`flex items-center gap-2 px-4 py-2 rounded-xl ${config.bg} ${config.border} border ${config.color} flex-shrink-0`}>{config.icon}<span className="font-bold text-sm">{v.verdict}</span></div>
+                        </div>
+                      </motion.div>
+                    );
+                  })}
+                </div>
+              </>
+            )}
+          </TabsContent>
+
+          {/* ═══════ RESEARCH LIBRARY TAB ═══════ */}
+          <TabsContent value="research">
+            {loadingResearch ? (
+              <div className="flex items-center justify-center py-24"><Loader2 className="w-8 h-8 animate-spin text-primary" /></div>
+            ) : researchRuns.length === 0 ? (
+              <div className="text-center py-24">
+                <div className="w-20 h-20 mx-auto rounded-2xl bg-primary/10 flex items-center justify-center mb-6"><BookOpen className="w-10 h-10 text-primary" /></div>
+                <h2 className="text-2xl font-semibold mb-3">No research yet</h2>
+                <p className="text-muted-foreground max-w-md mx-auto">Run deep research from any validation result to build your research library.</p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {researchRuns.map((run, i) => (
+                  <motion.div key={run.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.03 }}>
+                    <div
+                      onClick={() => setExpandedResearch(expandedResearch === run.id ? null : run.id)}
+                      className="cursor-pointer p-5 rounded-xl bg-card border border-border hover:border-primary/30 transition-all"
+                    >
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className={`w-2 h-2 rounded-full ${run.status === "completed" ? "bg-success" : run.status === "failed" ? "bg-destructive" : "bg-primary animate-pulse"}`} />
+                            <span className="text-sm font-semibold capitalize">{run.mode} Research</span>
+                            {run.query && <span className="text-xs text-muted-foreground truncate max-w-[200px]">— {run.query}</span>}
+                          </div>
+                          {run.summary && <p className="text-xs text-muted-foreground line-clamp-2 mt-1">{run.summary}</p>}
+                          <p className="text-xs text-muted-foreground mt-2">{new Date(run.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}</p>
+                        </div>
+                        <span className={`text-xs px-2 py-1 rounded-full ${run.status === "completed" ? "bg-success/10 text-success" : run.status === "failed" ? "bg-destructive/10 text-destructive" : "bg-primary/10 text-primary"}`}>
+                          {run.status}
+                        </span>
                       </div>
                     </div>
+                    <AnimatePresence>
+                      {expandedResearch === run.id && run.result_data && Object.keys(run.result_data).length > 0 && (
+                        <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }} className="overflow-hidden">
+                          <div className="p-4 mx-2 mb-2 rounded-b-xl border border-t-0 border-border bg-muted/20 max-h-[400px] overflow-y-auto">
+                            <pre className="text-xs text-muted-foreground whitespace-pre-wrap">{JSON.stringify(run.result_data, null, 2)}</pre>
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
                   </motion.div>
-                );
-              })}
-            </div>
-          </>
-        )}
+                ))}
+              </div>
+            )}
+          </TabsContent>
+
+          {/* ═══════ ARTIFACTS TAB ═══════ */}
+          <TabsContent value="artifacts">
+            {loadingArtifacts ? (
+              <div className="flex items-center justify-center py-24"><Loader2 className="w-8 h-8 animate-spin text-primary" /></div>
+            ) : artifacts.length === 0 ? (
+              <div className="text-center py-24">
+                <div className="w-20 h-20 mx-auto rounded-2xl bg-primary/10 flex items-center justify-center mb-6"><FileText className="w-10 h-10 text-primary" /></div>
+                <h2 className="text-2xl font-semibold mb-3">No artifacts yet</h2>
+                <p className="text-muted-foreground max-w-md mx-auto">Generate business plans, MVP roadmaps, or pitch decks from any validation result.</p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {artifacts.map((artifact, i) => {
+                  const typeIcons: Record<string, any> = { "business-plan": "📋", "mvp-roadmap": "🗺️", "pitch-deck": "📊" };
+                  return (
+                    <motion.div key={artifact.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.03 }}
+                      className="p-5 rounded-xl bg-card border border-border hover:border-primary/30 transition-all"
+                    >
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-1">
+                            <span>{typeIcons[artifact.artifact_type] || "📄"}</span>
+                            <span className="text-sm font-semibold">{artifact.title || artifact.artifact_type}</span>
+                          </div>
+                          <p className="text-xs text-muted-foreground mt-1">
+                            {new Date(artifact.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+                            <span className="mx-2">•</span>
+                            v{artifact.version}
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          {artifact.markdown && (
+                            <button onClick={() => copyArtifactMarkdown(artifact.id, artifact.markdown)} className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs bg-muted hover:bg-muted/80 transition-colors">
+                              {copiedArtifact === artifact.id ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
+                              {copiedArtifact === artifact.id ? "Copied" : "Copy"}
+                            </button>
+                          )}
+                          <span className={`text-xs px-2 py-1 rounded-full ${artifact.status === "completed" ? "bg-success/10 text-success" : "bg-primary/10 text-primary"}`}>
+                            {artifact.status}
+                          </span>
+                        </div>
+                      </div>
+                    </motion.div>
+                  );
+                })}
+              </div>
+            )}
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );
