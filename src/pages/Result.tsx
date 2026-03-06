@@ -52,6 +52,9 @@ import ReferralPrompt from "@/components/result/ReferralPrompt";
 import VerdictRadarChart from "@/components/result/VerdictRadarChart";
 import DeepResearchButton from "@/components/result/DeepResearchButton";
 import StartupBriefCard from "@/components/result/StartupBriefCard";
+import ArtifactGenerator from "@/components/result/ArtifactGenerator";
+import FundingReadiness from "@/components/result/FundingReadiness";
+import GrowthStrategy from "@/components/result/GrowthStrategy";
 
 interface ValidationResult {
   demand_psychology: string;
@@ -220,6 +223,8 @@ const sections = [
   { id: "execution", label: "Execution", icon: <AlertTriangle className="w-3.5 h-3.5" /> },
   { id: "biases", label: "Biases", icon: <Fingerprint className="w-3.5 h-3.5" /> },
   { id: "action", label: "Action Plan", icon: <Lightbulb className="w-3.5 h-3.5" /> },
+  { id: "funding", label: "Funding & Growth", icon: <TrendingUp className="w-3.5 h-3.5" /> },
+  { id: "artifacts", label: "Artifacts", icon: <Sparkles className="w-3.5 h-3.5" /> },
 ];
 
 const Result = () => {
@@ -1076,6 +1081,21 @@ const Result = () => {
                   recommended_reading={result.recommended_reading}
                 />
               </motion.div>
+            </div>
+
+            {/* ═══════ FUNDING & GROWTH ═══════ */}
+            <div id="funding" className="space-y-6">
+              <FundingReadiness validationResult={result} />
+              <GrowthStrategy validationResult={result} />
+            </div>
+
+            {/* ═══════ ARTIFACTS ═══════ */}
+            <div id="artifacts">
+              <ArtifactGenerator
+                validationResult={result}
+                formData={startupInput}
+                validationId={validationRecordId}
+              />
             </div>
           </div>
 
