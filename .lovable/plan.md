@@ -1,61 +1,117 @@
 
 
-# Implementation Plan: Steps 4-8 — Complete AI Startup Copilot
+# Futuristic AI-Powered Landing Page Redesign
 
-## Current State
-Steps 1-3 are done: structured input, research tables with RLS, research orchestrator edge function. The remaining work is artifact generation, funding/growth sections, and dashboard expansion.
+## Overview
+Complete redesign of the Landing page and its sub-components to create a cinematic, futuristic AI product experience. The current gold/obsidian luxury theme shifts to a deep black + neon blue/purple cyberpunk-AI aesthetic with glassmorphism, particle effects, parallax, and interactive micro-interactions.
 
-## Implementation (4 tasks)
+## Color System Change
+Update CSS variables in `src/index.css`:
+- Background: pure deep black (`240 10% 2%`)
+- Primary accent: neon blue (`220 90% 60%`) instead of gold
+- Secondary accent: electric purple (`270 80% 60%`)
+- Keep success/destructive semantics
+- Add `--neon-blue`, `--neon-purple`, `--glass-bg` custom properties
 
-### Task 1: Artifact Generator Edge Function + UI
+Update `tailwind.config.ts` with new color tokens and keyframes for particle float, glow-pulse-blue, and scan-line effects.
 
-**New file: `supabase/functions/generate-artifact/index.ts`**
-- Accepts `validationId`, `artifactType` (business-plan | mvp-roadmap | pitch-deck), `validationResult`, `formData`
-- Uses Lovable AI gateway with tool calling to return structured JSON per type:
-  - **business-plan**: executive_summary, market_analysis, product_strategy, marketing_strategy, financial_projections
-  - **mvp-roadmap**: core_features[], tech_stack, timeline[], budget_estimate, milestones[]
-  - **pitch-deck**: slides[] (Problem, Solution, Market, Business Model, Competition, Go-to-Market, Financials) each with title + content + talking_points
-- Persists to `report_artifacts` table with user auth
-- Register in `supabase/config.toml`
+## New/Rewritten Components
 
-**New file: `src/components/result/ArtifactGenerator.tsx`**
-- Three buttons in a premium card: "Business Plan", "MVP Roadmap", "Pitch Deck"
-- Loading state per artifact, renders result in collapsible accordion
-- "Copy as Markdown" action per artifact
-- Add to Result page after the Action Plan section
+### 1. `src/components/landing/ParticleField.tsx` (NEW)
+Canvas-based animated particle/neural-network background. Dots connected by lines, subtle mouse-reactive movement. Replaces `GradientMesh`.
 
-### Task 2: Funding Readiness + Growth Strategy Components
+### 2. `src/components/landing/HeroSection.tsx` (NEW — replaces TypewriterHero + hero markup in Landing)
+- Full-viewport cinematic hero
+- Animated 3D-like floating glass sphere using CSS transforms + framer-motion (rotation, glow pulse, mouse-parallax via `onMouseMove`)
+- Headline: "Validate Your Business Idea Before You Build It"
+- Subheadline with typing animation
+- CTA button with breathing neon glow + hover ripple
+- Floating stats badges around the sphere
 
-**New file: `src/components/result/FundingReadiness.tsx`**
-- Derives scores from existing validation data (no new backend call):
-  - VC Readiness (from scalability + market size + network effects)
-  - Angel Readiness (from execution simplicity + founder fit)
-  - Bootstrap Potential (from unit economics + low burn)
-- Visual progress bars + investor checklist
+### 3. `src/components/landing/InteractiveInput.tsx` (NEW)
+- Glassmorphism floating panel with a fake input field
+- On focus/type simulation: shows "Analyzing market...", "Scanning competitors...", "Calculating risk..." step-by-step with animated progress
+- Triggers curiosity — clicking navigates to `/input`
 
-**New file: `src/components/result/GrowthStrategy.tsx`**
-- Top growth channels (from `distribution_channels` data)
-- Viral loop potential (from `network_effects`)
-- Revenue simulator: Year 1/3/5 projections from unit economics
-- Startup Score breakdown
+### 4. `src/components/landing/AnimatedFlow.tsx` (NEW — replaces HowItWorks)
+- SVG-based node graph: 3 nodes connected by glowing animated lines
+- Data particles flowing along the lines
+- Step 1 → Step 2 → Step 3 with scroll-triggered activation
+- Each node expands on scroll to reveal details
 
-**Update `src/pages/Result.tsx`**: Add new "Funding & Growth" section with both components, and add "Artifacts" section with ArtifactGenerator. Add nav entries for these sections.
+### 5. `src/components/landing/FeatureCards.tsx` (REWRITE of FeatureShowcase)
+- Glassmorphism cards with tilt-on-hover (CSS perspective transform)
+- Subtle float animation per card (staggered)
+- Neon border glow on hover
+- 6 key features: Market Validation, Competitor Analysis, Risk Score, AI Suggestions, Revenue Model, Startup Score
 
-### Task 3: Dashboard Expansion — Founder OS Workspace
+### 6. `src/components/landing/MockResult.tsx` (NEW)
+- Fake AI result dashboard showing:
+  - Animated score counter (0→78%)
+  - Animated progress bars for strengths
+  - Glassmorphism card layout
+  - Scroll-triggered animation
 
-**Update `src/pages/Dashboard.tsx`**: Add tab-based layout with 3 tabs:
-- **Validations** (current content)
-- **Research Library**: Query `research_runs` for current user, display past research with status/section/summary, expandable to view cached result
-- **Artifacts**: Query `report_artifacts`, show generated business plans/pitch decks/roadmaps with view/copy actions
-- **Startup Score** card at top: aggregate from latest validation's confidence + bias-adjusted data
+### 7. `src/components/landing/PricingCards.tsx` (REWRITE)
+- 3 glassmorphism pricing cards
+- Middle card highlighted with neon glow border
+- Hover lift + glow intensify
+- Anchoring bias layout
 
-### Task 4: Connect External Research Providers
+### 8. Updated `src/components/landing/FinalCTA.tsx`
+- Full-width dark section with particle background
+- Large headline + breathing CTA
+- Neon glow effects
 
-Use `connect` tool for Perplexity and Firecrawl connectors. The `research-orchestrator` already has code paths for both API keys — once connected, deep research automatically uses live grounded sources.
+## Landing.tsx Rewrite
+Simplify the Landing page to use the new components in order:
+1. ParticleField (fixed background)
+2. Nav (glassmorphism, updated colors)
+3. HeroSection
+4. InteractiveInput
+5. AnimatedFlow (How it Works)
+6. FeatureCards
+7. MockResult
+8. PricingCards
+9. Testimonials (keep, restyle)
+10. FinalCTA
+11. Footer
 
-## Files Summary
+Remove: OnboardingOverlay, LiveActivityFeed, LiveCounterStrip, WallOfVerdicts, ProblemAgitation, CEOPatternSection, FounderShowcase, ComparisonTable, MoneyBackGuarantee, Benefits, SocialProof, TrustBadges — these bloat the page and fight the futuristic aesthetic.
 
-**New (3):** `generate-artifact/index.ts`, `ArtifactGenerator.tsx`, `FundingReadiness.tsx`, `GrowthStrategy.tsx`
-**Modified (3):** `config.toml`, `Result.tsx`, `Dashboard.tsx`
-**No new migrations needed** — all tables exist.
+## Scroll Experience
+- Add `scroll-smooth` behavior
+- Each section uses `whileInView` fade-up with stagger
+- Parallax on hero sphere (translateY based on scroll)
+- Section transitions feel cinematic with opacity + translateY
+
+## Micro-Interactions
+- All buttons: hover glow intensify + scale 1.02
+- Cards: perspective tilt on mousemove (`rotateX`/`rotateY` from cursor position)
+- CTA: breathing neon pulse animation
+- Nav: glassmorphism blur on scroll
+- Cursor: subtle glow trail effect via CSS
+
+## Files Changed
+- `src/index.css` — new color variables, glassmorphism utilities, neon glow classes
+- `tailwind.config.ts` — new keyframes and animation tokens
+- `src/pages/Landing.tsx` — complete rewrite with new component composition
+- `src/components/landing/GradientMesh.tsx` → replaced by `ParticleField.tsx`
+- `src/components/landing/TypewriterHero.tsx` → replaced by `HeroSection.tsx`
+- `src/components/landing/HowItWorks.tsx` → replaced by `AnimatedFlow.tsx`
+- `src/components/landing/FeatureShowcase.tsx` → replaced by `FeatureCards.tsx`
+- `src/components/landing/FinalCTA.tsx` — updated styling
+- **New files**: `ParticleField.tsx`, `HeroSection.tsx`, `InteractiveInput.tsx`, `AnimatedFlow.tsx`, `FeatureCards.tsx`, `MockResult.tsx`, `PricingCards.tsx`
+
+## Performance
+- Canvas particle field uses `requestAnimationFrame` with throttling
+- All animations use `will-change` and GPU-composited properties (transform, opacity)
+- Lazy-load below-fold sections
+- No heavy 3D libraries — pure CSS transforms + framer-motion
+
+## What Stays
+- Auth flow, Dashboard, Input, Loading, Result pages untouched
+- App routing unchanged
+- All backend edge functions unchanged
+- Existing UI component library (button, card, etc.) unchanged
 
