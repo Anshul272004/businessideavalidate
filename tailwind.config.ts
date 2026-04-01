@@ -14,9 +14,8 @@ export default {
     },
     extend: {
       fontFamily: {
-        sans: ['DM Sans', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
-        serif: ['Cormorant Garamond', 'Georgia', 'serif'],
-        display: ['Cormorant Garamond', 'Georgia', 'serif'],
+        sans: ['Space Grotesk', 'DM Sans', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+        display: ['Space Grotesk', 'DM Sans', 'sans-serif'],
       },
       colors: {
         border: "hsl(var(--border))",
@@ -60,9 +59,9 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
-        ice: {
-          DEFAULT: "hsl(var(--ice-blue))",
-          foreground: "hsl(var(--ice-blue-foreground))",
+        neon: {
+          blue: "hsl(var(--primary))",
+          purple: "hsl(var(--neon-purple))",
         },
       },
       borderRadius: {
@@ -102,12 +101,22 @@ export default {
           "50%": { transform: "translateY(-8px)" },
         },
         "glow-pulse": {
-          "0%, 100%": { boxShadow: "0 0 25px -10px hsl(var(--glow-primary) / 0.25)" },
-          "50%": { boxShadow: "0 0 40px -10px hsl(var(--glow-primary) / 0.4)" },
+          "0%, 100%": { boxShadow: "0 0 25px -10px hsl(var(--glow-primary) / 0.3)" },
+          "50%": { boxShadow: "0 0 45px -10px hsl(var(--glow-primary) / 0.5)" },
         },
         "reveal": {
           from: { opacity: "0", clipPath: "inset(0 100% 0 0)" },
           to: { opacity: "1", clipPath: "inset(0 0 0 0)" },
+        },
+        "particle-float": {
+          "0%, 100%": { transform: "translateY(0) translateX(0)" },
+          "25%": { transform: "translateY(-20px) translateX(10px)" },
+          "50%": { transform: "translateY(-5px) translateX(-10px)" },
+          "75%": { transform: "translateY(-15px) translateX(5px)" },
+        },
+        "sphere-spin": {
+          from: { transform: "rotateY(0deg)" },
+          to: { transform: "rotateY(360deg)" },
         },
       },
       animation: {
@@ -120,6 +129,8 @@ export default {
         "float": "float 4s ease-in-out infinite",
         "glow-pulse": "glow-pulse 3s ease-in-out infinite",
         "reveal": "reveal 0.6s ease-out forwards",
+        "particle-float": "particle-float 8s ease-in-out infinite",
+        "sphere-spin": "sphere-spin 20s linear infinite",
       },
       transitionDuration: {
         "150": "150ms",

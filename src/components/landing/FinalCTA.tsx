@@ -1,37 +1,44 @@
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { LuxuryButton } from "@/components/ui/luxury-button";
 import { ArrowRight, Shield } from "lucide-react";
 
 const FinalCTA = () => {
   const navigate = useNavigate();
 
   return (
-    <section className="luxury-container py-24 border-t border-border/50">
+    <section className="relative py-32 overflow-hidden">
+      {/* Background glow */}
+      <div className="absolute inset-0 z-0">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full opacity-20"
+          style={{ background: "radial-gradient(circle, hsl(220 90% 60% / 0.15) 0%, transparent 70%)" }} />
+      </div>
+
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
-        className="max-w-2xl mx-auto text-center"
+        className="luxury-container relative z-10 max-w-2xl mx-auto text-center"
       >
-        <p className="text-sm text-muted-foreground mb-4 uppercase tracking-wide">Begin</p>
-        <h2 className="text-heading font-semibold mb-6">
-          Reduce irreversible <span className="font-serif italic font-normal gradient-text">mistakes</span>
+        <h2 className="text-heading font-bold mb-6">
+          Stop guessing. <span className="gradient-text">Start validating.</span>
         </h2>
         <p className="text-muted-foreground mb-4 leading-relaxed">
-          The cost of a wrong direction is measured in years, not dollars. 
+          The cost of a wrong direction is measured in years, not dollars.
         </p>
         <p className="text-foreground font-medium mb-10">
           Know before you commit.
         </p>
-        <LuxuryButton 
-          onClick={() => navigate("/input")} 
-          size="lg" 
-          className="group"
+
+        <button
+          onClick={() => navigate("/input")}
+          className="group px-10 py-5 rounded-xl font-semibold text-background bg-primary hover:bg-primary/90 transition-all duration-200 animate-breathing-glow haptic-click"
         >
-          Validate My Business Idea
-          <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
-        </LuxuryButton>
+          <span className="flex items-center gap-2">
+            Validate My Business Idea
+            <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
+          </span>
+        </button>
+
         <div className="flex items-center justify-center gap-6 mt-8 text-sm text-muted-foreground">
           <div className="flex items-center gap-2">
             <Shield className="w-4 h-4 text-primary" />
