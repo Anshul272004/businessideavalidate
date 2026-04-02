@@ -1,19 +1,19 @@
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Check, ArrowRight, Sparkles } from "lucide-react";
+import { Check, ArrowRight, Crown } from "lucide-react";
 
 const plans = [
   {
-    name: "Starter",
+    name: "Essential",
     price: "$29",
     period: "per evaluation",
-    description: "Quick validation for early-stage ideas",
+    description: "Surface-level analysis for early exploration",
     features: [
       "Single idea evaluation",
       "5 analysis agents",
       "GO / PIVOT / KILL verdict",
       "Basic action steps",
-      "Email support",
+      "48-hour email support",
     ],
     popular: false,
   },
@@ -21,32 +21,32 @@ const plans = [
     name: "Founder",
     price: "$79",
     period: "per evaluation",
-    description: "Complete intelligence for serious founders",
+    description: "Complete analysis for serious decisions",
     features: [
-      "8 analysis agents (full suite)",
+      "9 specialized analysis agents",
+      "Macro environment analysis",
       "Founder-market fit analysis",
       "Cognitive bias detection",
+      "Regional market intelligence",
       "Unit economics projection",
-      "Competitor deep-dive",
-      "MVP roadmap generator",
+      "CEO pattern matching",
       "Exportable PDF report",
       "Priority support",
     ],
     popular: true,
   },
   {
-    name: "Scale",
+    name: "Decision Companion",
     price: "$249",
     period: "per quarter",
-    description: "For serial founders and teams",
+    description: "Ongoing access for serial founders",
     features: [
       "5 evaluations per quarter",
       "Everything in Founder",
-      "Side-by-side comparison",
-      "Pitch deck generator",
-      "Business plan generator",
-      "Validation dashboard",
-      "API access",
+      "Compare ideas side-by-side",
+      "Validation history dashboard",
+      "Monthly trend updates",
+      "Direct analyst access",
     ],
     popular: false,
   },
@@ -56,19 +56,19 @@ const PricingCards = () => {
   const navigate = useNavigate();
 
   return (
-    <section className="luxury-container py-24 relative z-10">
+    <section className="luxury-container py-28 relative z-10">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
-        className="text-center mb-14"
+        className="text-center mb-16"
       >
-        <p className="text-sm text-primary mb-4 uppercase tracking-widest font-medium">Pricing</p>
+        <p className="text-sm text-primary mb-4 uppercase tracking-widest font-medium font-sans">Investment</p>
         <h2 className="text-heading font-bold mb-4">
-          Invest in <span className="gradient-text">clarity</span>
+          Choose your <span className="gradient-text italic">depth</span>
         </h2>
-        <p className="text-muted-foreground max-w-xl mx-auto">
-          The cost of a bad decision is measured in years. The cost of clarity is minutes.
+        <p className="text-muted-foreground max-w-xl mx-auto font-sans">
+          The cost of a bad decision is measured in years, not dollars
         </p>
       </motion.div>
 
@@ -76,45 +76,46 @@ const PricingCards = () => {
         {plans.map((plan, i) => (
           <motion.div
             key={i}
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: i * 0.1 }}
-            className={`relative glass rounded-2xl p-8 transition-all duration-300 hover-lift ${
-              plan.popular ? "border-primary/50 shadow-[0_0_40px_-15px_hsl(220_90%_60%/0.3)]" : ""
+            className={`relative rounded-2xl p-8 transition-all duration-280 hover-lift ${
+              plan.popular
+                ? "bg-card border-2 border-primary/40 glow-subtle"
+                : "bg-card border border-border hover:border-primary/20"
             }`}
           >
             {plan.popular && (
               <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                <span className="px-4 py-1 bg-primary text-primary-foreground text-xs font-semibold rounded-full uppercase tracking-wider flex items-center gap-1.5">
-                  <Sparkles className="w-3 h-3" />
-                  Most Popular
+                <span className="px-4 py-1 bg-primary text-primary-foreground text-xs font-medium font-sans rounded-full uppercase tracking-wide flex items-center gap-1.5">
+                  <Crown className="w-3 h-3" /> Most Popular
                 </span>
               </div>
             )}
 
             <h3 className="text-xl font-semibold mb-1">{plan.name}</h3>
-            <p className="text-sm text-muted-foreground mb-5">{plan.description}</p>
+            <p className="text-sm text-muted-foreground mb-6 font-sans">{plan.description}</p>
 
-            <div className="mb-6">
+            <div className="mb-8">
               <span className="text-4xl font-bold">{plan.price}</span>
-              <span className="text-muted-foreground ml-2 text-sm">{plan.period}</span>
+              <span className="text-muted-foreground ml-2 text-sm font-sans">{plan.period}</span>
             </div>
 
             <button
               onClick={() => navigate("/input")}
-              className={`w-full py-3 rounded-xl font-medium text-sm flex items-center justify-center gap-2 transition-all duration-200 haptic-click mb-6 ${
+              className={`w-full py-3 rounded-xl text-sm font-medium font-sans flex items-center justify-center gap-2 transition-all duration-200 haptic-click mb-8 ${
                 plan.popular
-                  ? "bg-primary text-primary-foreground hover:bg-primary/90 animate-breathing-glow"
-                  : "bg-secondary text-secondary-foreground hover:bg-secondary/80 border border-border"
+                  ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                  : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
               }`}
             >
               Get Started <ArrowRight className="w-4 h-4" />
             </button>
 
-            <ul className="space-y-2.5">
+            <ul className="space-y-3">
               {plan.features.map((feature, j) => (
-                <li key={j} className="flex items-start gap-2 text-sm">
+                <li key={j} className="flex items-start gap-2 text-sm font-sans">
                   <Check className={`w-4 h-4 mt-0.5 flex-shrink-0 ${plan.popular ? "text-primary" : "text-muted-foreground"}`} />
                   <span className="text-muted-foreground">{feature}</span>
                 </li>
@@ -123,15 +124,6 @@ const PricingCards = () => {
           </motion.div>
         ))}
       </div>
-
-      <motion.p
-        initial={{ opacity: 0 }}
-        whileInView={{ opacity: 1 }}
-        viewport={{ once: true }}
-        className="text-center mt-8 text-sm text-muted-foreground"
-      >
-        24-hour money-back guarantee. No questions asked.
-      </motion.p>
     </section>
   );
 };
