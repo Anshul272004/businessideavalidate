@@ -223,6 +223,7 @@ const sections = [
   { id: "market", label: "Market", icon: <Target className="w-3.5 h-3.5" /> },
   { id: "economics", label: "Economics", icon: <DollarSign className="w-3.5 h-3.5" /> },
   { id: "execution", label: "Execution", icon: <AlertTriangle className="w-3.5 h-3.5" /> },
+  { id: "macro", label: "Macro", icon: <Globe className="w-3.5 h-3.5" /> },
   { id: "biases", label: "Biases", icon: <Fingerprint className="w-3.5 h-3.5" /> },
   { id: "action", label: "Action Plan", icon: <Lightbulb className="w-3.5 h-3.5" /> },
   { id: "funding", label: "Funding & Growth", icon: <TrendingUp className="w-3.5 h-3.5" /> },
