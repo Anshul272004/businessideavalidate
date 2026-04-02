@@ -199,6 +199,7 @@ interface ValidationResult {
   bias_adjusted_verdict?: any;
   // Cognitive bias agent data
   cognitive_bias_analysis?: any;
+  macro_environment?: any;
   startup_brief?: {
     idea?: string | null;
     problem?: string | null;
