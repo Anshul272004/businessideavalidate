@@ -1,117 +1,114 @@
 
 
-# Futuristic AI-Powered Landing Page Redesign
+# Revert UI + Enhance Analysis with Real-World Macro Factors
 
-## Overview
-Complete redesign of the Landing page and its sub-components to create a cinematic, futuristic AI product experience. The current gold/obsidian luxury theme shifts to a deep black + neon blue/purple cyberpunk-AI aesthetic with glassmorphism, particle effects, parallax, and interactive micro-interactions.
+## What You Asked
+1. Revert the UI back to the previous premium gold/obsidian luxury theme (before the neon blue/purple change)
+2. Apply that premium look consistently across ALL pages
+3. Add real-world macroeconomic factors to the analysis (economics, wars, inflation, geopolitics, etc.)
+4. Make everything look ultra-luxurious like Apple/Samsung websites
 
-## Color System Change
-Update CSS variables in `src/index.css`:
-- Background: pure deep black (`240 10% 2%`)
-- Primary accent: neon blue (`220 90% 60%`) instead of gold
-- Secondary accent: electric purple (`270 80% 60%`)
-- Keep success/destructive semantics
-- Add `--neon-blue`, `--neon-purple`, `--glass-bg` custom properties
+## Part 1: Revert Color System to Gold/Obsidian Luxury Theme
 
-Update `tailwind.config.ts` with new color tokens and keyframes for particle float, glow-pulse-blue, and scan-line effects.
+**Files: `src/index.css`, `tailwind.config.ts`**
 
-## New/Rewritten Components
+Restore the original premium color palette:
+- Primary: warm gold (`45 93% 47%`) instead of neon blue
+- Background: deep obsidian black
+- Accents: champagne gold gradients instead of neon purple
+- Restore `Cormorant Garamond` as the display font for editorial luxury feel
+- Update all glow effects, gradient-text, premium-badge, glass classes to use gold tones
+- Remove neon-purple references, scan-line effects
+- Keep glassmorphism but with warm gold undertones
 
-### 1. `src/components/landing/ParticleField.tsx` (NEW)
-Canvas-based animated particle/neural-network background. Dots connected by lines, subtle mouse-reactive movement. Replaces `GradientMesh`.
+## Part 2: Consistent Premium UI Across All Pages
 
-### 2. `src/components/landing/HeroSection.tsx` (NEW — replaces TypewriterHero + hero markup in Landing)
-- Full-viewport cinematic hero
-- Animated 3D-like floating glass sphere using CSS transforms + framer-motion (rotation, glow pulse, mouse-parallax via `onMouseMove`)
-- Headline: "Validate Your Business Idea Before You Build It"
-- Subheadline with typing animation
-- CTA button with breathing neon glow + hover ripple
-- Floating stats badges around the sphere
+**Files: All page files — Auth.tsx, Input.tsx, Loading.tsx, Result.tsx, Dashboard.tsx, Pricing.tsx, Methodology.tsx, CaseStudies.tsx, WhoThisIsNotFor.tsx, NotFound.tsx**
 
-### 3. `src/components/landing/InteractiveInput.tsx` (NEW)
-- Glassmorphism floating panel with a fake input field
-- On focus/type simulation: shows "Analyzing market...", "Scanning competitors...", "Calculating risk..." step-by-step with animated progress
-- Triggers curiosity — clicking navigates to `/input`
+- Ensure every page uses the luxury container, premium-card, and gold gradient styles
+- Consistent nav styling across all pages (glassmorphism with gold accents)
+- Consistent footer on all pages
+- Typography hierarchy: Cormorant Garamond for headings, DM Sans for body
+- All CTAs use gold-glow hover effects
+- Cards use warm gold border-hover effects
 
-### 4. `src/components/landing/AnimatedFlow.tsx` (NEW — replaces HowItWorks)
-- SVG-based node graph: 3 nodes connected by glowing animated lines
-- Data particles flowing along the lines
-- Step 1 → Step 2 → Step 3 with scroll-triggered activation
-- Each node expands on scroll to reveal details
+**Landing page components** (`HeroSection.tsx`, `InteractiveInput.tsx`, `AnimatedFlow.tsx`, `FeatureCards.tsx`, `MockResult.tsx`, `PricingCards.tsx`, `FinalCTA.tsx`, `ParticleField.tsx`):
+- Update all neon blue/purple references to gold/warm tones
+- ParticleField: gold-tinted particles and connections
+- Hero sphere: warm gold glow instead of blue
+- Feature cards: gold border glow on hover
+- Pricing cards: gold highlight on featured plan
 
-### 5. `src/components/landing/FeatureCards.tsx` (REWRITE of FeatureShowcase)
-- Glassmorphism cards with tilt-on-hover (CSS perspective transform)
-- Subtle float animation per card (staggered)
-- Neon border glow on hover
-- 6 key features: Market Validation, Competitor Analysis, Risk Score, AI Suggestions, Revenue Model, Startup Score
+## Part 3: Add Real-World Macroeconomic Factors to Analysis
 
-### 6. `src/components/landing/MockResult.tsx` (NEW)
-- Fake AI result dashboard showing:
-  - Animated score counter (0→78%)
-  - Animated progress bars for strengths
-  - Glassmorphism card layout
-  - Scroll-triggered animation
+**File: `supabase/functions/validate-idea/index.ts`**
 
-### 7. `src/components/landing/PricingCards.tsx` (REWRITE)
-- 3 glassmorphism pricing cards
-- Middle card highlighted with neon glow border
-- Hover lift + glow intensify
-- Anchoring bias layout
+Add a new **9th agent — "Macro Environment Analyst"** that evaluates:
+- **Economic Climate**: GDP trends, inflation rates, interest rates, recession risk
+- **Geopolitical Factors**: Trade wars, sanctions, regional conflicts that affect supply chains
+- **Currency & Forex Impact**: Exchange rate risks for cross-border businesses
+- **Regulatory Shifts**: Government policy changes, tax reforms, industry-specific regulations
+- **Technology Disruption Risk**: AI displacement, platform shifts
+- **Supply Chain Vulnerabilities**: Global dependencies, manufacturing bottlenecks
+- **Consumer Spending Trends**: Discretionary vs essential spending shifts
+- **Labor Market Dynamics**: Hiring difficulty, remote work trends, wage inflation
+- **Energy & Resource Costs**: Impact on operational costs
+- **Black Swan Preparedness**: How resilient is the business to unexpected global shocks
 
-### 8. Updated `src/components/landing/FinalCTA.tsx`
-- Full-width dark section with particle background
-- Large headline + breathing CTA
-- Neon glow effects
+Returns structured JSON with `macro_risk_score`, `favorable_factors`, `headwind_factors`, `recession_resilience`, `inflation_sensitivity`, and `geopolitical_exposure`.
 
-## Landing.tsx Rewrite
-Simplify the Landing page to use the new components in order:
-1. ParticleField (fixed background)
-2. Nav (glassmorphism, updated colors)
-3. HeroSection
-4. InteractiveInput
-5. AnimatedFlow (How it Works)
-6. FeatureCards
-7. MockResult
-8. PricingCards
-9. Testimonials (keep, restyle)
-10. FinalCTA
-11. Footer
+Update the **Verdict Synthesizer** prompt to incorporate macro analysis as an 8th input, weighting it into the final score.
 
-Remove: OnboardingOverlay, LiveActivityFeed, LiveCounterStrip, WallOfVerdicts, ProblemAgitation, CEOPatternSection, FounderShowcase, ComparisonTable, MoneyBackGuarantee, Benefits, SocialProof, TrustBadges — these bloat the page and fight the futuristic aesthetic.
+Update `userContext` to include macro considerations.
 
-## Scroll Experience
-- Add `scroll-smooth` behavior
-- Each section uses `whileInView` fade-up with stagger
-- Parallax on hero sphere (translateY based on scroll)
-- Section transitions feel cinematic with opacity + translateY
+**File: `src/pages/Result.tsx`**
 
-## Micro-Interactions
-- All buttons: hover glow intensify + scale 1.02
-- Cards: perspective tilt on mousemove (`rotateX`/`rotateY` from cursor position)
-- CTA: breathing neon pulse animation
-- Nav: glassmorphism blur on scroll
-- Cursor: subtle glow trail effect via CSS
+- Add `macro_environment` to the `ValidationResult` interface
+- Add a new "Macro Environment" section in the floating nav
+- Render the new `MacroEnvironment` component
 
-## Files Changed
-- `src/index.css` — new color variables, glassmorphism utilities, neon glow classes
-- `tailwind.config.ts` — new keyframes and animation tokens
-- `src/pages/Landing.tsx` — complete rewrite with new component composition
-- `src/components/landing/GradientMesh.tsx` → replaced by `ParticleField.tsx`
-- `src/components/landing/TypewriterHero.tsx` → replaced by `HeroSection.tsx`
-- `src/components/landing/HowItWorks.tsx` → replaced by `AnimatedFlow.tsx`
-- `src/components/landing/FeatureShowcase.tsx` → replaced by `FeatureCards.tsx`
-- `src/components/landing/FinalCTA.tsx` — updated styling
-- **New files**: `ParticleField.tsx`, `HeroSection.tsx`, `InteractiveInput.tsx`, `AnimatedFlow.tsx`, `FeatureCards.tsx`, `MockResult.tsx`, `PricingCards.tsx`
+**New file: `src/components/result/MacroEnvironment.tsx`**
 
-## Performance
-- Canvas particle field uses `requestAnimationFrame` with throttling
-- All animations use `will-change` and GPU-composited properties (transform, opacity)
-- Lazy-load below-fold sections
-- No heavy 3D libraries — pure CSS transforms + framer-motion
+Premium card displaying:
+- Macro Risk Score (gauge visualization)
+- Economic headwinds and tailwinds
+- Recession resilience rating
+- Inflation sensitivity indicator
+- Geopolitical exposure map
+- Supply chain dependency assessment
+- Recommended macro-hedging strategies
 
-## What Stays
-- Auth flow, Dashboard, Input, Loading, Result pages untouched
-- App routing unchanged
-- All backend edge functions unchanged
-- Existing UI component library (button, card, etc.) unchanged
+## Part 4: Ultra-Luxurious Polish (Apple/Samsung Level)
+
+Across all components:
+- Increase whitespace — more generous padding and section spacing
+- Larger, bolder typography with tighter letter-spacing
+- Smoother, slower animations (300ms transitions)
+- More subtle hover states (2px lift max, soft gold glow)
+- Remove any "busy" visual noise — clean, minimal, confident
+- Card borders: 1px subtle, not heavy
+- Background: pure deep black with very subtle warm grain texture
+- Loading states: gold shimmer instead of blue
+
+## Implementation Order
+
+1. Revert color system (index.css + tailwind.config.ts)
+2. Update all landing components to gold theme
+3. Update all pages (Auth, Input, Loading, Result, Dashboard, Pricing, Methodology, CaseStudies) for consistent luxury look
+4. Add Macro Environment Agent to validate-idea edge function
+5. Create MacroEnvironment.tsx result component
+6. Wire macro data into Result page
+7. Final polish pass — spacing, animations, typography
+
+## Files Summary
+
+**Modified (14):**
+- `src/index.css` — gold color system
+- `tailwind.config.ts` — gold keyframes/tokens
+- `src/pages/Landing.tsx`, `Auth.tsx`, `Input.tsx`, `Loading.tsx`, `Result.tsx`, `Dashboard.tsx`, `Pricing.tsx`, `Methodology.tsx`, `CaseStudies.tsx`
+- `src/components/landing/ParticleField.tsx`, `HeroSection.tsx`, `InteractiveInput.tsx`, `AnimatedFlow.tsx`, `FeatureCards.tsx`, `MockResult.tsx`, `PricingCards.tsx`, `FinalCTA.tsx`
+- `supabase/functions/validate-idea/index.ts` — add 9th agent
+
+**New (1):**
+- `src/components/result/MacroEnvironment.tsx`
 
