@@ -55,6 +55,7 @@ import StartupBriefCard from "@/components/result/StartupBriefCard";
 import ArtifactGenerator from "@/components/result/ArtifactGenerator";
 import FundingReadiness from "@/components/result/FundingReadiness";
 import GrowthStrategy from "@/components/result/GrowthStrategy";
+import MacroEnvironment from "@/components/result/MacroEnvironment";
 
 interface ValidationResult {
   demand_psychology: string;
@@ -198,6 +199,7 @@ interface ValidationResult {
   bias_adjusted_verdict?: any;
   // Cognitive bias agent data
   cognitive_bias_analysis?: any;
+  macro_environment?: any;
   startup_brief?: {
     idea?: string | null;
     problem?: string | null;
@@ -221,6 +223,7 @@ const sections = [
   { id: "market", label: "Market", icon: <Target className="w-3.5 h-3.5" /> },
   { id: "economics", label: "Economics", icon: <DollarSign className="w-3.5 h-3.5" /> },
   { id: "execution", label: "Execution", icon: <AlertTriangle className="w-3.5 h-3.5" /> },
+  { id: "macro", label: "Macro", icon: <Globe className="w-3.5 h-3.5" /> },
   { id: "biases", label: "Biases", icon: <Fingerprint className="w-3.5 h-3.5" /> },
   { id: "action", label: "Action Plan", icon: <Lightbulb className="w-3.5 h-3.5" /> },
   { id: "funding", label: "Funding & Growth", icon: <TrendingUp className="w-3.5 h-3.5" /> },
@@ -960,6 +963,20 @@ const Result = () => {
                 </ResultCard>
               </motion.div>
             )}
+
+            {/* ═══════ MACRO ENVIRONMENT SECTION ═══════ */}
+            <div id="macro">
+              {result.macro_environment && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  className="mb-6"
+                >
+                  <MacroEnvironment macro_environment={result.macro_environment} />
+                </motion.div>
+              )}
+            </div>
 
             {/* ═══════ COGNITIVE BIAS SECTION ═══════ */}
             <div id="biases">

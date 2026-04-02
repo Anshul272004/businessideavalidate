@@ -14,8 +14,9 @@ export default {
     },
     extend: {
       fontFamily: {
-        sans: ['Space Grotesk', 'DM Sans', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
-        display: ['Space Grotesk', 'DM Sans', 'sans-serif'],
+        sans: ['DM Sans', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+        display: ['Cormorant Garamond', 'Georgia', 'serif'],
+        serif: ['Cormorant Garamond', 'Georgia', 'serif'],
       },
       colors: {
         border: "hsl(var(--border))",
@@ -59,9 +60,8 @@ export default {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
-        neon: {
-          blue: "hsl(var(--primary))",
-          purple: "hsl(var(--neon-purple))",
+        champagne: {
+          DEFAULT: "hsl(var(--champagne))",
         },
       },
       borderRadius: {
@@ -101,8 +101,8 @@ export default {
           "50%": { transform: "translateY(-8px)" },
         },
         "glow-pulse": {
-          "0%, 100%": { boxShadow: "0 0 25px -10px hsl(var(--glow-primary) / 0.3)" },
-          "50%": { boxShadow: "0 0 45px -10px hsl(var(--glow-primary) / 0.5)" },
+          "0%, 100%": { boxShadow: "0 0 25px -10px hsl(var(--glow-primary) / 0.25)" },
+          "50%": { boxShadow: "0 0 45px -10px hsl(var(--glow-primary) / 0.45)" },
         },
         "reveal": {
           from: { opacity: "0", clipPath: "inset(0 100% 0 0)" },
