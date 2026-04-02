@@ -964,6 +964,20 @@ const Result = () => {
               </motion.div>
             )}
 
+            {/* ═══════ MACRO ENVIRONMENT SECTION ═══════ */}
+            <div id="macro">
+              {result.macro_environment && (
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  className="mb-6"
+                >
+                  <MacroEnvironment macro_environment={result.macro_environment} />
+                </motion.div>
+              )}
+            </div>
+
             {/* ═══════ COGNITIVE BIAS SECTION ═══════ */}
             <div id="biases">
               {result.cognitive_bias_analysis && (
