@@ -24,19 +24,19 @@ const HeroSection = () => {
       {/* Radial gradient backdrop */}
       <div className="absolute inset-0 z-0">
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] rounded-full opacity-20"
-          style={{ background: "radial-gradient(circle, hsl(220 90% 60% / 0.15) 0%, transparent 70%)" }} />
+          style={{ background: "radial-gradient(circle, hsl(45 93% 47% / 0.12) 0%, transparent 70%)" }} />
         <div className="absolute top-1/3 right-1/4 w-[400px] h-[400px] rounded-full opacity-15"
-          style={{ background: "radial-gradient(circle, hsl(270 80% 60% / 0.1) 0%, transparent 70%)" }} />
+          style={{ background: "radial-gradient(circle, hsl(38 60% 72% / 0.08) 0%, transparent 70%)" }} />
       </div>
 
-      <div className="luxury-container relative z-10 flex flex-col lg:flex-row items-center gap-12 lg:gap-20 py-20">
+      <div className="luxury-container relative z-10 flex flex-col lg:flex-row items-center gap-16 lg:gap-24 py-24">
         {/* Text */}
         <div className="flex-1 max-w-2xl">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="premium-badge mb-8"
+            className="premium-badge mb-10"
           >
             <Sparkles className="w-3.5 h-3.5" />
             AI-Powered Business Intelligence
@@ -46,17 +46,17 @@ const HeroSection = () => {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.1 }}
-            className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight mb-6"
+            className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight mb-8"
           >
             Validate Your Business Idea{" "}
-            <span className="gradient-text">Before You Build It</span>
+            <span className="gradient-text italic">Before You Build It</span>
           </motion.h1>
 
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.25 }}
-            className="text-lg text-muted-foreground mb-10 leading-relaxed max-w-xl"
+            className="text-lg text-muted-foreground mb-12 leading-relaxed max-w-xl font-sans"
           >
             AI-powered validation that reduces risk and increases success probability. 
             Get market analysis, competitor insights, and a startup score in minutes.
@@ -70,7 +70,7 @@ const HeroSection = () => {
           >
             <button
               onClick={() => navigate("/input")}
-              className="group relative px-8 py-4 rounded-xl font-semibold text-background bg-primary hover:bg-primary/90 transition-all duration-200 animate-breathing-glow haptic-click"
+              className="group relative px-10 py-5 rounded-xl font-semibold font-sans text-primary-foreground bg-primary hover:bg-primary/90 transition-all duration-280 animate-breathing-glow haptic-click"
             >
               <span className="relative z-10 flex items-center gap-2">
                 Validate My Idea
@@ -79,7 +79,7 @@ const HeroSection = () => {
             </button>
             <button
               onClick={() => navigate("/auth")}
-              className="px-8 py-4 rounded-xl font-medium text-muted-foreground border border-border hover:border-primary/40 hover:text-foreground transition-all duration-200"
+              className="px-10 py-5 rounded-xl font-medium font-sans text-muted-foreground border border-border hover:border-primary/30 hover:text-foreground transition-all duration-280"
             >
               View Demo Report
             </button>
@@ -90,7 +90,7 @@ const HeroSection = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.6 }}
-            className="flex items-center gap-8 mt-12 text-sm"
+            className="flex items-center gap-10 mt-14 text-sm font-sans"
           >
             {[
               { label: "Ideas Validated", value: "12,847+" },
@@ -119,19 +119,16 @@ const HeroSection = () => {
           >
             {/* Outer glow */}
             <div className="absolute inset-0 rounded-full animate-glow-pulse"
-              style={{ background: "radial-gradient(circle, hsl(220 90% 60% / 0.1) 0%, transparent 70%)" }} />
+              style={{ background: "radial-gradient(circle, hsl(45 93% 47% / 0.08) 0%, transparent 70%)" }} />
 
             {/* Glass sphere */}
-            <div className="absolute inset-4 rounded-full border border-primary/20 animate-neon-border"
+            <div className="absolute inset-4 rounded-full border border-primary/15 animate-gold-border"
               style={{
-                background: "radial-gradient(circle at 30% 30%, hsl(220 90% 60% / 0.08), hsl(270 80% 60% / 0.04), transparent 70%)",
-                boxShadow: "inset 0 0 60px hsl(220 90% 60% / 0.05), 0 0 80px -20px hsl(220 90% 60% / 0.15)",
+                background: "radial-gradient(circle at 30% 30%, hsl(45 93% 47% / 0.06), hsl(38 60% 72% / 0.03), transparent 70%)",
+                boxShadow: "inset 0 0 60px hsl(45 93% 47% / 0.04), 0 0 80px -20px hsl(45 93% 47% / 0.1)",
               }}
             >
-              {/* Inner highlight */}
-              <div className="absolute top-6 left-8 w-16 h-10 rounded-full bg-primary/10 blur-xl" />
-              
-              {/* Center icon */}
+              <div className="absolute top-6 left-8 w-16 h-10 rounded-full bg-primary/8 blur-xl" />
               <div className="absolute inset-0 flex items-center justify-center">
                 <div className="w-16 h-16 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center">
                   <Zap className="w-8 h-8 text-primary" />
@@ -149,7 +146,7 @@ const HeroSection = () => {
                 key={i}
                 animate={{ y: [0, -6, 0] }}
                 transition={{ duration: 3, delay: i * 0.8, repeat: Infinity }}
-                className={`absolute ${badge.pos} glass px-3 py-1.5 rounded-full flex items-center gap-1.5 text-xs text-primary`}
+                className={`absolute ${badge.pos} glass px-3 py-1.5 rounded-full flex items-center gap-1.5 text-xs text-primary font-sans`}
               >
                 {badge.icon}
                 {badge.label}

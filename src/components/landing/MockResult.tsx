@@ -32,7 +32,7 @@ const ProgressBar = ({ label, value, color }: { label: string; value: number; co
 
   return (
     <div ref={ref} className="space-y-1.5">
-      <div className="flex justify-between text-sm">
+      <div className="flex justify-between text-sm font-sans">
         <span className="text-muted-foreground">{label}</span>
         <span className="font-medium">{value}%</span>
       </div>
@@ -50,18 +50,18 @@ const ProgressBar = ({ label, value, color }: { label: string; value: number; co
 
 const MockResult = () => {
   return (
-    <section className="luxury-container py-24 relative z-10">
+    <section className="luxury-container py-28 relative z-10">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
-        className="text-center mb-14"
+        className="text-center mb-16"
       >
-        <p className="text-sm text-primary mb-4 uppercase tracking-widest font-medium">Sample Output</p>
+        <p className="text-sm text-primary mb-4 uppercase tracking-widest font-medium font-sans">Sample Output</p>
         <h2 className="text-heading font-bold mb-4">
-          Your <span className="gradient-text">AI-powered results</span>
+          Your <span className="gradient-text italic">AI-powered results</span>
         </h2>
-        <p className="text-muted-foreground max-w-xl mx-auto">
+        <p className="text-muted-foreground max-w-xl mx-auto font-sans">
           See what a validated business report looks like
         </p>
       </motion.div>
@@ -70,36 +70,34 @@ const MockResult = () => {
         initial={{ opacity: 0, y: 30 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
-        className="max-w-4xl mx-auto glass rounded-2xl p-8 md:p-10"
+        className="max-w-4xl mx-auto glass rounded-2xl p-10 md:p-12"
       >
-        {/* Header */}
-        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 mb-8 pb-6 border-b border-border/50">
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 mb-10 pb-8 border-b border-border/50">
           <div>
-            <p className="text-xs text-muted-foreground mb-1">AI Resume Builder for Students</p>
+            <p className="text-xs text-muted-foreground mb-1 font-sans">AI Resume Builder for Students</p>
             <div className="flex items-center gap-3">
-              <span className="px-3 py-1 rounded-full bg-success/15 text-success text-sm font-semibold border border-success/30">
+              <span className="px-3 py-1 rounded-full bg-success/15 text-success text-sm font-semibold border border-success/30 font-sans">
                 GO
               </span>
-              <span className="text-muted-foreground text-sm">Strong market opportunity detected</span>
+              <span className="text-muted-foreground text-sm font-sans">Strong market opportunity detected</span>
             </div>
           </div>
           <div className="text-center">
-            <div className="text-5xl font-bold text-primary text-glow">
+            <div className="text-5xl font-bold text-primary text-glow font-serif">
               <AnimatedCounter target={78} suffix="%" />
             </div>
-            <p className="text-xs text-muted-foreground mt-1">Success Probability</p>
+            <p className="text-xs text-muted-foreground mt-1 font-sans">Success Probability</p>
           </div>
         </div>
 
-        {/* Score breakdown */}
-        <div className="grid md:grid-cols-2 gap-8">
+        <div className="grid md:grid-cols-2 gap-10">
           <div className="space-y-4">
-            <h4 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground mb-4 flex items-center gap-2">
+            <h4 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground mb-4 flex items-center gap-2 font-sans">
               <TrendingUp className="w-4 h-4 text-primary" /> Strengths
             </h4>
             <ProgressBar label="Market Demand" value={85} color="bg-primary" />
             <ProgressBar label="Revenue Potential" value={72} color="bg-primary" />
-            <ProgressBar label="Innovation Score" value={68} color="bg-neon-purple" />
+            <ProgressBar label="Innovation Score" value={68} color="bg-champagne" />
           </div>
 
           <div className="space-y-5">
@@ -107,8 +105,8 @@ const MockResult = () => {
               <div className="flex items-start gap-3">
                 <ShieldCheck className="w-5 h-5 text-success mt-0.5 flex-shrink-0" />
                 <div>
-                  <p className="text-sm font-medium mb-1">Low Competition Risk</p>
-                  <p className="text-xs text-muted-foreground">Only 3 direct competitors identified in this niche</p>
+                  <p className="text-sm font-medium mb-1 font-sans">Low Competition Risk</p>
+                  <p className="text-xs text-muted-foreground font-sans">Only 3 direct competitors identified in this niche</p>
                 </div>
               </div>
             </div>
@@ -116,8 +114,8 @@ const MockResult = () => {
               <div className="flex items-start gap-3">
                 <AlertTriangle className="w-5 h-5 text-warning mt-0.5 flex-shrink-0" />
                 <div>
-                  <p className="text-sm font-medium mb-1">Technical Complexity: Medium</p>
-                  <p className="text-xs text-muted-foreground">ATS parsing requires NLP expertise — consider partnering</p>
+                  <p className="text-sm font-medium mb-1 font-sans">Technical Complexity: Medium</p>
+                  <p className="text-xs text-muted-foreground font-sans">ATS parsing requires NLP expertise — consider partnering</p>
                 </div>
               </div>
             </div>
@@ -125,8 +123,8 @@ const MockResult = () => {
               <div className="flex items-start gap-3">
                 <Lightbulb className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
                 <div>
-                  <p className="text-sm font-medium mb-1">Key Suggestion</p>
-                  <p className="text-xs text-muted-foreground">Start with university partnerships for early traction</p>
+                  <p className="text-sm font-medium mb-1 font-sans">Key Suggestion</p>
+                  <p className="text-xs text-muted-foreground font-sans">Start with university partnerships for early traction</p>
                 </div>
               </div>
             </div>
