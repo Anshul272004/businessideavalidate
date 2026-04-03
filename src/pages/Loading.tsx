@@ -27,6 +27,7 @@ const analysisAgents = [
   { name: "USP Generator", icon: <Sparkles className="w-5 h-5" />, description: "Crafting your unique positioning", color: "from-cyan-500 to-blue-500", bgColor: "bg-cyan-500/20", textColor: "text-cyan-400" },
   { name: "Regional Analyst", icon: <Globe className="w-5 h-5" />, description: "Analyzing geographic and cultural factors", color: "from-indigo-500 to-violet-500", bgColor: "bg-indigo-500/20", textColor: "text-indigo-400" },
   { name: "Cognitive Bias Analyst", icon: <Fingerprint className="w-5 h-5" />, description: "Detecting founder and customer biases", color: "from-rose-500 to-pink-500", bgColor: "bg-rose-500/20", textColor: "text-rose-400" },
+  { name: "Macro Analyst", icon: <Globe className="w-5 h-5" />, description: "Evaluating global economic & geopolitical factors", color: "from-sky-500 to-blue-500", bgColor: "bg-sky-500/20", textColor: "text-sky-400" },
   { name: "Verdict Synthesizer", icon: <Zap className="w-5 h-5" />, description: "Compiling boardroom-ready assessment", color: "from-primary to-amber-500", bgColor: "bg-primary/20", textColor: "text-primary" },
 ];
 

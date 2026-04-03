@@ -927,6 +927,23 @@ Tailor analysis to this specific founder's background, budget, location, goals, 
         bias_adjusted_success_probability: biasResult?.bias_adjusted_success_probability || null,
       },
 
+      // Macro Environment Analysis
+      macro_environment: {
+        macro_risk_score: macroResult?.macro_risk_score || 50,
+        economic_climate_summary: macroResult?.economic_climate_summary || null,
+        favorable_factors: macroResult?.favorable_factors || [],
+        headwind_factors: macroResult?.headwind_factors || [],
+        recession_resilience: macroResult?.recession_resilience || "moderate",
+        inflation_sensitivity: macroResult?.inflation_sensitivity || "moderate",
+        geopolitical_exposure: macroResult?.geopolitical_exposure || "moderate",
+        supply_chain_risk: macroResult?.supply_chain_risk || "moderate",
+        technology_disruption_risk: macroResult?.technology_disruption_risk || "moderate",
+        labor_market_impact: macroResult?.labor_market_impact || "neutral",
+        energy_cost_impact: macroResult?.energy_cost_impact || "moderate",
+        black_swan_preparedness: macroResult?.black_swan_preparedness || "moderate",
+        hedging_strategies: macroResult?.hedging_strategies || [],
+      },
+
       // Verdict
       confidence_score: verdictResult?.confidence_score || 50,
       verdict: verdictResult?.verdict || "PIVOT",
@@ -964,9 +981,9 @@ Tailor analysis to this specific founder's background, budget, location, goals, 
       analysis_agents: [
         "Dopamine Detective", "Money Trail", "Amygdala Audit", 
         "CEO Pattern Matcher", "USP Generator", "Regional Market Analyst", 
-        "Cognitive Bias Analyst", "Verdict Synthesizer"
+        "Cognitive Bias Analyst", "Macro Environment Analyst", "Verdict Synthesizer"
       ],
-      analysis_version: "5.0-cognitive-bias-security",
+      analysis_version: "6.0-macro-environment",
     };
 
     console.log("[Analysis] Complete. Verdict:", finalResult.verdict, "Score:", finalResult.confidence_score);
