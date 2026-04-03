@@ -74,7 +74,7 @@ const Loading = () => {
     setPersonalFact(facts[Math.floor(Math.random() * facts.length)]);
 
     // Agent progression
-    const agentTimings = [0, 2500, 5000, 7500, 10000, 12500, 15000, 17500];
+    const agentTimings = [0, 2200, 4400, 6600, 8800, 11000, 13200, 15400, 17600];
     agentTimings.forEach((time, index) => {
       setTimeout(() => {
         setCurrentAgent(index);
@@ -82,7 +82,7 @@ const Loading = () => {
       }, time);
     });
 
-    setTimeout(() => setCompletedAgents([0, 1, 2, 3, 4, 5, 6, 7]), 19000);
+    setTimeout(() => setCompletedAgents([0, 1, 2, 3, 4, 5, 6, 7, 8]), 19000);
 
     const progressInterval = setInterval(() => {
       setProgress(prev => prev >= 90 ? 90 : prev + 0.45);
