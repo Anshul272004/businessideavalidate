@@ -768,10 +768,10 @@ Consider all real-world factors including REGIONAL MARKET DYNAMICS, cultural tru
 local competition, payment behaviors, and infrastructure limitations.
 Tailor analysis to this specific founder's background, budget, location, goals, and business model.`;
 
-    // Run all 7 specialist agents in PARALLEL
-    console.log("[Analysis] Starting 7-Agent Multi-Dimensional Analysis...");
+    // Run all 8 specialist agents in PARALLEL
+    console.log("[Analysis] Starting 8-Agent Multi-Dimensional Analysis...");
     
-    const [dopamineResult, moneyResult, amygdalaResult, ceoResult, uspResult, regionalResult, biasResult] = await Promise.all([
+    const [dopamineResult, moneyResult, amygdalaResult, ceoResult, uspResult, regionalResult, biasResult, macroResult] = await Promise.all([
       callAgent("DopamineDetective", agentPrompts.dopamineDetective, userContext, LOVABLE_API_KEY),
       callAgent("MoneyTrail", agentPrompts.moneyTrail, userContext, LOVABLE_API_KEY),
       callAgent("AmygdalaAudit", agentPrompts.amygdalaAudit, userContext, LOVABLE_API_KEY),
@@ -779,9 +779,10 @@ Tailor analysis to this specific founder's background, budget, location, goals, 
       callAgent("USPGenerator", agentPrompts.uspGenerator, userContext, LOVABLE_API_KEY),
       callAgent("RegionalMarketAnalyst", agentPrompts.regionalMarketAnalyst, userContext, LOVABLE_API_KEY),
       callAgent("CognitiveBiasAnalyst", agentPrompts.cognitivebiasAnalyst, userContext, LOVABLE_API_KEY),
+      callAgent("MacroEnvironmentAnalyst", agentPrompts.macroEnvironmentAnalyst, userContext, LOVABLE_API_KEY),
     ]);
 
-    console.log("[Analysis] All 7 agents completed, synthesizing verdict...");
+    console.log("[Analysis] All 8 agents completed, synthesizing verdict...");
 
     // Synthesize with all agent findings
     const synthesisPrompt = agentPrompts.verdictSynthesizer
