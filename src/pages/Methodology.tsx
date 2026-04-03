@@ -47,6 +47,12 @@ const frameworks = [
     factors: ["Confirmation bias detection", "Dunning-Kruger assessment", "Reality score calibration"],
   },
   {
+    icon: <BarChart3 className="w-6 h-6" />,
+    title: "Macro Environment Analyst",
+    description: "Evaluates global macroeconomic and geopolitical factors. Assesses recession resilience, inflation sensitivity, and supply chain risks.",
+    factors: ["Economic climate analysis", "Geopolitical exposure assessment", "Black swan preparedness"],
+  },
+  {
     icon: <Scale className="w-6 h-6" />,
     title: "Verdict Synthesizer",
     description: "Weighs all factors against your specific situation. Delivers a GO, PIVOT, or KILL with supporting evidence.",
