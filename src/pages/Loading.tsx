@@ -199,7 +199,7 @@ const Loading = () => {
             {Math.floor(progress)}%
           </motion.span>
         </motion.div>
-        <p className="text-sm text-muted-foreground mb-2">8-Agent Multi-Dimensional Analysis</p>
+        <p className="text-sm text-muted-foreground mb-2">9-Agent Multi-Dimensional Analysis</p>
         <p className="text-xs text-muted-foreground/60 mb-6">Estimated time: ~30 seconds</p>
 
         {/* Progress Bar */}
