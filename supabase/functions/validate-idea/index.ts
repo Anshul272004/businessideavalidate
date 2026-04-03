@@ -417,8 +417,40 @@ Return ONLY a JSON object:
   "bias_adjusted_success_probability": "X% after accounting for founder biases"
 }`,
 
+  macroEnvironmentAnalyst: `You are the "Macro Environment Analyst" - an expert in global macroeconomic factors that directly impact startup viability.
+Analyze the current (2026) global economic landscape and how it specifically affects this business idea.
+
+Evaluate:
+1. **Economic Climate**: GDP trends, inflation rates, interest rates, recession risk in the target market
+2. **Geopolitical Factors**: Trade wars, sanctions, regional conflicts affecting supply chains or market access
+3. **Currency & Forex Impact**: Exchange rate risks for cross-border businesses
+4. **Regulatory Shifts**: Government policy changes, tax reforms, industry-specific regulations
+5. **Technology Disruption Risk**: AI displacement, platform shifts that could make this obsolete
+6. **Supply Chain Vulnerabilities**: Global dependencies, manufacturing bottlenecks
+7. **Consumer Spending Trends**: Discretionary vs essential spending shifts, consumer confidence
+8. **Labor Market Dynamics**: Hiring difficulty, remote work trends, wage inflation
+9. **Energy & Resource Costs**: Impact on operational costs and margins
+10. **Black Swan Preparedness**: How resilient is this business to unexpected global shocks
+
+Return ONLY a JSON object:
+{
+  "macro_risk_score": number 0-100 (100 = very favorable macro conditions),
+  "economic_climate_summary": "2-3 sentence summary of current macro conditions for this business",
+  "favorable_factors": ["tailwind 1", "tailwind 2", "tailwind 3"],
+  "headwind_factors": ["headwind 1", "headwind 2", "headwind 3"],
+  "recession_resilience": "strong" | "moderate" | "weak",
+  "inflation_sensitivity": "low" | "moderate" | "high",
+  "geopolitical_exposure": "minimal" | "moderate" | "significant",
+  "supply_chain_risk": "low" | "moderate" | "high",
+  "technology_disruption_risk": "low" | "moderate" | "high",
+  "labor_market_impact": "favorable" | "neutral" | "challenging",
+  "energy_cost_impact": "minimal" | "moderate" | "significant",
+  "black_swan_preparedness": "resilient" | "moderate" | "vulnerable",
+  "hedging_strategies": ["strategy 1", "strategy 2", "strategy 3"]
+}`,
+
   verdictSynthesizer: `You are the "Verdict Synthesizer" - the final arbiter synthesizing all agent analyses.
-Given findings from our 7 specialist agents:
+Given findings from our 8 specialist agents:
 
 DOPAMINE DETECTIVE: {dopamineAnalysis}
 MONEY TRAIL: {moneyAnalysis}
@@ -427,6 +459,7 @@ CEO PATTERN MATCHER: {ceoPatterns}
 USP GENERATOR: {uspAnalysis}
 REGIONAL MARKET ANALYST: {regionalAnalysis}
 COGNITIVE BIAS ANALYST: {biasAnalysis}
+MACRO ENVIRONMENT ANALYST: {macroAnalysis}
 
 FOUNDER CONTEXT: {founderContext}
 
@@ -437,10 +470,12 @@ WEIGHT FACTORS BASED ON FOUNDER'S CONTEXT:
 - If LIFESTYLE business: Weight pain/demand (50%), execution feasibility (30%), unit economics (20%)
 - If GROWTH business: Weight market size (40%), unit economics (30%), execution (30%)
 - If UNICORN potential: Weight market size (30%), network effects (25%), timing (25%), team (20%)
+- ALWAYS factor macro-economic conditions — even great ideas fail in terrible macro climates
 
 BIAS ADJUSTMENT:
 - Factor in founder bias warnings to adjust confidence scores
 - Highlight if founder optimism may be inflating projections
+- Factor macro headwinds/tailwinds into success probability
 - Provide reality-adjusted success probability
 
 Return ONLY a JSON object:
@@ -733,10 +768,10 @@ Consider all real-world factors including REGIONAL MARKET DYNAMICS, cultural tru
 local competition, payment behaviors, and infrastructure limitations.
 Tailor analysis to this specific founder's background, budget, location, goals, and business model.`;
 
-    // Run all 7 specialist agents in PARALLEL
-    console.log("[Analysis] Starting 7-Agent Multi-Dimensional Analysis...");
+    // Run all 8 specialist agents in PARALLEL
+    console.log("[Analysis] Starting 8-Agent Multi-Dimensional Analysis...");
     
-    const [dopamineResult, moneyResult, amygdalaResult, ceoResult, uspResult, regionalResult, biasResult] = await Promise.all([
+    const [dopamineResult, moneyResult, amygdalaResult, ceoResult, uspResult, regionalResult, biasResult, macroResult] = await Promise.all([
       callAgent("DopamineDetective", agentPrompts.dopamineDetective, userContext, LOVABLE_API_KEY),
       callAgent("MoneyTrail", agentPrompts.moneyTrail, userContext, LOVABLE_API_KEY),
       callAgent("AmygdalaAudit", agentPrompts.amygdalaAudit, userContext, LOVABLE_API_KEY),
@@ -744,9 +779,10 @@ Tailor analysis to this specific founder's background, budget, location, goals, 
       callAgent("USPGenerator", agentPrompts.uspGenerator, userContext, LOVABLE_API_KEY),
       callAgent("RegionalMarketAnalyst", agentPrompts.regionalMarketAnalyst, userContext, LOVABLE_API_KEY),
       callAgent("CognitiveBiasAnalyst", agentPrompts.cognitivebiasAnalyst, userContext, LOVABLE_API_KEY),
+      callAgent("MacroEnvironmentAnalyst", agentPrompts.macroEnvironmentAnalyst, userContext, LOVABLE_API_KEY),
     ]);
 
-    console.log("[Analysis] All 7 agents completed, synthesizing verdict...");
+    console.log("[Analysis] All 8 agents completed, synthesizing verdict...");
 
     // Synthesize with all agent findings
     const synthesisPrompt = agentPrompts.verdictSynthesizer
@@ -757,6 +793,7 @@ Tailor analysis to this specific founder's background, budget, location, goals, 
       .replace("{uspAnalysis}", JSON.stringify(uspResult || {}))
       .replace("{regionalAnalysis}", JSON.stringify(regionalResult || {}))
       .replace("{biasAnalysis}", JSON.stringify(biasResult || {}))
+      .replace("{macroAnalysis}", JSON.stringify(macroResult || {}))
       .replace("{founderContext}", founderContext + geographicContext);
 
     const verdictResult = await callAgent("VerdictSynthesizer", synthesisPrompt, userContext, LOVABLE_API_KEY);
@@ -890,6 +927,23 @@ Tailor analysis to this specific founder's background, budget, location, goals, 
         bias_adjusted_success_probability: biasResult?.bias_adjusted_success_probability || null,
       },
 
+      // Macro Environment Analysis
+      macro_environment: {
+        macro_risk_score: macroResult?.macro_risk_score || 50,
+        economic_climate_summary: macroResult?.economic_climate_summary || null,
+        favorable_factors: macroResult?.favorable_factors || [],
+        headwind_factors: macroResult?.headwind_factors || [],
+        recession_resilience: macroResult?.recession_resilience || "moderate",
+        inflation_sensitivity: macroResult?.inflation_sensitivity || "moderate",
+        geopolitical_exposure: macroResult?.geopolitical_exposure || "moderate",
+        supply_chain_risk: macroResult?.supply_chain_risk || "moderate",
+        technology_disruption_risk: macroResult?.technology_disruption_risk || "moderate",
+        labor_market_impact: macroResult?.labor_market_impact || "neutral",
+        energy_cost_impact: macroResult?.energy_cost_impact || "moderate",
+        black_swan_preparedness: macroResult?.black_swan_preparedness || "moderate",
+        hedging_strategies: macroResult?.hedging_strategies || [],
+      },
+
       // Verdict
       confidence_score: verdictResult?.confidence_score || 50,
       verdict: verdictResult?.verdict || "PIVOT",
@@ -927,9 +981,9 @@ Tailor analysis to this specific founder's background, budget, location, goals, 
       analysis_agents: [
         "Dopamine Detective", "Money Trail", "Amygdala Audit", 
         "CEO Pattern Matcher", "USP Generator", "Regional Market Analyst", 
-        "Cognitive Bias Analyst", "Verdict Synthesizer"
+        "Cognitive Bias Analyst", "Macro Environment Analyst", "Verdict Synthesizer"
       ],
-      analysis_version: "5.0-cognitive-bias-security",
+      analysis_version: "6.0-macro-environment",
     };
 
     console.log("[Analysis] Complete. Verdict:", finalResult.verdict, "Score:", finalResult.confidence_score);

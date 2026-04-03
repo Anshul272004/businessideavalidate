@@ -27,6 +27,7 @@ const analysisAgents = [
   { name: "USP Generator", icon: <Sparkles className="w-5 h-5" />, description: "Crafting your unique positioning", color: "from-cyan-500 to-blue-500", bgColor: "bg-cyan-500/20", textColor: "text-cyan-400" },
   { name: "Regional Analyst", icon: <Globe className="w-5 h-5" />, description: "Analyzing geographic and cultural factors", color: "from-indigo-500 to-violet-500", bgColor: "bg-indigo-500/20", textColor: "text-indigo-400" },
   { name: "Cognitive Bias Analyst", icon: <Fingerprint className="w-5 h-5" />, description: "Detecting founder and customer biases", color: "from-rose-500 to-pink-500", bgColor: "bg-rose-500/20", textColor: "text-rose-400" },
+  { name: "Macro Analyst", icon: <Globe className="w-5 h-5" />, description: "Evaluating global economic & geopolitical factors", color: "from-sky-500 to-blue-500", bgColor: "bg-sky-500/20", textColor: "text-sky-400" },
   { name: "Verdict Synthesizer", icon: <Zap className="w-5 h-5" />, description: "Compiling boardroom-ready assessment", color: "from-primary to-amber-500", bgColor: "bg-primary/20", textColor: "text-primary" },
 ];
 
@@ -73,7 +74,7 @@ const Loading = () => {
     setPersonalFact(facts[Math.floor(Math.random() * facts.length)]);
 
     // Agent progression
-    const agentTimings = [0, 2500, 5000, 7500, 10000, 12500, 15000, 17500];
+    const agentTimings = [0, 2200, 4400, 6600, 8800, 11000, 13200, 15400, 17600];
     agentTimings.forEach((time, index) => {
       setTimeout(() => {
         setCurrentAgent(index);
@@ -81,7 +82,7 @@ const Loading = () => {
       }, time);
     });
 
-    setTimeout(() => setCompletedAgents([0, 1, 2, 3, 4, 5, 6, 7]), 19000);
+    setTimeout(() => setCompletedAgents([0, 1, 2, 3, 4, 5, 6, 7, 8]), 19000);
 
     const progressInterval = setInterval(() => {
       setProgress(prev => prev >= 90 ? 90 : prev + 0.45);
@@ -120,7 +121,7 @@ const Loading = () => {
         });
         if (error) throw error;
         setProgress(100);
-        setCompletedAgents([0, 1, 2, 3, 4, 5, 6, 7]);
+        setCompletedAgents([0, 1, 2, 3, 4, 5, 6, 7, 8]);
         sessionStorage.setItem("validationResult", JSON.stringify(data));
         if (user) {
           try {
@@ -198,7 +199,7 @@ const Loading = () => {
             {Math.floor(progress)}%
           </motion.span>
         </motion.div>
-        <p className="text-sm text-muted-foreground mb-2">8-Agent Multi-Dimensional Analysis</p>
+        <p className="text-sm text-muted-foreground mb-2">9-Agent Multi-Dimensional Analysis</p>
         <p className="text-xs text-muted-foreground/60 mb-6">Estimated time: ~30 seconds</p>
 
         {/* Progress Bar */}

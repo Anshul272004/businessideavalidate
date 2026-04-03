@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { LuxuryButton } from "@/components/ui/luxury-button";
-import { ArrowLeft, ArrowRight, Brain, Target, Shield, Scale, TrendingUp, Users, Globe, Fingerprint } from "lucide-react";
+import { ArrowLeft, ArrowRight, Brain, Target, Shield, Scale, TrendingUp, Users, Globe, Fingerprint, BarChart3 } from "lucide-react";
 
 const frameworks = [
   {
@@ -45,6 +45,12 @@ const frameworks = [
     title: "Cognitive Bias Analyst",
     description: "Detects founder and customer biases that distort validation. Adjusts the verdict for human delusion and blind spots.",
     factors: ["Confirmation bias detection", "Dunning-Kruger assessment", "Reality score calibration"],
+  },
+  {
+    icon: <BarChart3 className="w-6 h-6" />,
+    title: "Macro Environment Analyst",
+    description: "Evaluates global macroeconomic and geopolitical factors. Assesses recession resilience, inflation sensitivity, and supply chain risks.",
+    factors: ["Economic climate analysis", "Geopolitical exposure assessment", "Black swan preparedness"],
   },
   {
     icon: <Scale className="w-6 h-6" />,
@@ -143,7 +149,7 @@ const Methodology = () => {
           viewport={{ once: true }}
           className="mb-24"
         >
-          <h2 className="text-sm text-muted-foreground mb-8 uppercase tracking-wide">The Eight Analysis Agents</h2>
+          <h2 className="text-sm text-muted-foreground mb-8 uppercase tracking-wide">The Nine Analysis Agents</h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {frameworks.map((framework, i) => (
               <motion.div
