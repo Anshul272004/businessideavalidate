@@ -149,7 +149,7 @@ const Methodology = () => {
           viewport={{ once: true }}
           className="mb-24"
         >
-          <h2 className="text-sm text-muted-foreground mb-8 uppercase tracking-wide">The Eight Analysis Agents</h2>
+          <h2 className="text-sm text-muted-foreground mb-8 uppercase tracking-wide">The Nine Analysis Agents</h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {frameworks.map((framework, i) => (
               <motion.div
