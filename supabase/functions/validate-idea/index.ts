@@ -417,8 +417,40 @@ Return ONLY a JSON object:
   "bias_adjusted_success_probability": "X% after accounting for founder biases"
 }`,
 
+  macroEnvironmentAnalyst: `You are the "Macro Environment Analyst" - an expert in global macroeconomic factors that directly impact startup viability.
+Analyze the current (2026) global economic landscape and how it specifically affects this business idea.
+
+Evaluate:
+1. **Economic Climate**: GDP trends, inflation rates, interest rates, recession risk in the target market
+2. **Geopolitical Factors**: Trade wars, sanctions, regional conflicts affecting supply chains or market access
+3. **Currency & Forex Impact**: Exchange rate risks for cross-border businesses
+4. **Regulatory Shifts**: Government policy changes, tax reforms, industry-specific regulations
+5. **Technology Disruption Risk**: AI displacement, platform shifts that could make this obsolete
+6. **Supply Chain Vulnerabilities**: Global dependencies, manufacturing bottlenecks
+7. **Consumer Spending Trends**: Discretionary vs essential spending shifts, consumer confidence
+8. **Labor Market Dynamics**: Hiring difficulty, remote work trends, wage inflation
+9. **Energy & Resource Costs**: Impact on operational costs and margins
+10. **Black Swan Preparedness**: How resilient is this business to unexpected global shocks
+
+Return ONLY a JSON object:
+{
+  "macro_risk_score": number 0-100 (100 = very favorable macro conditions),
+  "economic_climate_summary": "2-3 sentence summary of current macro conditions for this business",
+  "favorable_factors": ["tailwind 1", "tailwind 2", "tailwind 3"],
+  "headwind_factors": ["headwind 1", "headwind 2", "headwind 3"],
+  "recession_resilience": "strong" | "moderate" | "weak",
+  "inflation_sensitivity": "low" | "moderate" | "high",
+  "geopolitical_exposure": "minimal" | "moderate" | "significant",
+  "supply_chain_risk": "low" | "moderate" | "high",
+  "technology_disruption_risk": "low" | "moderate" | "high",
+  "labor_market_impact": "favorable" | "neutral" | "challenging",
+  "energy_cost_impact": "minimal" | "moderate" | "significant",
+  "black_swan_preparedness": "resilient" | "moderate" | "vulnerable",
+  "hedging_strategies": ["strategy 1", "strategy 2", "strategy 3"]
+}`,
+
   verdictSynthesizer: `You are the "Verdict Synthesizer" - the final arbiter synthesizing all agent analyses.
-Given findings from our 7 specialist agents:
+Given findings from our 8 specialist agents:
 
 DOPAMINE DETECTIVE: {dopamineAnalysis}
 MONEY TRAIL: {moneyAnalysis}
@@ -427,6 +459,7 @@ CEO PATTERN MATCHER: {ceoPatterns}
 USP GENERATOR: {uspAnalysis}
 REGIONAL MARKET ANALYST: {regionalAnalysis}
 COGNITIVE BIAS ANALYST: {biasAnalysis}
+MACRO ENVIRONMENT ANALYST: {macroAnalysis}
 
 FOUNDER CONTEXT: {founderContext}
 
@@ -437,10 +470,12 @@ WEIGHT FACTORS BASED ON FOUNDER'S CONTEXT:
 - If LIFESTYLE business: Weight pain/demand (50%), execution feasibility (30%), unit economics (20%)
 - If GROWTH business: Weight market size (40%), unit economics (30%), execution (30%)
 - If UNICORN potential: Weight market size (30%), network effects (25%), timing (25%), team (20%)
+- ALWAYS factor macro-economic conditions — even great ideas fail in terrible macro climates
 
 BIAS ADJUSTMENT:
 - Factor in founder bias warnings to adjust confidence scores
 - Highlight if founder optimism may be inflating projections
+- Factor macro headwinds/tailwinds into success probability
 - Provide reality-adjusted success probability
 
 Return ONLY a JSON object:
