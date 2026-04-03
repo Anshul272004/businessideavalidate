@@ -793,6 +793,7 @@ Tailor analysis to this specific founder's background, budget, location, goals, 
       .replace("{uspAnalysis}", JSON.stringify(uspResult || {}))
       .replace("{regionalAnalysis}", JSON.stringify(regionalResult || {}))
       .replace("{biasAnalysis}", JSON.stringify(biasResult || {}))
+      .replace("{macroAnalysis}", JSON.stringify(macroResult || {}))
       .replace("{founderContext}", founderContext + geographicContext);
 
     const verdictResult = await callAgent("VerdictSynthesizer", synthesisPrompt, userContext, LOVABLE_API_KEY);
