@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { LuxuryButton } from "@/components/ui/luxury-button";
-import { ArrowLeft, ArrowRight, Brain, Target, Shield, Scale, TrendingUp, Users, Globe, Fingerprint } from "lucide-react";
+import { ArrowLeft, ArrowRight, Brain, Target, Shield, Scale, TrendingUp, Users, Globe, Fingerprint, BarChart3 } from "lucide-react";
 
 const frameworks = [
   {
