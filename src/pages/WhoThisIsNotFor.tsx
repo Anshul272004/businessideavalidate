@@ -82,8 +82,8 @@ const WhoThisIsNotFor = () => {
           className="max-w-3xl mb-20"
         >
           <p className="text-sm text-muted-foreground mb-4 uppercase tracking-wide">Before You Begin</p>
-          <h1 className="text-4xl md:text-6xl font-semibold mb-6">
-            Who this is <span className="font-serif italic font-normal text-destructive">not</span> for
+          <h1 className="text-editorial text-5xl md:text-7xl mb-8">
+            Who this is <span className="italic text-destructive">not</span> for
           </h1>
           <p className="text-xl text-muted-foreground leading-relaxed">
             Being selective about who we serve allows us to serve them well. 
@@ -156,7 +156,7 @@ const WhoThisIsNotFor = () => {
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
-          className="mb-20 p-8 rounded-xl bg-card border border-border"
+          className="mb-20 p-10 rounded-2xl glass luxury-hairline"
         >
           <p className="text-xl font-serif italic text-muted-foreground mb-4">
             "If this helps you avoid one bad year, it's worth it. If it confirms the right path, it's invaluable."

@@ -108,8 +108,8 @@ const Methodology = () => {
           className="max-w-3xl mb-20"
         >
           <p className="text-sm text-muted-foreground mb-4 uppercase tracking-wide">How It Works</p>
-          <h1 className="text-4xl md:text-6xl font-semibold mb-6">
-            The <span className="font-serif italic font-normal gradient-text">methodology</span>
+          <h1 className="text-editorial text-5xl md:text-7xl mb-8">
+            The <span className="italic gradient-text">methodology</span>
           </h1>
           <p className="text-xl text-muted-foreground leading-relaxed">
             A decision framework, not an opinion generator. Built on pattern recognition from 
@@ -133,7 +133,7 @@ const Methodology = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1 }}
-                className="p-6 rounded-xl bg-card border border-border"
+                className="p-6 rounded-2xl glass luxury-hairline ease-luxury hover-lift"
               >
                 <h3 className="font-semibold mb-2">{principle.title}</h3>
                 <p className="text-sm text-muted-foreground">{principle.description}</p>
@@ -158,7 +158,7 @@ const Methodology = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.05 }}
-                className="p-6 rounded-xl bg-card border border-border hover:border-primary/30 transition-colors"
+                className="p-6 rounded-2xl glass luxury-hairline ease-luxury hover:border-primary/30 hover-lift"
               >
                 <div className="w-12 h-12 rounded-lg bg-primary/10 text-primary flex items-center justify-center mb-4">
                   {framework.icon}
@@ -183,9 +183,9 @@ const Methodology = () => {
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
-          className="mb-24 p-8 rounded-xl bg-card border border-border"
+          className="mb-24 p-10 rounded-2xl glass luxury-hairline"
         >
-          <h2 className="text-xl font-semibold mb-6">Why this is different</h2>
+          <h2 className="text-editorial text-3xl md:text-4xl mb-6">Why this is <span className="italic gradient-text">different</span></h2>
           <div className="space-y-4 text-muted-foreground">
             <p>
               Most idea validators ask generic questions and return generic answers. 
