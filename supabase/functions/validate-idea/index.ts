@@ -417,36 +417,44 @@ Return ONLY a JSON object:
   "bias_adjusted_success_probability": "X% after accounting for founder biases"
 }`,
 
-  macroEnvironmentAnalyst: `You are the "Macro Environment Analyst" - an expert in global macroeconomic factors that directly impact startup viability.
-Analyze the current (2026) global economic landscape and how it specifically affects this business idea.
+  macroEnvironmentAnalyst: `You are the "Macro Environment Analyst" - an expert in global macro forces (2026) that directly determine startup viability.
+Evaluate ALL real-world factors that could materially impact this specific business.
 
 Evaluate:
-1. **Economic Climate**: GDP trends, inflation rates, interest rates, recession risk in the target market
-2. **Geopolitical Factors**: Trade wars, sanctions, regional conflicts affecting supply chains or market access
-3. **Currency & Forex Impact**: Exchange rate risks for cross-border businesses
-4. **Regulatory Shifts**: Government policy changes, tax reforms, industry-specific regulations
-5. **Technology Disruption Risk**: AI displacement, platform shifts that could make this obsolete
-6. **Supply Chain Vulnerabilities**: Global dependencies, manufacturing bottlenecks
-7. **Consumer Spending Trends**: Discretionary vs essential spending shifts, consumer confidence
-8. **Labor Market Dynamics**: Hiring difficulty, remote work trends, wage inflation
-9. **Energy & Resource Costs**: Impact on operational costs and margins
-10. **Black Swan Preparedness**: How resilient is this business to unexpected global shocks
+1. **Economic Climate**: GDP, inflation, interest rates, recession risk in target market
+2. **Geopolitical Factors**: Trade wars, sanctions, regional conflicts, supply chain access
+3. **Currency & Forex**: Exchange rate volatility for cross-border revenue/costs
+4. **Regulatory Volatility**: Likelihood of sudden policy changes, taxes, industry rules
+5. **AI Disruption Risk**: Probability AI replaces or commoditizes this offering in 2-5 years
+6. **Cybersecurity & Data Sovereignty**: Breach exposure, cross-border data laws (GDPR, etc.)
+7. **Climate & Environmental Risk**: Extreme weather, ESG pressure, carbon cost exposure
+8. **Pandemic / Health-Shock Resilience**: Durability under future health shocks, remote-work fitness
+9. **Demographic Shifts**: Aging population, Gen-Z spending power, urbanization alignment
+10. **Energy & Commodity Volatility**: Oil, electricity, raw materials cost exposure
+11. **Supply Chain Vulnerabilities**: Global dependencies, single-source bottlenecks
+12. **Talent War**: Hiring difficulty for required roles in target geography
+13. **Cultural & Social Trends**: Values shifts, generational preference alignment
+14. **Consumer Spending**: Discretionary vs essential exposure
+15. **Black Swan Preparedness**: Resilience to unexpected global shocks
 
 Return ONLY a JSON object:
 {
-  "macro_risk_score": number 0-100 (100 = very favorable macro conditions),
-  "economic_climate_summary": "2-3 sentence summary of current macro conditions for this business",
-  "favorable_factors": ["tailwind 1", "tailwind 2", "tailwind 3"],
-  "headwind_factors": ["headwind 1", "headwind 2", "headwind 3"],
+  "macro_risk_score": number 0-100 (0 = very favorable, 100 = severe risk),
+  "summary": "2-3 sentence honest summary of macro forces shaping this venture",
+  "favorable_factors": ["tailwind 1", "tailwind 2", "tailwind 3", "tailwind 4"],
+  "headwind_factors": ["headwind 1", "headwind 2", "headwind 3", "headwind 4"],
   "recession_resilience": "strong" | "moderate" | "weak",
   "inflation_sensitivity": "low" | "moderate" | "high",
   "geopolitical_exposure": "minimal" | "moderate" | "significant",
-  "supply_chain_risk": "low" | "moderate" | "high",
-  "technology_disruption_risk": "low" | "moderate" | "high",
-  "labor_market_impact": "favorable" | "neutral" | "challenging",
-  "energy_cost_impact": "minimal" | "moderate" | "significant",
-  "black_swan_preparedness": "resilient" | "moderate" | "vulnerable",
-  "hedging_strategies": ["strategy 1", "strategy 2", "strategy 3"]
+  "supply_chain_dependency": "low" | "moderate" | "high",
+  "ai_disruption_risk": "low" | "moderate" | "high",
+  "cyber_risk": "low" | "moderate" | "high",
+  "climate_risk": "low" | "moderate" | "high",
+  "demographic_alignment": "aligned" | "neutral" | "misaligned",
+  "talent_difficulty": "easy" | "moderate" | "hard",
+  "regulatory_volatility": "low" | "moderate" | "high",
+  "black_swan_resilience": "resilient" | "moderate" | "vulnerable",
+  "hedging_strategies": ["strategy 1", "strategy 2", "strategy 3", "strategy 4"]
 }`,
 
   verdictSynthesizer: `You are the "Verdict Synthesizer" - the final arbiter synthesizing all agent analyses.
@@ -927,20 +935,23 @@ Tailor analysis to this specific founder's background, budget, location, goals, 
         bias_adjusted_success_probability: biasResult?.bias_adjusted_success_probability || null,
       },
 
-      // Macro Environment Analysis
+      // Macro Environment Analysis (expanded real-world factors)
       macro_environment: {
-        macro_risk_score: macroResult?.macro_risk_score || 50,
-        economic_climate_summary: macroResult?.economic_climate_summary || null,
+        macro_risk_score: macroResult?.macro_risk_score ?? 50,
+        summary: macroResult?.summary || macroResult?.economic_climate_summary || null,
         favorable_factors: macroResult?.favorable_factors || [],
         headwind_factors: macroResult?.headwind_factors || [],
         recession_resilience: macroResult?.recession_resilience || "moderate",
         inflation_sensitivity: macroResult?.inflation_sensitivity || "moderate",
         geopolitical_exposure: macroResult?.geopolitical_exposure || "moderate",
-        supply_chain_risk: macroResult?.supply_chain_risk || "moderate",
-        technology_disruption_risk: macroResult?.technology_disruption_risk || "moderate",
-        labor_market_impact: macroResult?.labor_market_impact || "neutral",
-        energy_cost_impact: macroResult?.energy_cost_impact || "moderate",
-        black_swan_preparedness: macroResult?.black_swan_preparedness || "moderate",
+        supply_chain_dependency: macroResult?.supply_chain_dependency || macroResult?.supply_chain_risk || "moderate",
+        ai_disruption_risk: macroResult?.ai_disruption_risk || macroResult?.technology_disruption_risk || "moderate",
+        cyber_risk: macroResult?.cyber_risk || "moderate",
+        climate_risk: macroResult?.climate_risk || "moderate",
+        demographic_alignment: macroResult?.demographic_alignment || "neutral",
+        talent_difficulty: macroResult?.talent_difficulty || "moderate",
+        regulatory_volatility: macroResult?.regulatory_volatility || "moderate",
+        black_swan_resilience: macroResult?.black_swan_resilience || macroResult?.black_swan_preparedness || "moderate",
         hedging_strategies: macroResult?.hedging_strategies || [],
       },
 
