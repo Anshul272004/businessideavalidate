@@ -139,7 +139,7 @@ const Auth = () => {
             Join <span className="text-primary font-semibold">12,847 founders</span> making smarter decisions
           </p>
 
-          <h1 className="text-2xl font-semibold mb-2">
+          <h1 className="text-editorial text-4xl md:text-5xl gradient-text mb-3">
             {isSignUp ? "Create your account" : "Welcome back"}
           </h1>
           <p className="text-muted-foreground text-sm">
@@ -150,7 +150,7 @@ const Auth = () => {
         </div>
 
         {/* Auth Form */}
-        <div className="p-8 rounded-2xl bg-card border border-border">
+        <div className="p-8 rounded-2xl glass luxury-hairline glow-subtle ease-luxury">
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
               <label className="luxury-label mb-2 block">Email</label>
