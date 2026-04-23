@@ -128,8 +128,8 @@ const CaseStudies = () => {
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-16"
         >
-          <h1 className="text-4xl md:text-6xl font-bold mb-4">
-            Real founders, <span className="font-serif italic font-normal gradient-text">real results</span>
+          <h1 className="text-editorial text-5xl md:text-7xl mb-6">
+            Real founders, <span className="italic gradient-text">real results</span>
           </h1>
           <p className="text-xl text-muted-foreground max-w-xl mx-auto">
             See how our validation helped founders make better decisions
@@ -147,7 +147,7 @@ const CaseStudies = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.1 }}
-                className="bg-card border border-border rounded-2xl overflow-hidden"
+                className="glass luxury-hairline rounded-2xl overflow-hidden ease-luxury hover-lift"
               >
                 {/* Header */}
                 <div className="p-8 border-b border-border">
@@ -262,7 +262,7 @@ const CaseStudies = () => {
           viewport={{ once: true }}
           className="text-center mt-16"
         >
-          <h2 className="text-2xl font-bold mb-4">Ready to validate your idea?</h2>
+          <h2 className="text-editorial text-3xl md:text-5xl mb-4">Ready to validate <span className="italic gradient-text">your idea?</span></h2>
           <p className="text-muted-foreground mb-8">
             Join 2,847+ founders who've made better decisions with our validation
           </p>

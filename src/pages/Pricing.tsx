@@ -90,8 +90,8 @@ const Pricing = () => {
           className="text-center mb-16"
         >
           <p className="text-sm text-muted-foreground mb-4 uppercase tracking-wide">Investment</p>
-          <h1 className="text-4xl md:text-6xl font-semibold mb-4">
-            Choose your <span className="font-serif italic font-normal gradient-text">depth</span>
+          <h1 className="text-editorial text-5xl md:text-7xl mb-6">
+            Choose your <span className="italic gradient-text">depth</span>
           </h1>
           <p className="text-muted-foreground max-w-xl mx-auto">
             The cost of a bad decision is measured in years, not dollars. 
@@ -107,10 +107,10 @@ const Pricing = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.1 }}
-              className={`relative rounded-xl p-8 ${
-                plan.popular 
-                  ? "bg-card border-2 border-primary" 
-                  : "bg-card border border-border"
+              className={`relative rounded-2xl p-8 ease-luxury hover-lift ${
+                plan.popular
+                  ? "glass border border-primary/40 glow-box"
+                  : "glass luxury-hairline"
               }`}
             >
               {plan.popular && (
