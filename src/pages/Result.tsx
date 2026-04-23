@@ -973,7 +973,7 @@ const Result = () => {
                   viewport={{ once: true }}
                   className="mb-6"
                 >
-                  <MacroEnvironment macro_environment={result.macro_environment} />
+                  <MacroEnvironment data={result.macro_environment} />
                 </motion.div>
               )}
             </div>
