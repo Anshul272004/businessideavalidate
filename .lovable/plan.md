@@ -1,78 +1,71 @@
 
+## Build Fix Plan: Resolve `MacroEnvironment` Import Failure Completely
 
-# Fix Build + Ultra-Luxury Polish + Expanded Real-World Factors
+### What is actually broken
+`src/pages/Result.tsx` imports `@/components/result/MacroEnvironment`, but the build step is trying to open the extensionless path directly:
 
-## Part 1: Fix Build Error (Critical)
+```text
+/dev-server/src/components/result/MacroEnvironment
+```
 
-`src/pages/Result.tsx` imports `@/components/result/MacroEnvironment` but the file was never written to disk. Build fails.
+That means the resolver is not successfully landing on `MacroEnvironment.tsx` during build, even though the file now exists in `src/components/result/`.
 
-**Create `src/components/result/MacroEnvironment.tsx`** — premium gold/obsidian card displaying:
-- Macro Risk Score gauge (0–100)
-- Recession Resilience indicator (low/medium/high with color coding)
-- Inflation Sensitivity meter
-- Geopolitical Exposure rating
-- Two-column tailwinds (favorable_factors) vs headwinds (headwind_factors)
-- Supply chain dependency assessment
-- Recommended macro-hedging strategies list
-- Built with framer-motion reveal, Cormorant Garamond heading, gold accent borders, glassmorphism
+## Fix strategy
+Use a resolver-safe import and make the component reference impossible to miss during production build.
 
-## Part 2: Ultra-Luxury UI Polish (Apple/Samsung Tier)
+### 1) Harden the import in `src/pages/Result.tsx`
+Replace:
 
-Reference inspiration: refined editorial luxury — generous whitespace, restrained motion, hairline 1px borders, deep obsidian + warm gold (#AD8B3A), champagne gradients only at focal points.
+```ts
+import MacroEnvironment from "@/components/result/MacroEnvironment";
+```
 
-**Refine `src/index.css`:**
-- Add `.luxury-hairline` (1px gold-tinted border at 8% opacity)
-- Add `.luxury-grain` (very subtle SVG noise overlay for premium texture)
-- Add `.text-editorial` (tight letter-spacing, Cormorant Garamond, large display sizes)
-- Refine `.premium-card` — softer shadow, hairline border, 16% gold hover glow
-- Refine `.glass` — warmer undertone (gold tint at 3%)
-- Slow all transitions to 280–300ms with `cubic-bezier(0.16, 1, 0.3, 1)` (Apple ease)
+with an explicit file import:
 
-**Polish remaining pages to match landing-tier quality:**
-- `src/pages/Auth.tsx` — center-stage glass card on obsidian, Cormorant heading, gold CTA, hairline divider for OAuth
-- `src/pages/Dashboard.tsx` — editorial header with serif, refined tab bar, glass stat cards with subtle gold accent rings
-- `src/pages/Pricing.tsx` — large editorial headline, three glass plans with hairline borders, middle plan elevated with gold ring + champagne gradient
-- `src/pages/Input.tsx` — focused single-column form, large serif heading, generous spacing, gold-glow focus states on inputs
-- `src/pages/CaseStudies.tsx` — magazine-style layout with serif headlines, asymmetric grid
-- `src/pages/Methodology.tsx` — editorial timeline, gold numerals, generous line-height
-- `src/pages/WhoThisIsNotFor.tsx` — minimal manifesto-style typography
-- `src/pages/Loading.tsx` — already shows 9 agents; polish with gold shimmer and slower reveal cadence
+```ts
+import MacroEnvironment from "@/components/result/MacroEnvironment.tsx";
+```
 
-## Part 3: Expand Real-World Factors in Analysis
+Why:
+- `tsconfig.app.json` already enables `allowImportingTsExtensions`
+- this bypasses the extension-resolution edge case entirely
+- it is the most direct fix for the exact ENOENT path in the build log
 
-**Update `supabase/functions/validate-idea/index.ts`** — extend the Macro Environment Analyst prompt to evaluate **additional real-world factors** that directly impact business success:
+### 2) Verify `src/components/result/MacroEnvironment.tsx` is valid for bundling
+Keep the component file, but verify these points while editing:
+- it has a `default export`
+- no broken imports inside it
+- no unsupported syntax or accidental path issues
+- no hidden dependency on missing CSS/utilities
 
-1. **Climate & Environmental Risk** — extreme weather, ESG pressure, carbon costs
-2. **Pandemic & Health System Resilience** — health-shock vulnerability, remote-work durability
-3. **Demographic Shifts** — aging population, Gen-Z spending, urbanization
-4. **AI Disruption Risk** — likelihood of being replaced or augmented by AI in 2–5 yrs
-5. **Energy & Commodity Price Volatility** — oil, electricity, raw materials exposure
-6. **Cybersecurity & Data Sovereignty Risk** — breach exposure, cross-border data laws
-7. **Cultural & Social Trends** — values shifts, generational preference changes
-8. **Talent War Index** — hiring difficulty in target geography/role
-9. **Regulatory Whiplash** — likelihood of sudden policy reversal
-10. **Black Swan Preparedness** — already present; keep
+### 3) Check for any duplicate or stale references
+Search the repo for all `MacroEnvironment` references and normalize them so there is only one import style everywhere:
+- either all explicit `.tsx`
+- or only the final corrected reference used by `Result.tsx`
 
-Returns expanded JSON with: `macro_risk_score`, `recession_resilience`, `inflation_sensitivity`, `geopolitical_exposure`, `climate_risk`, `ai_disruption_risk`, `demographic_alignment`, `cyber_risk`, `talent_difficulty`, `regulatory_volatility`, `favorable_factors[]`, `headwind_factors[]`, `hedging_strategies[]`, `black_swan_resilience`.
+### 4) Build-proof the Vite config only if needed
+If the explicit import alone does not fix the build, apply the fallback hardening in `vite.config.ts`:
+- add `resolve.extensions` including `.ts` and `.tsx`
+- if the issue still behaves like a cached path-resolution problem, add:
+  ```ts
+  server: {
+    fs: {
+      cachedChecks: false,
+    },
+  }
+  ```
+This is secondary, not the first fix.
 
-Update the **Verdict Synthesizer** to weight these new factors into the final probability (cap macro impact at ~25% to prevent overshadowing core signals).
+### 5) Final validation
+Run a full build after the changes and confirm:
+- no more `vite:load-fallback` ENOENT for `MacroEnvironment`
+- `Result.tsx` bundles successfully
+- the result page still renders the Macro Environment section normally
 
-**Update `MacroEnvironment.tsx`** to render the expanded fields in organized sub-sections (Economic / Geopolitical / Tech & AI / Climate & Society / Operational).
+## Files to update
+- `src/pages/Result.tsx` — change the import to explicit `.tsx`
+- `src/components/result/MacroEnvironment.tsx` — verify/export cleanup if needed
+- `vite.config.ts` — only if the import hardening alone does not fully resolve the build
 
-## Files Summary
-
-**New (1):**
-- `src/components/result/MacroEnvironment.tsx` ← fixes build immediately
-
-**Modified (10):**
-- `src/index.css` — luxury utilities + Apple-ease transitions
-- `src/pages/Auth.tsx`, `Dashboard.tsx`, `Pricing.tsx`, `Input.tsx`, `CaseStudies.tsx`, `Methodology.tsx`, `WhoThisIsNotFor.tsx`, `Loading.tsx` — ultra-luxury polish
-- `supabase/functions/validate-idea/index.ts` — expanded macro factors + synthesizer weighting
-
-## Order of Execution
-1. Create MacroEnvironment.tsx (unblocks build)
-2. Refine index.css luxury utilities
-3. Polish all remaining pages
-4. Expand validate-idea agent + redeploy
-5. Verify build passes
-
+## Expected outcome
+The build will stop failing on the missing `MacroEnvironment` path, and the results page will keep the macro-analysis UI without needing to remove the feature.
