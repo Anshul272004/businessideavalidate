@@ -7,6 +7,8 @@ import { AnimatePresence } from "framer-motion";
 import { AuthProvider } from "@/hooks/useAuth";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import PageTransition from "@/components/shared/PageTransition";
+import LuxuryCursor from "@/components/brand/LuxuryCursor";
+import LuxuryPreloader from "@/components/brand/LuxuryPreloader";
 import Landing from "./pages/Landing";
 import Auth from "./pages/Auth";
 import Input from "./pages/Input";
@@ -59,6 +61,8 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
+          <LuxuryPreloader />
+          <LuxuryCursor />
           <AnimatedRoutes />
           <MobileNav />
         </BrowserRouter>
