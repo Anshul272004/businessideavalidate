@@ -55,7 +55,7 @@ import StartupBriefCard from "@/components/result/StartupBriefCard";
 import ArtifactGenerator from "@/components/result/ArtifactGenerator";
 import FundingReadiness from "@/components/result/FundingReadiness";
 import GrowthStrategy from "@/components/result/GrowthStrategy";
-import MacroEnvironment from "@/components/result/MacroEnvironment";
+import MacroEnvironment from "@/components/result/MacroEnvironment.tsx";
 
 interface ValidationResult {
   demand_psychology: string;
