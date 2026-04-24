@@ -11,33 +11,37 @@ const MobileNav = () => {
 
   if (!isMobile || !user) return null;
 
-  // Hide on certain pages
   const hiddenPaths = ["/auth", "/loading"];
   if (hiddenPaths.includes(location.pathname)) return null;
 
   const items = [
-    { path: "/", icon: <Home className="w-5 h-5" />, label: "Home" },
-    { path: "/input", icon: <Target className="w-5 h-5" />, label: "Validate" },
-    { path: "/dashboard", icon: <BarChart3 className="w-5 h-5" />, label: "Reports" },
+    { path: "/", icon: <Home className="w-4 h-4" />, label: "HOME" },
+    { path: "/input", icon: <Target className="w-4 h-4" />, label: "VALIDATE" },
+    { path: "/dashboard", icon: <BarChart3 className="w-4 h-4" />, label: "ARCHIVE" },
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-card/95 backdrop-blur-xl border-t border-border print:hidden safe-bottom">
-      <div className="flex items-center justify-around py-2 px-4">
-        {items.map((item) => {
+    <nav className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 print:hidden safe-bottom">
+      <div className="luxury-panel rounded-full px-2 py-2 flex items-center gap-1 shadow-[0_20px_60px_-20px_hsl(45_93%_47%_/_0.35)]">
+        {items.map((item, i) => {
           const isActive = location.pathname === item.path;
           return (
             <button
               key={item.path}
               onClick={() => navigate(item.path)}
-              className={`flex flex-col items-center gap-0.5 px-4 py-1.5 rounded-xl transition-colors ${
+              className={`relative flex items-center gap-2 px-4 py-2.5 rounded-full transition-all duration-300 ${
                 isActive
-                  ? "text-primary"
-                  : "text-muted-foreground"
+                  ? "bg-primary text-primary-foreground"
+                  : "text-muted-foreground hover:text-foreground"
               }`}
             >
               {item.icon}
-              <span className="text-[10px] font-medium">{item.label}</span>
+              <span
+                className="font-light tracking-[0.28em]"
+                style={{ fontSize: "0.6rem" }}
+              >
+                {item.label}
+              </span>
             </button>
           );
         })}

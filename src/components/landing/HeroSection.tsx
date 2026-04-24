@@ -1,159 +1,133 @@
 import { useNavigate } from "react-router-dom";
-import { motion, useMotionValue, useTransform } from "framer-motion";
-import { ArrowRight, Sparkles, BarChart3, Shield, Zap } from "lucide-react";
+import { motion } from "framer-motion";
+import { ArrowUpRight, Sparkles } from "lucide-react";
+import CinematicArtifact from "./CinematicArtifact";
 
 const HeroSection = () => {
   const navigate = useNavigate();
-  const mouseX = useMotionValue(0);
-  const mouseY = useMotionValue(0);
-
-  const rotateX = useTransform(mouseY, [-300, 300], [8, -8]);
-  const rotateY = useTransform(mouseX, [-300, 300], [-8, 8]);
-
-  const handleMouseMove = (e: React.MouseEvent) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    mouseX.set(e.clientX - rect.left - rect.width / 2);
-    mouseY.set(e.clientY - rect.top - rect.height / 2);
-  };
 
   return (
-    <section
-      className="relative min-h-screen flex items-center justify-center overflow-hidden"
-      onMouseMove={handleMouseMove}
-    >
-      {/* Radial gradient backdrop */}
-      <div className="absolute inset-0 z-0">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] rounded-full opacity-20"
-          style={{ background: "radial-gradient(circle, hsl(45 93% 47% / 0.12) 0%, transparent 70%)" }} />
-        <div className="absolute top-1/3 right-1/4 w-[400px] h-[400px] rounded-full opacity-15"
-          style={{ background: "radial-gradient(circle, hsl(38 60% 72% / 0.08) 0%, transparent 70%)" }} />
-      </div>
+    <section className="relative min-h-screen flex items-center overflow-hidden depth-stage luxury-noise pt-28 pb-20">
+      <div
+        className="cinematic-orb"
+        style={{ width: 520, height: 520, background: "hsl(45 93% 47% / 0.18)", top: "8%", left: "-10%" }}
+      />
+      <div
+        className="cinematic-orb"
+        style={{ width: 420, height: 420, background: "hsl(38 60% 72% / 0.12)", bottom: "5%", right: "-8%" }}
+      />
 
-      <div className="luxury-container relative z-10 flex flex-col lg:flex-row items-center gap-16 lg:gap-24 py-24">
-        {/* Text */}
-        <div className="flex-1 max-w-2xl">
+      <div className="pointer-events-none absolute inset-x-6 md:inset-x-12 top-24 bottom-12 border border-primary/10 rounded-sm" />
+
+      <div className="luxury-container relative z-10 grid lg:grid-cols-12 gap-12 items-center">
+        <div className="lg:col-span-7 space-y-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="premium-badge mb-10"
+            transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
+            className="flex items-center gap-4 flex-wrap"
           >
-            <Sparkles className="w-3.5 h-3.5" />
-            AI-Powered Business Intelligence
+            <span className="ui-label-sm text-primary/80">EST.&nbsp;&nbsp;2026</span>
+            <span className="h-px w-16 bg-primary/40" />
+            <span className="ui-label-sm text-muted-foreground">DECISION&nbsp;&nbsp;INTELLIGENCE</span>
           </motion.div>
 
           <motion.h1
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.1 }}
-            className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight mb-8"
+            initial={{ opacity: 0, y: 30, clipPath: "inset(0 100% 0 0)" }}
+            animate={{ opacity: 1, y: 0, clipPath: "inset(0 0 0 0)" }}
+            transition={{ duration: 1.3, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
+            className="editorial-display text-[clamp(2.6rem,8vw,6.5rem)] leading-[0.96] text-foreground"
           >
-            Validate Your Business Idea{" "}
-            <span className="gradient-text italic">Before You Build It</span>
+            <span className="block">THE&nbsp;FOUNDER'S</span>
+            <span className="block gold-sheen">PRIVATE&nbsp;COUNSEL</span>
           </motion.h1>
 
           <motion.p
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 14 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.25 }}
-            className="text-lg text-muted-foreground mb-12 leading-relaxed max-w-xl font-sans"
+            transition={{ duration: 1, delay: 0.55 }}
+            className="editorial-italic text-xl md:text-2xl text-muted-foreground max-w-xl leading-relaxed"
           >
-            AI-powered validation that reduces risk and increases success probability. 
-            Get market analysis, competitor insights, and a startup score in minutes.
+            A cinematic boardroom-grade verdict on your idea — delivered in minutes,
+            authored by nine specialist agents, written for you alone.
           </motion.p>
 
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 14 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.4 }}
-            className="flex flex-col sm:flex-row items-start gap-4"
+            transition={{ duration: 1, delay: 0.75 }}
+            className="flex flex-col sm:flex-row gap-4 pt-2"
           >
             <button
               onClick={() => navigate("/input")}
-              className="group relative px-10 py-5 rounded-xl font-semibold font-sans text-primary-foreground bg-primary hover:bg-primary/90 transition-all duration-280 animate-breathing-glow haptic-click"
+              className="group relative inline-flex items-center justify-center gap-3 px-9 py-5 bg-primary text-primary-foreground hover:bg-primary/90 transition-colors haptic-click overflow-hidden"
+              data-cursor="hover"
             >
-              <span className="relative z-10 flex items-center gap-2">
-                Validate My Idea
-                <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
-              </span>
+              <span className="ui-label">Validate&nbsp;My&nbsp;Idea</span>
+              <ArrowUpRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+              <span className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-white/20 to-transparent" />
             </button>
+
             <button
-              onClick={() => navigate("/auth")}
-              className="px-10 py-5 rounded-xl font-medium font-sans text-muted-foreground border border-border hover:border-primary/30 hover:text-foreground transition-all duration-280"
+              onClick={() => navigate("/methodology")}
+              className="inline-flex items-center justify-center gap-3 px-9 py-5 border border-primary/30 hover:border-primary/60 text-foreground transition-colors haptic-click"
+              data-cursor="hover"
             >
-              View Demo Report
+              <Sparkles className="w-4 h-4 text-primary" />
+              <span className="ui-label">The&nbsp;Methodology</span>
             </button>
           </motion.div>
 
-          {/* Stats strip */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 0.6 }}
-            className="flex items-center gap-10 mt-14 text-sm font-sans"
+            transition={{ duration: 1, delay: 1 }}
+            className="flex flex-wrap items-center gap-x-10 gap-y-6 pt-8 mt-2 border-t border-primary/15"
           >
             {[
-              { label: "Ideas Validated", value: "12,847+" },
-              { label: "Success Rate", value: "78%" },
-              { label: "Time to Results", value: "< 3 min" },
+              { v: "12,847", l: "Ideas Validated" },
+              { v: "94%", l: "Accuracy Rate" },
+              { v: "180s", l: "Time to Verdict" },
             ].map((s, i) => (
-              <div key={i} className="flex flex-col">
-                <span className="font-bold text-foreground text-lg">{s.value}</span>
-                <span className="text-muted-foreground text-xs">{s.label}</span>
+              <div key={i} className="space-y-1.5">
+                <div className="editorial-display text-3xl md:text-4xl text-primary tabular-nums">
+                  {s.v}
+                </div>
+                <div className="ui-label-sm text-muted-foreground">{s.l}</div>
               </div>
             ))}
           </motion.div>
         </div>
 
-        {/* 3D Glass Sphere */}
         <motion.div
-          initial={{ opacity: 0, scale: 0.8 }}
+          initial={{ opacity: 0, scale: 0.85 }}
           animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.8, delay: 0.3 }}
-          className="relative flex-shrink-0"
-          style={{ perspective: 1000 }}
+          transition={{ duration: 1.6, delay: 0.4, ease: [0.16, 1, 0.3, 1] }}
+          className="lg:col-span-5 relative h-[440px] sm:h-[520px] lg:h-[620px]"
         >
-          <motion.div
-            style={{ rotateX, rotateY }}
-            className="relative w-64 h-64 lg:w-80 lg:h-80"
-          >
-            {/* Outer glow */}
-            <div className="absolute inset-0 rounded-full animate-glow-pulse"
-              style={{ background: "radial-gradient(circle, hsl(45 93% 47% / 0.08) 0%, transparent 70%)" }} />
-
-            {/* Glass sphere */}
-            <div className="absolute inset-4 rounded-full border border-primary/15 animate-gold-border"
-              style={{
-                background: "radial-gradient(circle at 30% 30%, hsl(45 93% 47% / 0.06), hsl(38 60% 72% / 0.03), transparent 70%)",
-                boxShadow: "inset 0 0 60px hsl(45 93% 47% / 0.04), 0 0 80px -20px hsl(45 93% 47% / 0.1)",
-              }}
-            >
-              <div className="absolute top-6 left-8 w-16 h-10 rounded-full bg-primary/8 blur-xl" />
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="w-16 h-16 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center">
-                  <Zap className="w-8 h-8 text-primary" />
-                </div>
-              </div>
-            </div>
-
-            {/* Orbiting badges */}
-            {[
-              { icon: <BarChart3 className="w-3.5 h-3.5" />, label: "Market", pos: "top-0 right-4" },
-              { icon: <Shield className="w-3.5 h-3.5" />, label: "Risk", pos: "bottom-8 left-0" },
-              { icon: <Sparkles className="w-3.5 h-3.5" />, label: "Score", pos: "top-1/2 -right-4" },
-            ].map((badge, i) => (
-              <motion.div
-                key={i}
-                animate={{ y: [0, -6, 0] }}
-                transition={{ duration: 3, delay: i * 0.8, repeat: Infinity }}
-                className={`absolute ${badge.pos} glass px-3 py-1.5 rounded-full flex items-center gap-1.5 text-xs text-primary font-sans`}
-              >
-                {badge.icon}
-                {badge.label}
-              </motion.div>
-            ))}
-          </motion.div>
+          <div className="absolute inset-0">
+            <CinematicArtifact />
+          </div>
+          <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2">
+            <div className="h-8 w-px bg-primary/30" />
+            <div className="ui-label-sm text-muted-foreground">THE&nbsp;&nbsp;ORACLE</div>
+          </div>
         </motion.div>
+      </div>
+
+      <div className="absolute bottom-0 left-0 right-0 overflow-hidden border-t border-primary/10 bg-background/40 backdrop-blur-sm py-4">
+        <div className="marquee-track">
+          {[0, 1].map((dup) => (
+            <div key={dup} className="flex items-center gap-12 px-6 shrink-0">
+              {["AI · SAAS","FINTECH","MARKETPLACE","DEEP TECH","CLIMATE","CONSUMER","HEALTH","B2B","DEV TOOLS","EDU TECH"].map((t, i) => (
+                <div key={i} className="flex items-center gap-12 shrink-0">
+                  <span className="ui-label-sm text-muted-foreground/70">{t}</span>
+                  <span className="text-primary/40">◆</span>
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
       </div>
     </section>
   );

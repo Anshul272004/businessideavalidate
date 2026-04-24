@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500&family=Raleway:wght@100;200;300;400;500&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -303,6 +303,238 @@
   .ease-luxury {
     transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
     transition-duration: 300ms;
+  }
+
+  /* ============== CHRONOS LUXURY BRAND SYSTEM ============== */
+
+  /* Editorial typography */
+  .editorial-display {
+    font-family: 'Cinzel', 'Cormorant Garamond', Georgia, serif;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    line-height: 1.02;
+    text-transform: uppercase;
+  }
+
+  .editorial-italic {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-style: italic;
+    font-weight: 400;
+    letter-spacing: 0.005em;
+  }
+
+  .ui-label {
+    font-family: 'Raleway', 'DM Sans', sans-serif;
+    font-weight: 300;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    font-size: 0.7rem;
+  }
+
+  .ui-label-sm {
+    font-family: 'Raleway', 'DM Sans', sans-serif;
+    font-weight: 300;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    font-size: 0.625rem;
+  }
+
+  /* Gold dividers / hairlines */
+  .gold-divider {
+    height: 1px;
+    background: linear-gradient(90deg,
+      transparent 0%,
+      hsl(var(--primary) / 0.5) 50%,
+      transparent 100%);
+  }
+
+  .gold-divider-vertical {
+    width: 1px;
+    background: linear-gradient(180deg,
+      transparent 0%,
+      hsl(var(--primary) / 0.4) 50%,
+      transparent 100%);
+  }
+
+  .gold-sheen {
+    background: linear-gradient(110deg,
+      hsl(var(--primary) / 0.85) 0%,
+      hsl(38 70% 80%) 35%,
+      hsl(var(--primary) / 0.95) 55%,
+      hsl(38 60% 65%) 75%,
+      hsl(var(--primary) / 0.85) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    background-size: 200% auto;
+    animation: gold-sheen-shift 8s linear infinite;
+  }
+
+  @keyframes gold-sheen-shift {
+    to { background-position: 200% center; }
+  }
+
+  /* Cinematic depth stage */
+  .depth-stage {
+    background:
+      radial-gradient(ellipse 80% 60% at 50% 0%, hsl(var(--primary) / 0.08), transparent 60%),
+      radial-gradient(ellipse 60% 50% at 50% 100%, hsl(var(--primary) / 0.05), transparent 60%),
+      hsl(var(--background));
+  }
+
+  .luxury-noise::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.04;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    mix-blend-mode: overlay;
+    z-index: 1;
+  }
+
+  /* Luxury panels */
+  .luxury-panel {
+    position: relative;
+    background: linear-gradient(180deg, hsl(240 8% 7% / 0.7), hsl(240 10% 4% / 0.85));
+    border: 1px solid hsl(var(--primary) / 0.12);
+    backdrop-filter: blur(20px);
+  }
+
+  .luxury-panel::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: linear-gradient(180deg,
+      hsl(var(--primary) / 0.18) 0%,
+      transparent 1px,
+      transparent calc(100% - 1px),
+      hsl(var(--primary) / 0.12) 100%);
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+  }
+
+  .luxury-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.45rem 1rem;
+    border: 1px solid hsl(var(--primary) / 0.3);
+    border-radius: 999px;
+    background: hsl(var(--primary) / 0.04);
+    font-family: 'Raleway', sans-serif;
+    font-weight: 300;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    font-size: 0.65rem;
+    color: hsl(var(--primary));
+  }
+
+  /* Brand cursor (desktop) */
+  .brand-cursor-dot,
+  .brand-cursor-ring {
+    position: fixed;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+    z-index: 9999;
+    will-change: transform;
+    transform: translate3d(-100px, -100px, 0);
+  }
+  .brand-cursor-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: hsl(var(--primary));
+    box-shadow: 0 0 12px hsl(var(--primary) / 0.6);
+    transition: transform 80ms linear, opacity 200ms;
+  }
+  .brand-cursor-ring {
+    width: 36px;
+    height: 36px;
+    border: 1px solid hsl(var(--primary) / 0.55);
+    border-radius: 50%;
+    transition: transform 280ms cubic-bezier(0.16, 1, 0.3, 1),
+                width 220ms ease, height 220ms ease,
+                border-color 220ms ease, opacity 200ms;
+    margin-left: -15px;
+    margin-top: -15px;
+  }
+  .brand-cursor-active .brand-cursor-ring {
+    width: 56px;
+    height: 56px;
+    margin-left: -25px;
+    margin-top: -25px;
+    border-color: hsl(var(--primary));
+  }
+  @media (hover: none), (max-width: 768px) {
+    .brand-cursor-dot, .brand-cursor-ring { display: none; }
+  }
+  .brand-cursor-host * { cursor: none !important; }
+
+  /* Preloader */
+  .luxury-preloader {
+    position: fixed;
+    inset: 0;
+    z-index: 99999;
+    background: hsl(var(--background));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+  .luxury-preloader::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at center, hsl(var(--primary) / 0.06), transparent 60%);
+  }
+
+  /* Editorial reveal mask */
+  .reveal-mask {
+    clip-path: inset(0 100% 0 0);
+    animation: reveal-mask-anim 1.2s cubic-bezier(0.7, 0, 0.2, 1) forwards;
+  }
+  @keyframes reveal-mask-anim {
+    to { clip-path: inset(0 0 0 0); }
+  }
+
+  /* Marquee */
+  .marquee-track {
+    display: flex;
+    width: max-content;
+    animation: marquee-scroll 38s linear infinite;
+  }
+  @keyframes marquee-scroll {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+
+  /* Cinematic orb (CSS fallback / accent) */
+  .cinematic-orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(60px);
+    opacity: 0.5;
+    pointer-events: none;
+  }
+
+  /* Monogram */
+  .luxury-monogram {
+    width: 44px;
+    height: 44px;
+    border: 1px solid hsl(var(--primary) / 0.4);
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Cinzel', serif;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    color: hsl(var(--primary));
+    background: linear-gradient(180deg, hsl(var(--primary) / 0.08), transparent);
   }
 }
 
