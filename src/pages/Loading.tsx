@@ -253,35 +253,60 @@ const Loading = () => {
         </p>
         <p className="text-xs text-muted-foreground/60 mb-10">Estimated time: ~30 seconds</p>
 
-        {/* Agent Grid */}
-        <div className="mb-8">
-          <p className="text-xs text-muted-foreground mb-4 uppercase tracking-wider">Specialist Agents</p>
-          <div className="grid grid-cols-4 gap-2 md:gap-3">
+        {/* Agent Grid — glass console */}
+        <GlassPanel padding="md" tilt={false} className="mb-8">
+          <p className="ui-label-sm text-primary/70 mb-4">SPECIALIST&nbsp;COUNCIL</p>
+          <div className="grid grid-cols-3 md:grid-cols-9 gap-2 md:gap-2">
             {analysisAgents.map((agent, index) => {
               const isActive = currentAgent === index;
               const isComplete = completedAgents.includes(index);
               return (
-                <motion.div key={agent.name} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.05 }}
-                  className={`relative p-3 md:p-4 rounded-xl border transition-all duration-300 ${
-                    isComplete ? "bg-success/10 border-success/30" : isActive ? `${agent.bgColor} border-primary/30` : "bg-card/50 border-border/50"
+                <motion.div
+                  key={agent.name}
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.04 }}
+                  className={`relative p-2.5 rounded-lg border transition-all duration-500 ${
+                    isComplete
+                      ? "bg-success/10 border-success/40"
+                      : isActive
+                      ? "bg-primary/10 border-primary/50"
+                      : "bg-background/40 border-primary/10"
                   }`}
+                  style={{
+                    boxShadow: isActive
+                      ? "0 0 24px -6px hsl(45 93% 47% / 0.5)"
+                      : undefined,
+                  }}
                 >
-                  {isActive && !isComplete && (
-                    <motion.div animate={{ opacity: [0.3, 0.8, 0.3] }} transition={{ duration: 1.5, repeat: Infinity }} className={`absolute inset-0 rounded-xl bg-gradient-to-r ${agent.color} opacity-10`} />
-                  )}
-                  <div className="relative">
-                    <div className={`w-8 h-8 mx-auto mb-1.5 rounded-lg flex items-center justify-center ${isComplete ? "bg-success/20 text-success" : `${agent.bgColor} ${agent.textColor}`}`}>
-                      {isComplete ? <CheckCircle2 className="w-4 h-4" /> : agent.icon}
-                    </div>
-                    <p className={`text-[10px] md:text-xs font-medium leading-tight ${isComplete ? "text-success" : isActive ? agent.textColor : "text-muted-foreground/70"}`}>
-                      {agent.name}
-                    </p>
+                  <div
+                    className={`w-7 h-7 mx-auto mb-1.5 rounded-md flex items-center justify-center ${
+                      isComplete
+                        ? "bg-success/20 text-success"
+                        : isActive
+                        ? "bg-primary/20 text-primary"
+                        : "bg-primary/5 text-muted-foreground"
+                    }`}
+                  >
+                    {isComplete ? <CheckCircle2 className="w-3.5 h-3.5" /> : agent.icon}
                   </div>
+                  <p
+                    className={`text-[9px] leading-tight text-center tracking-wider ${
+                      isComplete
+                        ? "text-success"
+                        : isActive
+                        ? "text-primary"
+                        : "text-muted-foreground/70"
+                    }`}
+                    style={{ fontFamily: "Raleway, sans-serif" }}
+                  >
+                    {agent.name.toUpperCase()}
+                  </p>
                 </motion.div>
               );
             })}
           </div>
-        </div>
+        </GlassPanel>
 
         {/* Current Agent Description */}
         <AnimatePresence mode="wait">
