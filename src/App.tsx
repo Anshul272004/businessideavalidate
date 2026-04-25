@@ -9,6 +9,7 @@ import ProtectedRoute from "@/components/ProtectedRoute";
 import PageTransition from "@/components/shared/PageTransition";
 import LuxuryCursor from "@/components/brand/LuxuryCursor";
 import LuxuryPreloader from "@/components/brand/LuxuryPreloader";
+import PrismaticBackdrop from "@/components/brand/PrismaticBackdrop";
 import Landing from "./pages/Landing";
 import Auth from "./pages/Auth";
 import Input from "./pages/Input";
@@ -61,6 +62,7 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
+          <PrismaticBackdrop />
           <LuxuryPreloader />
           <LuxuryCursor />
           <AnimatedRoutes />
