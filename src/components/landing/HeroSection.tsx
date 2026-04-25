@@ -21,11 +21,13 @@ const HeroSection = () => {
     mx.set(0);
     my.set(0);
   };
-  // sentinel — original const was here
-  const _navigate = navigate;
 
   return (
-    <section className="relative min-h-screen flex items-center overflow-hidden depth-stage luxury-noise pt-28 pb-20">
+    <section
+      onMouseMove={handleHeroMove}
+      onMouseLeave={handleHeroLeave}
+      className="relative min-h-screen flex items-center overflow-hidden depth-stage luxury-noise pt-28 pb-20"
+    >
       <div
         className="cinematic-orb"
         style={{ width: 520, height: 520, background: "hsl(45 93% 47% / 0.18)", top: "8%", left: "-10%" }}
