@@ -162,8 +162,6 @@ const Loading = () => {
     return () => { clearInterval(progressInterval); clearInterval(insightInterval); };
   }, [navigate]);
 
-  const progressMarkers = [0, 25, 50, 75, 100];
-
   return (
     <div className="min-h-screen bg-background flex items-center justify-center overflow-hidden relative">
       <div className="luxury-container text-center relative z-10 max-w-4xl mx-auto px-4 py-12">
