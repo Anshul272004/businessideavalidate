@@ -1,10 +1,28 @@
 import { useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
+import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import { ArrowUpRight, Sparkles } from "lucide-react";
 import CinematicArtifact from "./CinematicArtifact";
 
 const HeroSection = () => {
   const navigate = useNavigate();
+  const mx = useMotionValue(0);
+  const my = useMotionValue(0);
+  const sx = useSpring(mx, { stiffness: 60, damping: 14 });
+  const sy = useSpring(my, { stiffness: 60, damping: 14 });
+  const rotateX = useTransform(sy, [-0.5, 0.5], [8, -8]);
+  const rotateY = useTransform(sx, [-0.5, 0.5], [-12, 12]);
+
+  const handleHeroMove = (e: React.MouseEvent<HTMLElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    mx.set((e.clientX - rect.left) / rect.width - 0.5);
+    my.set((e.clientY - rect.top) / rect.height - 0.5);
+  };
+  const handleHeroLeave = () => {
+    mx.set(0);
+    my.set(0);
+  };
+  // sentinel — original const was here
+  const _navigate = navigate;
 
   return (
     <section className="relative min-h-screen flex items-center overflow-hidden depth-stage luxury-noise pt-28 pb-20">
