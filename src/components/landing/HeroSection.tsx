@@ -1,13 +1,33 @@
 import { useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
+import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import { ArrowUpRight, Sparkles } from "lucide-react";
 import CinematicArtifact from "./CinematicArtifact";
 
 const HeroSection = () => {
   const navigate = useNavigate();
+  const mx = useMotionValue(0);
+  const my = useMotionValue(0);
+  const sx = useSpring(mx, { stiffness: 60, damping: 14 });
+  const sy = useSpring(my, { stiffness: 60, damping: 14 });
+  const rotateX = useTransform(sy, [-0.5, 0.5], [8, -8]);
+  const rotateY = useTransform(sx, [-0.5, 0.5], [-12, 12]);
+
+  const handleHeroMove = (e: React.MouseEvent<HTMLElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    mx.set((e.clientX - rect.left) / rect.width - 0.5);
+    my.set((e.clientY - rect.top) / rect.height - 0.5);
+  };
+  const handleHeroLeave = () => {
+    mx.set(0);
+    my.set(0);
+  };
 
   return (
-    <section className="relative min-h-screen flex items-center overflow-hidden depth-stage luxury-noise pt-28 pb-20">
+    <section
+      onMouseMove={handleHeroMove}
+      onMouseLeave={handleHeroLeave}
+      className="relative min-h-screen flex items-center overflow-hidden depth-stage luxury-noise pt-28 pb-20"
+    >
       <div
         className="cinematic-orb"
         style={{ width: 520, height: 520, background: "hsl(45 93% 47% / 0.18)", top: "8%", left: "-10%" }}
@@ -103,6 +123,7 @@ const HeroSection = () => {
           initial={{ opacity: 0, scale: 0.85 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 1.6, delay: 0.4, ease: [0.16, 1, 0.3, 1] }}
+          style={{ rotateX, rotateY, transformPerspective: 1400 }}
           className="lg:col-span-5 relative h-[440px] sm:h-[520px] lg:h-[620px]"
         >
           <div className="absolute inset-0">

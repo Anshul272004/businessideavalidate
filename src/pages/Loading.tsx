@@ -18,6 +18,8 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { countries } from "@/data/countries";
+import NeuralCore from "@/components/brand/NeuralCore";
+import GlassPanel from "@/components/brand/GlassPanel";
 
 const analysisAgents = [
   { name: "Dopamine Detective", icon: <Brain className="w-5 h-5" />, description: "Scanning demand psychology and buying motivation", color: "from-purple-500 to-pink-500", bgColor: "bg-purple-500/20", textColor: "text-purple-400" },
@@ -160,89 +162,149 @@ const Loading = () => {
     return () => { clearInterval(progressInterval); clearInterval(insightInterval); };
   }, [navigate]);
 
-  const progressMarkers = [0, 25, 50, 75, 100];
-
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center overflow-hidden">
-      <div className="fixed inset-0 pointer-events-none">
-        <motion.div 
-          animate={{ scale: [1, 1.2, 1], opacity: [0.08, 0.15, 0.08] }}
-          transition={{ duration: 4, repeat: Infinity }}
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-primary/10 rounded-full blur-[150px]" 
-        />
-      </div>
-
-      <div className="luxury-container text-center relative z-10 max-w-4xl mx-auto px-4">
-        {/* Brain Animation */}
-        <motion.div initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="relative mb-8">
-          <div className="w-24 h-24 mx-auto relative">
-            <motion.div animate={{ scale: [1, 1.5], opacity: [0.3, 0] }} transition={{ duration: 2, repeat: Infinity }} className="absolute inset-0 rounded-full border-2 border-primary" />
-            <motion.div animate={{ scale: [1, 1.3], opacity: [0.5, 0] }} transition={{ duration: 2, repeat: Infinity, delay: 0.5 }} className="absolute inset-0 rounded-full border border-primary" />
-            <motion.div animate={{ rotate: [0, 360] }} transition={{ duration: 20, repeat: Infinity, ease: "linear" }} className="absolute inset-2 rounded-full bg-gradient-to-br from-primary/30 to-transparent" />
-            <div className="relative w-24 h-24 rounded-full bg-card border border-primary/50 flex items-center justify-center">
-              <motion.div animate={{ scale: [1, 1.1, 1] }} transition={{ duration: 2, repeat: Infinity }}>
-                <Brain className="w-10 h-10 text-primary" />
-              </motion.div>
-            </div>
-          </div>
+    <div className="min-h-screen bg-background flex items-center justify-center overflow-hidden relative">
+      <div className="luxury-container text-center relative z-10 max-w-4xl mx-auto px-4 py-12">
+        {/* Heading */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+          className="mb-8"
+        >
+          <p className="ui-label text-primary/70 mb-3">ANALYSIS&nbsp;CHAMBER</p>
+          <h1 className="editorial-display text-2xl md:text-4xl tracking-[0.06em]">
+            CONSULTING&nbsp;<span className="gold-sheen">THE&nbsp;COUNCIL</span>
+          </h1>
         </motion.div>
 
-        {/* Progress Number with spring */}
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mb-2">
-          <motion.span 
-            key={Math.floor(progress)}
-            initial={{ scale: 1.1 }}
-            animate={{ scale: 1 }}
-            transition={{ type: "spring", stiffness: 300, damping: 20 }}
-            className="text-5xl font-bold font-mono gradient-text inline-block"
+        {/* Neural Core + Gold progress ring */}
+        <div className="relative w-[280px] h-[280px] md:w-[360px] md:h-[360px] mx-auto mb-8">
+          <div className="absolute inset-0">
+            <NeuralCore />
+          </div>
+
+          {/* Outer gold progress ring */}
+          <svg
+            className="absolute inset-0 w-full h-full -rotate-90 pointer-events-none"
+            viewBox="0 0 200 200"
           >
-            {Math.floor(progress)}%
-          </motion.span>
-        </motion.div>
-        <p className="text-sm text-muted-foreground mb-2">9-Agent Multi-Dimensional Analysis</p>
-        <p className="text-xs text-muted-foreground/60 mb-6">Estimated time: ~30 seconds</p>
+            <circle
+              cx="100"
+              cy="100"
+              r="96"
+              fill="none"
+              stroke="hsl(45 93% 47% / 0.12)"
+              strokeWidth="1"
+            />
+            <circle
+              cx="100"
+              cy="100"
+              r="96"
+              fill="none"
+              stroke="hsl(45 93% 47%)"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              strokeDasharray={`${(progress / 100) * 603} 603`}
+              style={{
+                filter: "drop-shadow(0 0 6px hsl(45 93% 47% / 0.6))",
+                transition: "stroke-dasharray 300ms ease-out",
+              }}
+            />
+            {/* Tick marks */}
+            {Array.from({ length: 60 }).map((_, i) => {
+              const angle = (i / 60) * 360;
+              const isMajor = i % 5 === 0;
+              return (
+                <line
+                  key={i}
+                  x1="100"
+                  y1="2"
+                  x2="100"
+                  y2={isMajor ? 8 : 5}
+                  stroke="hsl(45 93% 47%)"
+                  strokeOpacity={isMajor ? 0.5 : 0.2}
+                  strokeWidth="0.5"
+                  transform={`rotate(${angle} 100 100)`}
+                />
+              );
+            })}
+          </svg>
 
-        {/* Progress Bar */}
-        <div className="max-w-lg mx-auto mb-10">
-          <div className="relative h-3 bg-card rounded-full overflow-hidden border border-border">
-            <motion.div className="h-full rounded-full bg-gradient-to-r from-primary via-primary to-success" initial={{ width: 0 }} animate={{ width: `${progress}%` }} transition={{ duration: 0.3 }} />
-          </div>
-          <div className="flex justify-between mt-2">
-            {progressMarkers.map(marker => (
-              <span key={marker} className={`text-xs font-mono ${progress >= marker ? 'text-primary' : 'text-muted-foreground/50'}`}>{marker}%</span>
-            ))}
+          {/* Center floating progress number */}
+          <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+            <motion.span
+              key={Math.floor(progress)}
+              initial={{ scale: 1.08, opacity: 0.8 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ type: "spring", stiffness: 280, damping: 22 }}
+              className="editorial-display text-4xl md:text-5xl gold-sheen tabular-nums leading-none"
+            >
+              {Math.floor(progress)}<span className="text-2xl text-muted-foreground">%</span>
+            </motion.span>
+            <p className="ui-label-sm text-muted-foreground mt-3">DECISION&nbsp;INTELLIGENCE</p>
           </div>
         </div>
 
-        {/* Agent Grid */}
-        <div className="mb-8">
-          <p className="text-xs text-muted-foreground mb-4 uppercase tracking-wider">Specialist Agents</p>
-          <div className="grid grid-cols-4 gap-2 md:gap-3">
+        <p className="editorial-italic text-muted-foreground mb-2">
+          Nine specialists in counsel — consulting your dossier.
+        </p>
+        <p className="text-xs text-muted-foreground/60 mb-10">Estimated time: ~30 seconds</p>
+
+        {/* Agent Grid — glass console */}
+        <GlassPanel padding="md" tilt={false} className="mb-8">
+          <p className="ui-label-sm text-primary/70 mb-4">SPECIALIST&nbsp;COUNCIL</p>
+          <div className="grid grid-cols-3 md:grid-cols-9 gap-2 md:gap-2">
             {analysisAgents.map((agent, index) => {
               const isActive = currentAgent === index;
               const isComplete = completedAgents.includes(index);
               return (
-                <motion.div key={agent.name} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.05 }}
-                  className={`relative p-3 md:p-4 rounded-xl border transition-all duration-300 ${
-                    isComplete ? "bg-success/10 border-success/30" : isActive ? `${agent.bgColor} border-primary/30` : "bg-card/50 border-border/50"
+                <motion.div
+                  key={agent.name}
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.04 }}
+                  className={`relative p-2.5 rounded-lg border transition-all duration-500 ${
+                    isComplete
+                      ? "bg-success/10 border-success/40"
+                      : isActive
+                      ? "bg-primary/10 border-primary/50"
+                      : "bg-background/40 border-primary/10"
                   }`}
+                  style={{
+                    boxShadow: isActive
+                      ? "0 0 24px -6px hsl(45 93% 47% / 0.5)"
+                      : undefined,
+                  }}
                 >
-                  {isActive && !isComplete && (
-                    <motion.div animate={{ opacity: [0.3, 0.8, 0.3] }} transition={{ duration: 1.5, repeat: Infinity }} className={`absolute inset-0 rounded-xl bg-gradient-to-r ${agent.color} opacity-10`} />
-                  )}
-                  <div className="relative">
-                    <div className={`w-8 h-8 mx-auto mb-1.5 rounded-lg flex items-center justify-center ${isComplete ? "bg-success/20 text-success" : `${agent.bgColor} ${agent.textColor}`}`}>
-                      {isComplete ? <CheckCircle2 className="w-4 h-4" /> : agent.icon}
-                    </div>
-                    <p className={`text-[10px] md:text-xs font-medium leading-tight ${isComplete ? "text-success" : isActive ? agent.textColor : "text-muted-foreground/70"}`}>
-                      {agent.name}
-                    </p>
+                  <div
+                    className={`w-7 h-7 mx-auto mb-1.5 rounded-md flex items-center justify-center ${
+                      isComplete
+                        ? "bg-success/20 text-success"
+                        : isActive
+                        ? "bg-primary/20 text-primary"
+                        : "bg-primary/5 text-muted-foreground"
+                    }`}
+                  >
+                    {isComplete ? <CheckCircle2 className="w-3.5 h-3.5" /> : agent.icon}
                   </div>
+                  <p
+                    className={`text-[9px] leading-tight text-center tracking-wider ${
+                      isComplete
+                        ? "text-success"
+                        : isActive
+                        ? "text-primary"
+                        : "text-muted-foreground/70"
+                    }`}
+                    style={{ fontFamily: "Raleway, sans-serif" }}
+                  >
+                    {agent.name.toUpperCase()}
+                  </p>
                 </motion.div>
               );
             })}
           </div>
-        </div>
+        </GlassPanel>
 
         {/* Current Agent Description */}
         <AnimatePresence mode="wait">
