@@ -18,6 +18,8 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { countries } from "@/data/countries";
+import NeuralCore from "@/components/brand/NeuralCore";
+import GlassPanel from "@/components/brand/GlassPanel";
 
 const analysisAgents = [
   { name: "Dopamine Detective", icon: <Brain className="w-5 h-5" />, description: "Scanning demand psychology and buying motivation", color: "from-purple-500 to-pink-500", bgColor: "bg-purple-500/20", textColor: "text-purple-400" },
